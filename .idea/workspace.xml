@@ -1,0 +1,1399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/isz/houseContract.py" line="145" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4c62c90b-3b85-41a0-87e1-49bd70dfb2c8" name="Default" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/AutoTest_api$sqltest2.coverage" NAME="sqltest2 Coverage Results" MODIFIED="1517454505895" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$decorationNew.coverage" NAME="decorationNew Coverage Results" MODIFIED="1524555199015" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$xml.coverage" NAME="xml Coverage Results" MODIFIED="1524579802011" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$repair.coverage" NAME="repair Coverage Results" MODIFIED="1527509388297" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isz" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$datetimes.coverage" NAME="datetimes Coverage Results" MODIFIED="1518076473565" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$apartmentContract.coverage" NAME="apartmentContract Coverage Results" MODIFIED="1527761889546" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isz" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$auditHouseContract.coverage" NAME="auditHouseContract Coverage Results" MODIFIED="1522820695195" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$interface_wfl.coverage" NAME="interface_wfl Coverage Results" MODIFIED="1524293981505" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$threadTest.coverage" NAME="threadTest Coverage Results" MODIFIED="1527777667366" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$infoClass.coverage" NAME="infoClass Coverage Results" MODIFIED="1527845924028" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isz" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$apartment.coverage" NAME="apartment Coverage Results" MODIFIED="1527313547115" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isz" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$decoration.coverage" NAME="decoration Coverage Results" MODIFIED="1527773087152" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isz" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$worldToPhoto.coverage" NAME="worldToPhoto Coverage Results" MODIFIED="1524557061286" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$houseApi.coverage" NAME="houseApi Coverage Results" MODIFIED="1524646418929" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$ui_test.coverage" NAME="ui_test Coverage Results" MODIFIED="1515496313621" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$dataSend.coverage" NAME="dataSend Coverage Results" MODIFIED="1517467136387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Desktop" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$createHouseContract__1_.coverage" NAME="createHouseContract (1) Coverage Results" MODIFIED="1518077388090" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$TK.coverage" NAME="TK Coverage Results" MODIFIED="1513314907226" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../untitled1" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$downloadflash.coverage" NAME="downloadflash Coverage Results" MODIFIED="1519971220873" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="E:/Wfl/WeChat Files/Adaver/Files" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1527754521523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$test.coverage" NAME="test Coverage Results" MODIFIED="1528277485333" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$123__1_.coverage" NAME="123 (1) Coverage Results" MODIFIED="1513314973532" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../untitled1" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$auditHouseContract__1_.coverage" NAME="auditHouseContract (1) Coverage Results" MODIFIED="1522828510561" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$TKtest.coverage" NAME="TKtest Coverage Results" MODIFIED="1513314915018" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../untitled1" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$test_api.coverage" NAME="test_api Coverage Results" MODIFIED="1513736240056" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$createHouseContract.coverage" NAME="createHouseContract Coverage Results" MODIFIED="1527792034411" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$sqlbase.coverage" NAME="sqlbase Coverage Results" MODIFIED="1526561648461" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$housingAuthorityPush.coverage" NAME="housingAuthorityPush Coverage Results" MODIFIED="1528161560560" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$123.coverage" NAME="123 Coverage Results" MODIFIED="1513321094077" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$testClass.coverage" NAME="testClass Coverage Results" MODIFIED="1524712702514" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$createHouse.coverage" NAME="createHouse Coverage Results" MODIFIED="1524633631653" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$createApartmentContract.coverage" NAME="createApartmentContract Coverage Results" MODIFIED="1528273989612" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$pushtohousing.coverage" NAME="pushtohousing Coverage Results" MODIFIED="1524824606352" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$request_test.coverage" NAME="request_test Coverage Results" MODIFIED="1515133311450" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$contractBase.coverage" NAME="contractBase Coverage Results" MODIFIED="1524569495420" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/api" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$test__1_.coverage" NAME="test (1) Coverage Results" MODIFIED="1517910613839" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$houseContract.coverage" NAME="houseContract Coverage Results" MODIFIED="1527847066389" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/isz" />
+    <SUITE FILE_PATH="coverage/AutoTest_api$dict.coverage" NAME="dict Coverage Results" MODIFIED="1527235611741" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_TABLE_DETAILS" value="true" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <expand>
+      <path>
+        <item name="" type="eadb38e5:DatabaseStructure$Root" />
+        <item name="szz" type="e3449647:DbNodeDescriptor" />
+      </path>
+      <path>
+        <item name="" type="eadb38e5:DatabaseStructure$Root" />
+        <item name="szz" type="e3449647:DbNodeDescriptor" />
+        <item name="isz_erp_npd" type="e3449647:DbNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="AutoTest_api" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="createHouseContract.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/script/createHouseContract.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="132">
+              <caret line="6" column="26" lean-forward="false" selection-start-line="6" selection-start-column="26" selection-end-line="6" selection-end-column="26" />
+              <folding>
+                <marker date="1527788832291" expanded="true" signature="1682:2268" ph="SELECT a.hou... house" />
+                <marker date="1527788832291" expanded="true" signature="1825:1883" ph="SELECT * FRO... house_contract" />
+                <marker date="1527788832291" expanded="true" signature="1917:2003" ph="select * fro... residential_building" />
+                <marker date="1527788832291" expanded="true" signature="2036:2103" ph="select * fro... residential" />
+                <marker date="1527788832291" expanded="true" signature="2135:2223" ph="select * fro... house_rent" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="housingAuthorityPush.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/script/housingAuthorityPush.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="682">
+              <caret line="34" column="67" lean-forward="false" selection-start-line="34" selection-start-column="67" selection-end-line="34" selection-end-column="67" />
+              <folding>
+                <element signature="e#246#274#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="house.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/isz/house.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3366">
+              <caret line="364" column="32" lean-forward="false" selection-start-line="364" selection-start-column="32" selection-end-line="364" selection-end-column="32" />
+              <folding>
+                <element signature="e#706#1178#1" expanded="false" />
+                <element signature="e#1270#1466#0" expanded="false" />
+                <element signature="e#1856#1868#0" expanded="false" />
+                <element signature="e#3088#4200#0" expanded="false" />
+                <element signature="e#3476#4178#0" expanded="false" />
+                <element signature="e#3477#3835#0" expanded="false" />
+                <element signature="e#3837#4177#0" expanded="false" />
+                <element signature="e#4492#10460#0" expanded="false" />
+                <element signature="e#4493#5501#0" expanded="false" />
+                <element signature="e#4526#5212#0" expanded="false" />
+                <element signature="e#4527#4869#0" expanded="false" />
+                <element signature="e#4871#5211#0" expanded="false" />
+                <element signature="e#5503#6507#0" expanded="false" />
+                <element signature="e#5536#6222#0" expanded="false" />
+                <element signature="e#5537#5879#0" expanded="false" />
+                <element signature="e#5881#6221#0" expanded="false" />
+                <element signature="e#6509#7495#0" expanded="false" />
+                <element signature="e#6542#7228#0" expanded="false" />
+                <element signature="e#6543#6885#0" expanded="false" />
+                <element signature="e#6887#7227#0" expanded="false" />
+                <element signature="e#7497#8483#0" expanded="false" />
+                <element signature="e#7530#8216#0" expanded="false" />
+                <element signature="e#7531#7873#0" expanded="false" />
+                <element signature="e#7875#8215#0" expanded="false" />
+                <element signature="e#8485#9473#0" expanded="false" />
+                <element signature="e#8518#9204#0" expanded="false" />
+                <element signature="e#8519#8861#0" expanded="false" />
+                <element signature="e#8863#9203#0" expanded="false" />
+                <element signature="e#9475#10459#0" expanded="false" />
+                <element signature="e#9508#10194#0" expanded="false" />
+                <element signature="e#9509#9851#0" expanded="false" />
+                <element signature="e#9853#10193#0" expanded="false" />
+                <element signature="e#10746#11594#0" expanded="false" />
+                <element signature="e#10874#11118#0" expanded="false" />
+                <element signature="e#10875#11117#0" expanded="false" />
+                <element signature="e#11195#11464#0" expanded="false" />
+                <element signature="e#11632#13133#0" expanded="false" />
+                <element signature="e#12052#12734#0" expanded="false" />
+                <element signature="e#12053#12391#0" expanded="false" />
+                <element signature="e#12393#12733#0" expanded="false" />
+                <element signature="e#14238#14828#0" expanded="false" />
+                <element signature="e#14239#14535#0" expanded="false" />
+                <element signature="e#14537#14827#0" expanded="false" />
+                <marker date="1527788682212" expanded="false" signature="18308:18440" ph="select contr... house_contract" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="houseContract.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/isz/houseContract.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="660">
+              <caret line="80" column="0" lean-forward="false" selection-start-line="80" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
+              <folding>
+                <element signature="e#467#507#1" expanded="false" />
+                <element signature="e#582#913#0" expanded="false" />
+                <element signature="e#1516#2957#0" expanded="false" />
+                <element signature="e#1566#1836#0" expanded="false" />
+                <element signature="e#1572#1755#0" expanded="false" />
+                <element signature="e#1846#2002#0" expanded="false" />
+                <element signature="e#2712#2927#0" expanded="false" />
+                <element signature="e#3012#3317#0" expanded="false" />
+                <element signature="e#3317#3327#0" expanded="false" />
+                <element signature="e#3615#3809#0" expanded="false" />
+                <element signature="e#3858#4816#0" expanded="false" />
+                <element signature="e#4056#4236#0" expanded="false" />
+                <element signature="e#4353#4727#0" expanded="false" />
+                <element signature="e#4360#4459#0" expanded="false" />
+                <element signature="e#4559#4637#0" expanded="false" />
+                <element signature="e#4875#7435#0" expanded="false" />
+                <element signature="e#5089#6456#0" expanded="false" />
+                <element signature="e#5336#5695#0" expanded="false" />
+                <element signature="e#5367#5489#0" expanded="false" />
+                <element signature="e#5720#5949#0" expanded="false" />
+                <element signature="e#6230#6327#0" expanded="false" />
+                <element signature="e#6362#6456#0" expanded="false" />
+                <element signature="e#6534#7435#0" expanded="false" />
+                <element signature="e#6662#6979#0" expanded="false" />
+                <element signature="e#6711#6843#0" expanded="false" />
+                <element signature="e#7113#7435#0" expanded="false" />
+                <element signature="e#7162#7292#0" expanded="false" />
+                <element signature="e#7713#17831#0" expanded="false" />
+                <element signature="e#7767#8014#0" expanded="false" />
+                <element signature="e#8347#8539#0" expanded="false" />
+                <element signature="e#8566#8627#0" expanded="false" />
+                <element signature="e#9808#10656#0" expanded="false" />
+                <element signature="e#9936#10180#0" expanded="false" />
+                <element signature="e#9937#10179#0" expanded="false" />
+                <element signature="e#10257#10526#0" expanded="false" />
+                <element signature="e#10693#11876#0" expanded="false" />
+                <element signature="e#11117#11444#0" expanded="false" />
+                <element signature="e#11118#11443#0" expanded="false" />
+                <element signature="e#11919#12502#0" expanded="false" />
+                <element signature="e#12617#15926#0" expanded="false" />
+                <element signature="e#12981#13278#0" expanded="false" />
+                <element signature="e#12982#13277#0" expanded="false" />
+                <element signature="e#15964#16619#0" expanded="false" />
+                <element signature="e#16717#16924#0" expanded="false" />
+                <element signature="e#17027#17309#0" expanded="false" />
+                <element signature="e#17397#17825#0" expanded="false" />
+                <element signature="e#17882#18063#0" expanded="false" />
+                <element signature="e#18105#19698#0" expanded="false" />
+                <element signature="e#18194#19560#0" expanded="false" />
+                <element signature="e#18609#18931#0" expanded="false" />
+                <element signature="e#18610#18930#0" expanded="false" />
+                <element signature="e#19793#20564#0" expanded="false" />
+                <element signature="e#19828#20137#0" expanded="false" />
+                <element signature="e#19941#20072#0" expanded="false" />
+                <element signature="e#20199#20289#0" expanded="false" />
+                <element signature="e#20350#20440#0" expanded="false" />
+                <element signature="e#20664#20712#0" expanded="false" />
+                <marker date="1527847066366" expanded="false" signature="625:714" ph="select missi... house_contract" />
+                <marker date="1527847066366" expanded="true" signature="989:1134" ph="select landl... house_contract_landlord" />
+                <marker date="1527847066366" expanded="false" signature="1573:1754" ph="select a.img... house_contract_attachment" />
+                <marker date="1527847066366" expanded="false" signature="3042:3126" ph="select missi... house_contract" />
+                <marker date="1527847066366" expanded="false" signature="3401:3477" ph="select audit... house_contract" />
+                <marker date="1527847066366" expanded="false" signature="4057:4234" ph="select payab... house_contract_payable" />
+                <marker date="1527847066366" expanded="false" signature="17450:17612" ph="select contr... house_contract" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="createApartmentContract.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/script/createApartmentContract.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="418">
+              <caret line="26" column="134" lean-forward="false" selection-start-line="26" selection-start-column="134" selection-end-line="26" selection-end-column="134" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="733">
+              <caret line="122" column="18" lean-forward="false" selection-start-line="122" selection-start-column="18" selection-end-line="122" selection-end-column="18" />
+              <folding>
+                <marker date="1528277609154" expanded="true" signature="6145:6498" ph="select DISTI... apartment_contract_receivable" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="apartment.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/isz/apartment.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1584">
+              <caret line="237" column="51" lean-forward="false" selection-start-line="237" selection-start-column="51" selection-end-line="237" selection-end-column="51" />
+              <folding>
+                <element signature="e#730#3438#0" expanded="false" />
+                <element signature="e#3504#3719#0" expanded="false" />
+                <element signature="e#3786#3958#0" expanded="false" />
+                <element signature="e#4018#4385#0" expanded="false" />
+                <element signature="e#4441#4677#0" expanded="false" />
+                <element signature="e#4734#4971#0" expanded="false" />
+                <element signature="e#5024#7267#0" expanded="false" />
+                <element signature="e#7309#8198#0" expanded="false" />
+                <element signature="e#8240#8266#0" expanded="false" />
+                <element signature="e#10882#11539#0" expanded="false" />
+                <element signature="e#11563#12581#0" expanded="false" />
+                <marker date="1528261894698" expanded="true" signature="525:574" ph="select room_... house_room" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="customer.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/isz/customer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="88">
+              <caret line="8" column="4" lean-forward="false" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
+              <folding>
+                <element signature="e#596#4014#0" expanded="false" />
+                <marker date="1528186755219" expanded="true" signature="1395:1486" ph="select dep_i... sys_user" />
+                <marker date="1528186755219" expanded="true" signature="1539:1631" ph="select user_... sys_user" />
+                <marker date="1528186755219" expanded="true" signature="4082:4168" ph="select custo... customer" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="conf.ini" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common/conf.ini">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="220">
+              <caret line="10" column="9" lean-forward="false" selection-start-line="10" selection-start-column="9" selection-end-line="10" selection-end-column="9" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="apartmentContract.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/isz/apartmentContract.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="572">
+              <caret line="357" column="23" lean-forward="false" selection-start-line="357" selection-start-column="23" selection-end-line="357" selection-end-column="23" />
+              <folding>
+                <element signature="e#22#33#0" expanded="true" />
+                <element signature="e#542#1327#0" expanded="false" />
+                <element signature="e#658#1139#0" expanded="false" />
+                <element signature="e#1368#2659#0" expanded="false" />
+                <element signature="e#2785#6167#0" expanded="false" />
+                <element signature="e#3508#4853#0" expanded="false" />
+                <element signature="e#4973#5078#0" expanded="false" />
+                <element signature="e#5158#5633#0" expanded="false" />
+                <element signature="e#5748#5972#0" expanded="false" />
+                <element signature="e#6229#13598#0" expanded="false" />
+                <element signature="e#6438#11380#0" expanded="false" />
+                <element signature="e#13634#13888#0" expanded="false" />
+                <element signature="e#13922#16400#0" expanded="false" />
+                <element signature="e#14202#15505#0" expanded="false" />
+                <element signature="e#16489#18967#0" expanded="false" />
+                <element signature="e#16769#18072#0" expanded="false" />
+                <element signature="e#16803#17357#0" expanded="false" />
+                <marker date="1527843813334" expanded="true" signature="1575:1688" ph="select recei... apartment_contract_receivable" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>isz_base/LoginAuthController/checkLoginAuth.action</find>
+      <find>changeProgress/placeOrder</find>
+      <find>consol</find>
+      <find>03-29</find>
+      <find>contractPhotos</find>
+      <find>time</find>
+      <find>list</find>
+      <find>self.apartment_id</find>
+      <find>contract_num</find>
+      <find>checkVerificationCode.action</find>
+      <find>info</find>
+      <find>量房完成</find>
+      <find>de</find>
+      <find>deposit</find>
+      <find>set_conf</find>
+      <find>ApartmentContract</find>
+      <find>ApartmentInfo</find>
+      <find>houseContractInfo</find>
+      <find>houseImg</find>
+      <find>rent_price</find>
+      <find>query</find>
+      <find>audit_status</find>
+      <find>V_ONE</find>
+      <find>saveHouseContract</find>
+      <find>housekeep_mange_dep_user</find>
+      <find>load</find>
+      <find>houseInfo</find>
+      <find>area_code</find>
+      <find>house_contract_dict</find>
+      <find>endInfo</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>13600000001</replace>
+      <replace>null</replace>
+      <replace>'</replace>
+      <replace>isz_decoration</replace>
+      <replace>time.strftime('%Y-%m-%d %H:%M:%S')</replace>
+      <replace>self.project_id</replace>
+      <replace>isz_decoration_test.</replace>
+      <replace>self.getFileTypeId</replace>
+      <replace>__getFileTypeId</replace>
+      <replace>getFileTypeId</replace>
+      <replace>sname</replace>
+      <replace>None</replace>
+      <replace>info</replace>
+      <replace>houseInfo</replace>
+      <replace>house_info</replace>
+      <replace>apartment_info</replace>
+    </replaceStrings>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/script/createHouse.py" />
+        <option value="$PROJECT_DIR$/common/contractBase.py" />
+        <option value="$PROJECT_DIR$/test/__init__.py" />
+        <option value="$PROJECT_DIR$/script/decorationNew.py" />
+        <option value="$PROJECT_DIR$/test/worldToPhoto.py" />
+        <option value="$PROJECT_DIR$/test/0.0" />
+        <option value="$PROJECT_DIR$/test/sqlconfig" />
+        <option value="$PROJECT_DIR$/api/apartmentContractApi.py" />
+        <option value="$PROJECT_DIR$/api/houseApi.py" />
+        <option value="$PROJECT_DIR$/api/finance.py" />
+        <option value="$PROJECT_DIR$/test/testClass.py" />
+        <option value="$PROJECT_DIR$/test/xml.py" />
+        <option value="$APPLICATION_CONFIG_DIR$/consoles/db/9887e43f-5605-4f54-8efd-930d5a086182/console_1.sql" />
+        <option value="C:/Python27/Lib/site-packages/selenium/webdriver/firefox/firefox_profile.py" />
+        <option value="$PROJECT_DIR$/test/pushtohousing.py" />
+        <option value="$PROJECT_DIR$/test/housingAuthorityPush.py" />
+        <option value="$PROJECT_DIR$/api/contractBase.py" />
+        <option value="$PROJECT_DIR$/common/base.py" />
+        <option value="$PROJECT_DIR$/common/conf.ini" />
+        <option value="$PROJECT_DIR$/common/interface.py" />
+        <option value="$PROJECT_DIR$/api/decoration.py" />
+        <option value="$PROJECT_DIR$/test/123123..py" />
+        <option value="$PROJECT_DIR$/api/house.py" />
+        <option value="$PROJECT_DIR$/api/houseContract.py" />
+        <option value="$PROJECT_DIR$/class/apartmentContract.py" />
+        <option value="$PROJECT_DIR$/api/apartmentContract.py" />
+        <option value="$PROJECT_DIR$/api/apartment.py" />
+        <option value="$PROJECT_DIR$/class/repair.py" />
+        <option value="$PROJECT_DIR$/api2/repair.py" />
+        <option value="$PROJECT_DIR$/api/repair.py" />
+        <option value="$PROJECT_DIR$/isz/infoBase.py" />
+        <option value="$PROJECT_DIR$/isz/repair.py" />
+        <option value="$APPLICATION_CONFIG_DIR$/consoles/db/9887e43f-5605-4f54-8efd-930d5a086182/console.sql" />
+        <option value="$PROJECT_DIR$/isz/finance.py" />
+        <option value="$PROJECT_DIR$/common/interface_wfl.py" />
+        <option value="$PROJECT_DIR$/test/test2.py" />
+        <option value="$PROJECT_DIR$/test/threadTest.py" />
+        <option value="$PROJECT_DIR$/isz/decoration.py" />
+        <option value="$PROJECT_DIR$/isz/contractBase.py" />
+        <option value="$PROJECT_DIR$/isz/house.py" />
+        <option value="$PROJECT_DIR$/script/createHouseContract.py" />
+        <option value="$PROJECT_DIR$/common/dict.py" />
+        <option value="$PROJECT_DIR$/isz/apartmentContract.py" />
+        <option value="$PROJECT_DIR$/common/sqlbase.py" />
+        <option value="$PROJECT_DIR$/isz/houseContract.py" />
+        <option value="$PROJECT_DIR$/isz/infoClass.py" />
+        <option value="$PROJECT_DIR$/script/housingAuthorityPush.py" />
+        <option value="$PROJECT_DIR$/isz/customer.py" />
+        <option value="$PROJECT_DIR$/isz/apartment.py" />
+        <option value="$PROJECT_DIR$/script/createApartmentContract.py" />
+        <option value="$PROJECT_DIR$/test/test.py" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-1928" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>Python</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>PyUnresolvedReferencesInspection</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="AutoTest_api" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AutoTest_api" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="AutoTest_api" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AutoTest_api" type="462c0819:PsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="AutoTest_api" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AutoTest_api" type="462c0819:PsiDirectoryNode" />
+              <item name="script" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="AutoTest_api" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AutoTest_api" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="SearchEverywhereHistoryKey" value="login&#9;null&#9;null&#10;dec&#9;FILE&#9;file://C:/Users/user/PycharmProjects/AutoTest_api/script/decorationNew.py&#10;get_dict_value&#9;null&#9;null&#10;失败信息&#9;null&#9;null&#10;RequestsC&#9;null&#9;null" />
+    <property name="com.intellij.database.dataSource.DataSourceTemplate" value="MySQL" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="AutoTest_api" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="AutoTest_api" />
+      </console-settings>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api\script" />
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api\api" />
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api\others" />
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api\test" />
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api\common" />
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api\script" />
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api\api" />
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api\test" />
+      <recent name="C:\Users\user\PycharmProjects\AutoTest_api\ui" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.test">
+    <configuration name="createApartmentContract" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/script" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="AutoTest_api" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/script/createApartmentContract.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="houseContract" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/isz" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="AutoTest_api" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/isz/houseContract.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="housingAuthorityPush" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/script" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="AutoTest_api" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/script/housingAuthorityPush.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="infoClass" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/isz" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="AutoTest_api" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/isz/infoClass.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="AutoTest_api" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <list size="5">
+      <item index="0" class="java.lang.String" itemvalue="Python.houseContract" />
+      <item index="1" class="java.lang.String" itemvalue="Python.test" />
+      <item index="2" class="java.lang.String" itemvalue="Python.housingAuthorityPush" />
+      <item index="3" class="java.lang.String" itemvalue="Python.infoClass" />
+      <item index="4" class="java.lang.String" itemvalue="Python.createApartmentContract" />
+    </list>
+    <recent_temporary>
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="Python.test" />
+        <item index="1" class="java.lang.String" itemvalue="Python.createApartmentContract" />
+        <item index="2" class="java.lang.String" itemvalue="Python.housingAuthorityPush" />
+        <item index="3" class="java.lang.String" itemvalue="Python.houseContract" />
+        <item index="4" class="java.lang.String" itemvalue="Python.infoClass" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4c62c90b-3b85-41a0-87e1-49bd70dfb2c8" name="Default" comment="" />
+      <created>1512977940775</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1512977940775</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-1928" y="-8" width="1936" height="1056" extended-state="6" />
+    <layout>
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26226014" sideWeight="0.49328214" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987553" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46320346" sideWeight="0.5021322" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1119403" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32683983" sideWeight="0.49573562" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987553" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.114605546" sideWeight="0.50671786" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27380952" sideWeight="0.4978678" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28246754" sideWeight="0.4978678" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987553" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24891774" sideWeight="0.4978678" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Concurrent Activities Diagram" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987553" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987553" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46320346" sideWeight="0.5021322" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33766234" sideWeight="0.49573562" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987553" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28246754" sideWeight="0.4978678" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14978679" sideWeight="0.49328214" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987553" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1119403" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29220778" sideWeight="0.4978678" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Concurrent Activities Diagram" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987553" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4134199" sideWeight="0.4978678" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.114605546" sideWeight="0.50671786" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+    </layout-to-restore>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/common/interface.py</url>
+          <line>974</line>
+          <option name="timeStamp" value="416" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/isz/houseContract.py</url>
+          <line>441</line>
+          <option name="timeStamp" value="593" />
+        </line-breakpoint>
+      </breakpoints>
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+      <option name="time" value="596" />
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="houseContractInfo" language="Python" />
+        <watch expression="data[u'sign_name']" />
+        <watch expression="list.rent_status" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://C:/Python27/Lib/xml/dom/minidom.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-198">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/selenium/webdriver/firefox/firefox_profile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="35" column="53" lean-forward="true" selection-start-line="35" selection-start-column="53" selection-end-line="35" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ui/123.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="30" column="6" lean-forward="false" selection-start-line="30" selection-start-column="6" selection-end-line="30" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/2/typing.pyi">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="213" column="32" lean-forward="true" selection-start-line="213" selection-start-column="32" selection-end-line="213" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/pymysql/cursors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="341">
+          <caret line="165" column="0" lean-forward="false" selection-start-line="165" selection-start-column="0" selection-end-line="165" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/requests/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/poster/encode.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="414" column="0" lean-forward="true" selection-start-line="414" selection-start-column="0" selection-end-line="414" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/uuid.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="276">
+          <caret line="270" column="0" lean-forward="true" selection-start-line="270" selection-start-column="0" selection-end-line="270" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/requests/api.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="492">
+          <caret line="115" column="28" lean-forward="true" selection-start-line="115" selection-start-column="28" selection-end-line="115" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/requests_toolbelt/multipart/encoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="214">
+          <caret line="270" column="13" lean-forward="true" selection-start-line="270" selection-start-column="13" selection-end-line="270" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/interface.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="352">
+          <caret line="23" column="22" lean-forward="true" selection-start-line="23" selection-start-column="22" selection-end-line="23" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/json/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="188">
+          <caret line="338" column="0" lean-forward="false" selection-start-line="338" selection-start-column="0" selection-end-line="338" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="das://table:/3d90ec48/9887e43f-5605-4f54-8efd-930d5a086182/isz_erp_npd.apartment">
+      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
+        <state>
+          <filtering enabled="true" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/getAuthKey.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="550">
+          <caret line="26" column="50" lean-forward="true" selection-start-line="26" selection-start-column="50" selection-end-line="26" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/datetimes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="37" column="4" lean-forward="false" selection-start-line="37" selection-start-column="4" selection-end-line="37" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/auditApi.py" />
+    <entry file="file://$PROJECT_DIR$/api/apartmentContractApi.py" />
+    <entry file="file://$PROJECT_DIR$/isz/houseApi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="851">
+          <caret line="46" column="38" lean-forward="true" selection-start-line="46" selection-start-column="38" selection-end-line="46" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/123123..py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="352">
+          <caret line="18" column="21" lean-forward="true" selection-start-line="18" selection-start-column="21" selection-end-line="18" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/request_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/sqlconfig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/testClass.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="321">
+          <caret line="30" column="29" lean-forward="false" selection-start-line="30" selection-start-column="29" selection-end-line="30" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/worldToPhoto.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="66">
+          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/xmltest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="9" column="8" lean-forward="true" selection-start-line="9" selection-start-column="8" selection-end-line="9" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2017.2/system/python_stubs/-762174762/__builtin__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16544">
+          <caret line="752" column="8" lean-forward="false" selection-start-line="752" selection-start-column="8" selection-end-line="752" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="das://table:/3d90ec48/9887e43f-5605-4f54-8efd-930d5a086182/isz_erp_npd.achievement_config">
+      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
+        <state>
+          <filtering enabled="true" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/repair.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="159" column="59" lean-forward="true" selection-start-line="159" selection-start-column="59" selection-end-line="159" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/consoles/db/9887e43f-5605-4f54-8efd-930d5a086182/console.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="6" column="24" lean-forward="true" selection-start-line="6" selection-start-column="24" selection-end-line="6" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/finance.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="244">
+          <caret line="35" column="25" lean-forward="true" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
+          <folding>
+            <element signature="e#23#68#0" expanded="true" />
+            <marker date="1527686231326" expanded="true" signature="340:502" ph="select a.rec... apartment_contract_receivable" />
+            <marker date="1527686231326" expanded="true" signature="646:723" ph="select end_s... apartment_contract_receivable" />
+            <marker date="1527686231326" expanded="true" signature="2268:2621" ph="select DISTI... apartment_contract_receivable" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190889">
+          <caret line="16905" column="61" lean-forward="false" selection-start-line="16905" selection-start-column="45" selection-end-line="16905" selection-end-column="61" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="365">
+          <caret line="142" column="0" lean-forward="true" selection-start-line="142" selection-start-column="0" selection-end-line="142" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/decoration.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-130">
+          <caret line="27" column="23" lean-forward="true" selection-start-line="27" selection-start-column="23" selection-end-line="27" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/threadTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="403">
+          <caret line="23" column="26" lean-forward="true" selection-start-line="23" selection-start-column="26" selection-end-line="23" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/interface_wfl.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="23" column="4" lean-forward="false" selection-start-line="23" selection-start-column="4" selection-end-line="23" selection-end-column="4" />
+          <folding>
+            <element signature="e#228#485#0" expanded="false" />
+            <element signature="e#3650#8661#0" expanded="false" />
+            <element signature="e#6000#6070#0" expanded="false" />
+            <element signature="e#8686#9220#0" expanded="false" />
+            <marker date="1527754521506" expanded="true" signature="1679:1792" ph="..." />
+            <marker date="1527754521506" expanded="true" signature="1680:1792" ph="..." />
+            <marker date="1527754521506" expanded="true" signature="7086:7314" ph="select * fro... sys_department_flat" />
+            <marker date="1527754521506" expanded="true" signature="7135:7190" ph="SELECT dep_i... sys_department" />
+            <marker date="1527754521506" expanded="true" signature="7231:7313" ph="SELECT dep_i... sys_user" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/contractBase.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="384">
+          <caret line="26" column="0" lean-forward="true" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+          <folding>
+            <marker date="1527788603204" expanded="true" signature="1001:1079" ph="select file_... contract_file_type" />
+            <marker date="1527788603204" expanded="true" signature="1247:1433" ph="SELECT a.hou... house" />
+            <marker date="1527788603204" expanded="true" signature="22817:22885" ph="select contr... apartment_contract" />
+            <marker date="1527788603204" expanded="true" signature="23166:23269" ph="select contr... house_contract" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/dict.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="332">
+          <caret line="72" column="0" lean-forward="true" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/test2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="49" column="17" lean-forward="true" selection-start-line="49" selection-start-column="17" selection-end-line="49" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/threading.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="753" column="0" lean-forward="false" selection-start-line="753" selection-start-column="0" selection-end-line="753" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/apartmentContract.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="572">
+          <caret line="357" column="23" lean-forward="false" selection-start-line="357" selection-start-column="23" selection-end-line="357" selection-end-column="23" />
+          <folding>
+            <element signature="e#22#33#0" expanded="true" />
+            <element signature="e#542#1327#0" expanded="false" />
+            <element signature="e#658#1139#0" expanded="false" />
+            <element signature="e#1368#2659#0" expanded="false" />
+            <element signature="e#2785#6167#0" expanded="false" />
+            <element signature="e#3508#4853#0" expanded="false" />
+            <element signature="e#4973#5078#0" expanded="false" />
+            <element signature="e#5158#5633#0" expanded="false" />
+            <element signature="e#5748#5972#0" expanded="false" />
+            <element signature="e#6229#13598#0" expanded="false" />
+            <element signature="e#6438#11380#0" expanded="false" />
+            <element signature="e#13634#13888#0" expanded="false" />
+            <element signature="e#13922#16400#0" expanded="false" />
+            <element signature="e#14202#15505#0" expanded="false" />
+            <element signature="e#16489#18967#0" expanded="false" />
+            <element signature="e#16769#18072#0" expanded="false" />
+            <element signature="e#16803#17357#0" expanded="false" />
+            <marker date="1527843813334" expanded="true" signature="1575:1688" ph="select recei... apartment_contract_receivable" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/sqlbase.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="356">
+          <caret line="220" column="22" lean-forward="false" selection-start-line="220" selection-start-column="22" selection-end-line="220" selection-end-column="22" />
+          <folding>
+            <marker date="1527845865163" expanded="true" signature="19678:19794" ph="SELECT payab... house_contract_payable" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/houseContract.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="660">
+          <caret line="80" column="0" lean-forward="false" selection-start-line="80" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
+          <folding>
+            <element signature="e#467#507#1" expanded="false" />
+            <element signature="e#582#913#0" expanded="false" />
+            <element signature="e#1516#2957#0" expanded="false" />
+            <element signature="e#1566#1836#0" expanded="false" />
+            <element signature="e#1572#1755#0" expanded="false" />
+            <element signature="e#1846#2002#0" expanded="false" />
+            <element signature="e#2712#2927#0" expanded="false" />
+            <element signature="e#3012#3317#0" expanded="false" />
+            <element signature="e#3317#3327#0" expanded="false" />
+            <element signature="e#3615#3809#0" expanded="false" />
+            <element signature="e#3858#4816#0" expanded="false" />
+            <element signature="e#4056#4236#0" expanded="false" />
+            <element signature="e#4353#4727#0" expanded="false" />
+            <element signature="e#4360#4459#0" expanded="false" />
+            <element signature="e#4559#4637#0" expanded="false" />
+            <element signature="e#4875#7435#0" expanded="false" />
+            <element signature="e#5089#6456#0" expanded="false" />
+            <element signature="e#5336#5695#0" expanded="false" />
+            <element signature="e#5367#5489#0" expanded="false" />
+            <element signature="e#5720#5949#0" expanded="false" />
+            <element signature="e#6230#6327#0" expanded="false" />
+            <element signature="e#6362#6456#0" expanded="false" />
+            <element signature="e#6534#7435#0" expanded="false" />
+            <element signature="e#6662#6979#0" expanded="false" />
+            <element signature="e#6711#6843#0" expanded="false" />
+            <element signature="e#7113#7435#0" expanded="false" />
+            <element signature="e#7162#7292#0" expanded="false" />
+            <element signature="e#7713#17831#0" expanded="false" />
+            <element signature="e#7767#8014#0" expanded="false" />
+            <element signature="e#8347#8539#0" expanded="false" />
+            <element signature="e#8566#8627#0" expanded="false" />
+            <element signature="e#9808#10656#0" expanded="false" />
+            <element signature="e#9936#10180#0" expanded="false" />
+            <element signature="e#9937#10179#0" expanded="false" />
+            <element signature="e#10257#10526#0" expanded="false" />
+            <element signature="e#10693#11876#0" expanded="false" />
+            <element signature="e#11117#11444#0" expanded="false" />
+            <element signature="e#11118#11443#0" expanded="false" />
+            <element signature="e#11919#12502#0" expanded="false" />
+            <element signature="e#12617#15926#0" expanded="false" />
+            <element signature="e#12981#13278#0" expanded="false" />
+            <element signature="e#12982#13277#0" expanded="false" />
+            <element signature="e#15964#16619#0" expanded="false" />
+            <element signature="e#16717#16924#0" expanded="false" />
+            <element signature="e#17027#17309#0" expanded="false" />
+            <element signature="e#17397#17825#0" expanded="false" />
+            <element signature="e#17882#18063#0" expanded="false" />
+            <element signature="e#18105#19698#0" expanded="false" />
+            <element signature="e#18194#19560#0" expanded="false" />
+            <element signature="e#18609#18931#0" expanded="false" />
+            <element signature="e#18610#18930#0" expanded="false" />
+            <element signature="e#19793#20564#0" expanded="false" />
+            <element signature="e#19828#20137#0" expanded="false" />
+            <element signature="e#19941#20072#0" expanded="false" />
+            <element signature="e#20199#20289#0" expanded="false" />
+            <element signature="e#20350#20440#0" expanded="false" />
+            <element signature="e#20664#20712#0" expanded="false" />
+            <marker date="1527847066366" expanded="false" signature="625:714" ph="select missi... house_contract" />
+            <marker date="1527847066366" expanded="true" signature="989:1134" ph="select landl... house_contract_landlord" />
+            <marker date="1527847066366" expanded="false" signature="1573:1754" ph="select a.img... house_contract_attachment" />
+            <marker date="1527847066366" expanded="false" signature="3042:3126" ph="select missi... house_contract" />
+            <marker date="1527847066366" expanded="false" signature="3401:3477" ph="select audit... house_contract" />
+            <marker date="1527847066366" expanded="false" signature="4057:4234" ph="select payab... house_contract_payable" />
+            <marker date="1527847066366" expanded="false" signature="17450:17612" ph="select contr... house_contract" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/conf.ini">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="10" column="9" lean-forward="false" selection-start-line="10" selection-start-column="9" selection-end-line="10" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/infoClass.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="572">
+          <caret line="338" column="0" lean-forward="true" selection-start-line="338" selection-start-column="0" selection-end-line="338" selection-end-column="0" />
+          <folding>
+            <element signature="e#37#63#0" expanded="true" />
+            <element signature="e#140#1723#0" expanded="false" />
+            <element signature="e#183#1723#0" expanded="false" />
+            <element signature="e#1766#7034#0" expanded="false" />
+            <element signature="e#1811#5467#0" expanded="false" />
+            <element signature="e#5540#5719#0" expanded="false" />
+            <element signature="e#5823#6302#0" expanded="false" />
+            <element signature="e#7088#8842#0" expanded="false" />
+            <element signature="e#8651#8842#0" expanded="false" />
+            <element signature="e#8881#10512#0" expanded="false" />
+            <element signature="e#8928#10512#0" expanded="false" />
+            <element signature="e#8957#9129#0" expanded="false" />
+            <element signature="e#10563#15181#0" expanded="false" />
+            <element signature="e#10608#14100#0" expanded="false" />
+            <element signature="e#14427#14762#0" expanded="false" />
+            <element signature="e#14814#15181#0" expanded="false" />
+            <element signature="e#15243#16936#0" expanded="false" />
+            <element signature="e#16978#17193#0" expanded="false" />
+            <element signature="e#17014#17193#0" expanded="false" />
+            <element signature="e#17250#17504#0" expanded="false" />
+            <element signature="e#17536#18643#0" expanded="false" />
+            <element signature="e#17596#18393#0" expanded="false" />
+            <element signature="e#18672#20163#0" expanded="false" />
+            <marker date="1527848924308" expanded="false" signature="209:297" ph="select house... house" />
+            <marker date="1527848924308" expanded="false" signature="514:567" ph="select * fro... house" />
+            <marker date="1527848924308" expanded="true" signature="1840:1947" ph="select contr... house_contract" />
+            <marker date="1527848924308" expanded="true" signature="2188:2253" ph="select * fro... house_contract" />
+            <marker date="1527848924308" expanded="true" signature="2517:2574" ph="select * fro... query_house_contract" />
+            <marker date="1527848924308" expanded="true" signature="5578:5654" ph="select audit... house_contract" />
+            <marker date="1527848924308" expanded="true" signature="5830:5903" ph="select * fro... house_contract_payable" />
+            <marker date="1527848924308" expanded="true" signature="6392:6528" ph="select statu... house_contract_step_audit_status" />
+            <marker date="1527848924308" expanded="true" signature="6649:6705" ph="select * fro... house_contract_landlord" />
+            <marker date="1527848924308" expanded="true" signature="6649:6723" ph="select * fro... house_contract_landlord" />
+            <marker date="1527848924308" expanded="true" signature="6802:6947" ph="select landl... house_contract_landlord" />
+            <marker date="1527848924308" expanded="true" signature="7208:7277" ph="select * fro... house_contract_end" />
+            <marker date="1527848924308" expanded="true" signature="8693:8773" ph="select audit... house_contract_end" />
+            <marker date="1527848924308" expanded="false" signature="8958:9128" ph="select apart... apartment" />
+            <marker date="1527848924308" expanded="true" signature="9428:9489" ph="select * fro... apartment" />
+            <marker date="1527848924308" expanded="true" signature="10637:10982" ph="select ac.co... apartment_contract" />
+            <marker date="1527848924308" expanded="true" signature="11279:11334" ph="select * fro... apartment_contract" />
+            <marker date="1527848924308" expanded="true" signature="11548:11609" ph="select * fro... query_apartment_contract" />
+            <marker date="1527848924308" expanded="true" signature="14206:14272" ph="select audit... apartment_contract" />
+            <marker date="1527848924308" expanded="true" signature="14470:14563" ph="select missi... apartment_contract" />
+            <marker date="1527848924308" expanded="true" signature="14821:14901" ph="select * fro... apartment_contract_receivable" />
+            <marker date="1527848924308" expanded="true" signature="15359:15432" ph="select * fro... apartment_contract_end" />
+            <marker date="1527848924308" expanded="false" signature="17021:17092" ph="select * fro... decoration_house_info" />
+            <marker date="1527848924308" expanded="false" signature="17353:17411" ph="select * fro... new_decoration_project" />
+            <marker date="1527848924308" expanded="true" signature="17603:17617" ph="select * fro... apa" />
+            <marker date="1527848924308" expanded="true" signature="17603:17685" ph="select * fro... apartment_contract_receivable" />
+            <marker date="1527848924308" expanded="true" signature="18493:18566" ph="select end_s... apartment_contract_receivable" />
+            <marker date="1527848924308" expanded="true" signature="18493:18570" ph="select end_s... apartment_contract_receivable" />
+            <marker date="1527848924308" expanded="true" signature="18493:18584" ph="select end_s... apartment_contract_receivable" />
+            <marker date="1527848924308" expanded="true" signature="18771:18843" ph="select * fro... house_contract_payable" />
+            <marker date="1527848924308" expanded="true" signature="19791:19858" ph="select end_s... apartment_contract_receivable" />
+            <marker date="1527848924308" expanded="true" signature="19791:19872" ph="select end_s... house_contract_payable" />
+            <marker date="1527848924308" expanded="true" signature="20022:20105" ph="select audit... house_contract_payable" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script/createHouseContract.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="6" column="26" lean-forward="false" selection-start-line="6" selection-start-column="26" selection-end-line="6" selection-end-column="26" />
+          <folding>
+            <marker date="1527788832291" expanded="true" signature="1682:2268" ph="SELECT a.hou... house" />
+            <marker date="1527788832291" expanded="true" signature="1825:1883" ph="SELECT * FRO... house_contract" />
+            <marker date="1527788832291" expanded="true" signature="1917:2003" ph="select * fro... residential_building" />
+            <marker date="1527788832291" expanded="true" signature="2036:2103" ph="select * fro... residential" />
+            <marker date="1527788832291" expanded="true" signature="2135:2223" ph="select * fro... house_rent" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script/housingAuthorityPush.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="682">
+          <caret line="34" column="67" lean-forward="false" selection-start-line="34" selection-start-column="67" selection-end-line="34" selection-end-column="67" />
+          <folding>
+            <element signature="e#246#274#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/customer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="8" column="4" lean-forward="false" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
+          <folding>
+            <element signature="e#596#4014#0" expanded="false" />
+            <marker date="1528186755219" expanded="true" signature="1395:1486" ph="select dep_i... sys_user" />
+            <marker date="1528186755219" expanded="true" signature="1539:1631" ph="select user_... sys_user" />
+            <marker date="1528186755219" expanded="true" signature="4082:4168" ph="select custo... customer" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/apartment.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1584">
+          <caret line="237" column="51" lean-forward="false" selection-start-line="237" selection-start-column="51" selection-end-line="237" selection-end-column="51" />
+          <folding>
+            <element signature="e#730#3438#0" expanded="false" />
+            <element signature="e#3504#3719#0" expanded="false" />
+            <element signature="e#3786#3958#0" expanded="false" />
+            <element signature="e#4018#4385#0" expanded="false" />
+            <element signature="e#4441#4677#0" expanded="false" />
+            <element signature="e#4734#4971#0" expanded="false" />
+            <element signature="e#5024#7267#0" expanded="false" />
+            <element signature="e#7309#8198#0" expanded="false" />
+            <element signature="e#8240#8266#0" expanded="false" />
+            <element signature="e#10882#11539#0" expanded="false" />
+            <element signature="e#11563#12581#0" expanded="false" />
+            <marker date="1528261894698" expanded="true" signature="525:574" ph="select room_... house_room" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script/createApartmentContract.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="26" column="134" lean-forward="false" selection-start-line="26" selection-start-column="134" selection-end-line="26" selection-end-column="134" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isz/house.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3366">
+          <caret line="364" column="32" lean-forward="false" selection-start-line="364" selection-start-column="32" selection-end-line="364" selection-end-column="32" />
+          <folding>
+            <element signature="e#706#1178#1" expanded="false" />
+            <element signature="e#1270#1466#0" expanded="false" />
+            <element signature="e#1856#1868#0" expanded="false" />
+            <element signature="e#3088#4200#0" expanded="false" />
+            <element signature="e#3476#4178#0" expanded="false" />
+            <element signature="e#3477#3835#0" expanded="false" />
+            <element signature="e#3837#4177#0" expanded="false" />
+            <element signature="e#4492#10460#0" expanded="false" />
+            <element signature="e#4493#5501#0" expanded="false" />
+            <element signature="e#4526#5212#0" expanded="false" />
+            <element signature="e#4527#4869#0" expanded="false" />
+            <element signature="e#4871#5211#0" expanded="false" />
+            <element signature="e#5503#6507#0" expanded="false" />
+            <element signature="e#5536#6222#0" expanded="false" />
+            <element signature="e#5537#5879#0" expanded="false" />
+            <element signature="e#5881#6221#0" expanded="false" />
+            <element signature="e#6509#7495#0" expanded="false" />
+            <element signature="e#6542#7228#0" expanded="false" />
+            <element signature="e#6543#6885#0" expanded="false" />
+            <element signature="e#6887#7227#0" expanded="false" />
+            <element signature="e#7497#8483#0" expanded="false" />
+            <element signature="e#7530#8216#0" expanded="false" />
+            <element signature="e#7531#7873#0" expanded="false" />
+            <element signature="e#7875#8215#0" expanded="false" />
+            <element signature="e#8485#9473#0" expanded="false" />
+            <element signature="e#8518#9204#0" expanded="false" />
+            <element signature="e#8519#8861#0" expanded="false" />
+            <element signature="e#8863#9203#0" expanded="false" />
+            <element signature="e#9475#10459#0" expanded="false" />
+            <element signature="e#9508#10194#0" expanded="false" />
+            <element signature="e#9509#9851#0" expanded="false" />
+            <element signature="e#9853#10193#0" expanded="false" />
+            <element signature="e#10746#11594#0" expanded="false" />
+            <element signature="e#10874#11118#0" expanded="false" />
+            <element signature="e#10875#11117#0" expanded="false" />
+            <element signature="e#11195#11464#0" expanded="false" />
+            <element signature="e#11632#13133#0" expanded="false" />
+            <element signature="e#12052#12734#0" expanded="false" />
+            <element signature="e#12053#12391#0" expanded="false" />
+            <element signature="e#12393#12733#0" expanded="false" />
+            <element signature="e#14238#14828#0" expanded="false" />
+            <element signature="e#14239#14535#0" expanded="false" />
+            <element signature="e#14537#14827#0" expanded="false" />
+            <marker date="1527788682212" expanded="false" signature="18308:18440" ph="select contr... house_contract" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="733">
+          <caret line="122" column="18" lean-forward="false" selection-start-line="122" selection-start-column="18" selection-end-line="122" selection-end-column="18" />
+          <folding>
+            <marker date="1528277609154" expanded="true" signature="6145:6498" ph="select DISTI... apartment_contract_receivable" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
