@@ -1,14 +1,20 @@
 # -*- coding:utf8 -*-
-"""表元素基础信息类"""
+"""
+表元素基础信息类
+"""
+import threading
+
 from common import sqlbase
 from common.base import consoleLog, get_conf
+
 
 class HouseInfo(object):
 
     def __init__(self, houseIdOrCode):
-        houseId = sqlbase.serach("select house_id from house where (house_id='%s' or house_code like '%s%s') and deleted=0 " % (houseIdOrCode, houseIdOrCode, '%'), oneCount=False)
+        houseId = sqlbase.serach("select house_id from house where (house_id='%s' or house_code like '%s%s') "
+                                 "and deleted=0 " % (houseIdOrCode, houseIdOrCode, '%'), oneCount=False)
         if 1 != len(houseId):
-            raise ValueError('house_id number is not one but: %s! search for:%s' % (len(houseId), houseIdOrCode))
+            raise ValueError('the house_code is not one but: %s! search for:%s' % (len(houseId), houseIdOrCode))
         sql = "select * from house where house_id='%s' and deleted=0" % houseId[0]
         self.house_info = sqlbase.query(sql)[0]
         self.house_id = self.house_info['house_id']
@@ -35,20 +41,24 @@ class HouseInfo(object):
 class HouseContractInfo(HouseInfo):
 
     def __init__(self, contractIdOrNum):
-        contractId = sqlbase.serach("select contract_id,house_id from house_contract where (contract_id='%s' or contract_num='%s') and deleted=0" % (contractIdOrNum, contractIdOrNum), oneCount=False, nullLog=False)
+        contractId = sqlbase.serach("select contract_id,house_id from house_contract where (contract_id='%s' or "
+                                    "contract_num='%s') and deleted=0" % (contractIdOrNum, contractIdOrNum),
+                                    oneCount=False, nullLog=False)
         if 1 != len(contractId):
-            raise ValueError('contract_id number is not one but: %s! search for:%s' % (len(contractId), contractIdOrNum))
+            raise ValueError('the contract_num is not one but: %s! search for:%s' % (len(contractId), contractIdOrNum))
         sql = "select * from house_contract where contract_id='%s' and deleted=0" % contractId[0][0]
         super(HouseContractInfo, self).__init__(contractId[0][1])
         self.house_contract_info = sqlbase.query(sql)[0]
         self.house_contract_id = self.house_contract_info['contract_id']
-        query_house_contract = sqlbase.serach("select * from query_house_contract where contract_id='%s'" % self.house_contract_id, oneCount=False)
+        # threading.Thread(target=check_query_table, args=(self.house_contract_id, 'house_contract')).start()
+        query_house_contract = sqlbase.serach("select * from query_house_contract where contract_id='%s'" %
+                                              self.house_contract_id, oneCount=False, nullLog=False)
         if 1 != len(query_house_contract):  # 检查委托合同宽表
             consoleLog("there is no contract in 'query_house_contract',contract_id: %s" % self.house_contract_id, 'w')
         self.reform_way = self.house_contract_info['reform_way']
         self.is_active = self.house_contract_info['is_active']
         if 'N' == self.is_active:
-            consoleLog(u'委托合同非有效')
+            consoleLog('委托合同非有效')
         self.house_contract_num = self.house_contract_info['contract_num']
         self.apartment_type = self.house_contract_info['apartment_type']
         self.contract_type = self.house_contract_info['contract_type']
@@ -88,14 +98,15 @@ class HouseContractInfo(HouseInfo):
     # 委托合同实时审核状态
     @property
     def audit_status_now(self):
-        self.__audit_status = sqlbase.serach("select audit_status from house_contract where contract_id='%s' and deleted=0" % self.house_contract_id)[0]
+        self.__audit_status = sqlbase.serach("select audit_status from house_contract where contract_id='%s' "
+                                             "and deleted=0" % self.house_contract_id)[0]
         return self.__audit_status
 
     # 委托合同应付，默认读取未审核的应付租金
     def payables(self, audit_status='NOTAUDIT', money_type='RENT'):
+        payablesVo = []
         sql = "select * from house_contract_payable where contract_id='%s' and deleted=0" % self.house_contract_id
         payables = sqlbase.query(sql)
-        payablesVo = []
         for payable in payables:
             payableVo = Payable(payable['payable_id'])
             if not audit_status or audit_status == payableVo.audit_status:
