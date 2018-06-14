@@ -30,19 +30,19 @@ class Mysql(object):
         self._conn = Mysql.__getConn()
         self._cursor = self._conn.cursor()
 
-    @classmethod
-    def __getConn(cls):
+    @staticmethod
+    def __getConn():
         """
         :summary: 静态方法，从连接池中取出连接
         :return MySQLdb.connection
         """
         if Mysql.__pool is None:
-            cls.__pool = PooledDB(creator=MySQLdb, mincached=1, maxcached=20,
+            Mysql.__pool = PooledDB(creator=MySQLdb, mincached=1, maxcached=20,
                                   host=get_conf('db', 'host'), port=get_conf('db', 'port', int),
                                   user=get_conf('db', 'user'), passwd=get_conf('db', 'password'),
                                   db=get_conf('db', 'db'), use_unicode=False, charset=get_conf('db', 'charset'),
                                   cursorclass=DictCursor)
-        return cls.__pool.connection()
+        return Mysql.__pool.connection()
 
     def getAll(self, sql, param=None):
         """
