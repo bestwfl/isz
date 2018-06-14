@@ -10,19 +10,21 @@ from common.dict import User
 
 
 class Decoration(object):
-
     uploadPhotoURL = 'http://decorate.ishangzu.com/isz_decoration/DecorationFileController/uploadPhoto'  # 装修工程上传图片地址
 
     def __init__(self, contractIdOrNum):
         self.project_id = None
         nullLog = False
         for i in range(5):
-            project = sqlbase.serach("select project_id from %s.new_decoration_project a inner join %s.decoration_house_info b "
-                                        "on a.info_id=b.info_id  where b.deleted=0 and (b.contract_num='%s' or b.contract_id='%s')"
-                                     "limit 1" % (get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), contractIdOrNum, contractIdOrNum), nullLog=nullLog)
+            project = sqlbase.serach(
+                "select project_id,b.contract_num from %s.new_decoration_project a inner join %s.decoration_house_info b "
+                "on a.info_id=b.info_id  where b.deleted=0 and (b.contract_num='%s' or b.contract_id='%s')"
+                "limit 1" % (
+                    get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), contractIdOrNum, contractIdOrNum),
+                nullLog=nullLog)
             if project:
                 self.project_id = project[0]
-                self.contract_num = HouseContract.contract_num(contractIdOrNum)
+                self.contract_num = project[1]
                 self.sign_uid = HouseContract.contract_field(contractIdOrNum, 'sign_uid')
                 break
             elif i < 4:
@@ -30,7 +32,7 @@ class Decoration(object):
                 if i == 3:
                     nullLog = True
             else:
-                raise BaseException(u'the house_contract does not exist decoration order, contract：%s' % contractIdOrNum)
+                raise BaseException('the house_contract does not exist decoration order, contract：%s' % contractIdOrNum)
 
     # 下单
     def placeOrder(self):
@@ -38,13 +40,13 @@ class Decoration(object):
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/changeProgress/placeOrder'
         data = {
             'place_order_dep': User.DID.value,
-             'place_order_reason': u'测试',
-             'place_order_uid': User.UID.value,
-             'place_order_uname': User.NAME.value,
-             'place_order_date': time.strftime('%Y-%m-%d %H:%M:%S'),
-             'predict_survey_date': '%s 09:00' % addDays(1),
-             'project_id': self.project_id
-         }
+            'place_order_reason': u'测试',
+            'place_order_uid': User.UID.value,
+            'place_order_uname': User.NAME.value,
+            'place_order_date': time.strftime('%Y-%m-%d %H:%M:%S'),
+            'predict_survey_date': '%s 09:00' % addDays(1),
+            'project_id': self.project_id
+        }
         result = myRequest(url, data)
         if result:
             # consoleLog(u'下单完成')
@@ -94,8 +96,8 @@ class Decoration(object):
                 'attachments': [{
                     'attach_type': 'TOILET',
                     'imgs': [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
                         'create_name': '',
                         'create_dept': '',
                         'create_time': '',
@@ -105,8 +107,8 @@ class Decoration(object):
                 }, {
                     'attach_type': 'KITCHEN',
                     'imgs': [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
                         'create_name': '',
                         'create_dept': '',
                         'create_time': '',
@@ -127,8 +129,8 @@ class Decoration(object):
                 }, {
                     'attach_type': 'ROOM',
                     'imgs': [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
                         'create_name': '',
                         'create_dept': '',
                         'create_time': '',
@@ -138,7 +140,7 @@ class Decoration(object):
                 }, {
                     'attach_type': 'OTHER',
                     'imgs': []
-                    }]
+                }]
             }
             result = myRequest(url, data)
             if result:
@@ -165,8 +167,8 @@ class Decoration(object):
                 'attachments': [{
                     'attach_type': 'PROPERTY_DELIVERY_ORDER',
                     'imgs': [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
                         'create_name': '',
                         'create_dept': '',
                         'create_time': '',
@@ -189,8 +191,8 @@ class Decoration(object):
                 'attachments': [{
                     'attach_type': 'SCENE',
                     'imgs': [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
                         'create_name': '',
                         'create_dept': '',
                         'create_time': '',
@@ -234,10 +236,14 @@ class Decoration(object):
 
     # 项目计划
     def projectOrder(self):
-        projectInfo = sqlbase.serach("select b.info_id,a.project_no,b.entrust_type,b.build_area from %s.new_decoration_project a inner join %s.decoration_house_info b on a.info_id=b.info_id "
-                              "and a.project_id='%s' where b.deleted=0 " % (get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), self.project_id))
+        projectInfo = sqlbase.serach(
+            "select b.info_id,a.project_no,b.entrust_type,b.build_area from %s.new_decoration_project a "
+            "inner join %s.decoration_house_info b on a.info_id=b.info_id "
+            "and a.project_id='%s' where b.deleted=0 " % (
+                get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), self.project_id))
         url = 'http://decorate.ishangzu.com/isz_decoration/decoHouseInfoController/saveOrUpdateApartment/saveApartment/projectOrder'
-        img = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png', filepath="C:\Users\user\Desktop\Image\\")  # 户型图上传
+        img = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png',
+                          filepath=r"C:\Users\user\Desktop\Image\\")  # 户型图上传
         data = {
             'build_area': projectInfo[3],
             'reform_way_fact': 'OLDRESTYLE',
@@ -444,6 +450,7 @@ class Decoration(object):
 
     # 物品清单
     def configList(self):
+
         # 制定物品清单
         def designConfigList():
 
@@ -452,7 +459,6 @@ class Decoration(object):
                 result = myRequest(url, method='get')
                 if result:
                     zoneInfo = result['obj']
-                    zoneId = None
                     for i in zoneInfo:
                         if i['function_zone'] == u'甲':
                             zoneId = i['zone_id']
@@ -461,7 +467,8 @@ class Decoration(object):
             def confirm():
                 zoneId = getZoneId()
                 url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationConfigController/confirm'
-                data = [{
+                data = [
+                    {
                         "acceptance_num": None,
                         "acceptance_num_this": None,
                         "brand_id": None,
@@ -510,20 +517,21 @@ class Decoration(object):
                         "zone_id": zoneId,
                         "index": 0,
                         "disabled": "true"
-                    }]
+                    }
+                ]
                 result = myRequest(url, data)
                 if result:
-                    consoleLog(u'物品添加完成，准备下单')
+                    consoleLog('物品添加完成，准备下单')
                     return
 
             def submitOrder():
                 confirm()
                 url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationConfigController/submitOrder'
                 data = [{
-                        "predict_delivery_date": '%s 00:00:00' % addDays(2),
-                        "project_id": self.project_id,
-                        "supplier_id": "8A2152435CF3FFF3015D0C64330F0011",
-                        "supplier_name": "家具供应商:浙江品至家具有限公司"
+                    "predict_delivery_date": '%s 00:00:00' % addDays(2),
+                    "project_id": self.project_id,
+                    "supplier_id": "8A2152435CF3FFF3015D0C64330F0011",
+                    "supplier_name": "家具供应商:浙江品至家具有限公司"
                 }]
                 result = myRequest(url, data)
                 if result:
@@ -532,17 +540,21 @@ class Decoration(object):
 
             submitOrder()
 
-        # 验收物品清单
+        # 物品清单验收
         def acceptanceConfigList():
 
+            #  获取物品清单信息
             def getsupplierOrderDetail():
                 url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationConfigController/supplierOrdersDetail'
-                supplierId = sqlbase.serach("select supplier_id from %s.new_config_list where project_id='%s' and deleted=0  and config_list_status<>'CHECKED'" % (get_conf('db', 'decoration_db'), self.project_id))[0]
-                data = {"project_id":self.project_id,"supplier_id":supplierId}
+                supplierId = sqlbase.serach(
+                    "select supplier_id from %s.new_config_list where project_id='%s' and deleted=0  and config_list_status<>'CHECKED'" % (
+                        get_conf('db', 'decoration_db'), self.project_id))[0]
+                data = {"project_id": self.project_id, "supplier_id": supplierId}
                 result = myRequest(url, data)
                 if result:
                     return result['obj']
 
+            #  验收确认
             def acceptanceConfirm():
                 url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationConfigController/acceptance/confirm'
                 data = getsupplierOrderDetail()
@@ -804,133 +816,133 @@ class Decoration(object):
         #     "type_index": 1
         # }]
         commonData = [
-        {
-            "acceptance_num": None,
-            "acceptance_num_this": 0,
-            "acceptance_time": None,
-            "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-            "create_uid": User.UID.value,
-            "data_type": "成品安装",
-            "data_type_len": 26,
-            "decoration_detial": "家具安装",
-            "deleted": 0,
-            "function_zone": "甲",
-            "function_zone_len": 100,
-            "hard_deliver_audit_status": None,
-            "order_type": None,
-            "predict_delivery_date": None,
-            "project_id": self.project_id,
-            "purchase_num": "10",
-            "purchase_order_no": None,
-            "remark": None,
-            "remark_accept": None,
-            "remark_detail": "",
-            "remark_return": None,
-            "replacement_order": None,
-            "return_name": None,
-            "return_num": None,
-            "return_num_this": 0,
-            "stuff_fees_change_reason": None,
-            "stuff_list_id": None,
-            "stuff_list_status": "DRAFT",
-            "submit_time": None,
-            "supplier_id": None,
-            "supplier_name": None,
-            "total_account": None,
-            "total_paid": "100.00",
-            "unit_id": None,
-            "unit_name": "件",
-            "unit_price": 10,
-            "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-            "update_uid": User.UID.value,
-            "zone_type": None,
-            "type_index": 0,
-            "fun_index": 0
-        }, {
-            "acceptance_num": None,
-            "acceptance_num_this": 0,
-            "acceptance_time": None,
-            "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-            "create_uid": User.UID.value,
-            "data_type": "成品安装",
-            "data_type_len": 26,
-            "decoration_detial": "嵌入式天花灯-改造",
-            "deleted": 0,
-            "function_zone": "甲",
-            "function_zone_len": 100,
-            "hard_deliver_audit_status": None,
-            "order_type": None,
-            "predict_delivery_date": None,
-            "project_id": self.project_id,
-            "purchase_num": "11",
-            "purchase_order_no": None,
-            "remark": None,
-            "remark_accept": None,
-            "remark_detail": "",
-            "remark_return": None,
-            "replacement_order": None,
-            "return_name": None,
-            "return_num": None,
-            "return_num_this": 0,
-            "stuff_fees_change_reason": None,
-            "stuff_list_id": None,
-            "stuff_list_status": "DRAFT",
-            "submit_time": None,
-            "supplier_id": None,
-            "supplier_name": None,
-            "total_account": None,
-            "total_paid": "264.00",
-            "unit_id": None,
-            "unit_name": "个",
-            "unit_price": 24,
-            "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-            "update_uid": User.UID.value,
-            "zone_type": None,
-            "fun_index": 1,
-            "type_index": 1
-        }, {
-            "acceptance_num": None,
-            "acceptance_num_this": 0,
-            "acceptance_time": None,
-            "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-            "create_uid": User.UID.value,
-            "data_type": "成品安装",
-            "data_type_len": 26,
-            "decoration_detial": "明装筒灯-改造",
-            "deleted": 0,
-            "function_zone": "甲",
-            "function_zone_len": 100,
-            "hard_deliver_audit_status": None,
-            "order_type": None,
-            "predict_delivery_date": None,
-            "project_id": self.project_id,
-            "purchase_num": "12",
-            "purchase_order_no": None,
-            "remark": None,
-            "remark_accept": None,
-            "remark_detail": "",
-            "remark_return": None,
-            "replacement_order": None,
-            "return_name": None,
-            "return_num": None,
-            "return_num_this": 0,
-            "stuff_fees_change_reason": None,
-            "stuff_list_id": None,
-            "stuff_list_status": "DRAFT",
-            "submit_time": None,
-            "supplier_id": None,
-            "supplier_name": None,
-            "total_account": None,
-            "total_paid": "403.20",
-            "unit_id": None,
-            "unit_name": "个",
-            "unit_price": 33.6,
-            "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-            "update_uid": User.UID.value,
-            "zone_type": None,
-            "fun_index": 1,
-            "type_index": 1
-        }
+            {
+                "acceptance_num": None,
+                "acceptance_num_this": 0,
+                "acceptance_time": None,
+                "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                "create_uid": User.UID.value,
+                "data_type": "成品安装",
+                "data_type_len": 26,
+                "decoration_detial": "家具安装",
+                "deleted": 0,
+                "function_zone": "甲",
+                "function_zone_len": 100,
+                "hard_deliver_audit_status": None,
+                "order_type": None,
+                "predict_delivery_date": None,
+                "project_id": self.project_id,
+                "purchase_num": "10",
+                "purchase_order_no": None,
+                "remark": None,
+                "remark_accept": None,
+                "remark_detail": "",
+                "remark_return": None,
+                "replacement_order": None,
+                "return_name": None,
+                "return_num": None,
+                "return_num_this": 0,
+                "stuff_fees_change_reason": None,
+                "stuff_list_id": None,
+                "stuff_list_status": "DRAFT",
+                "submit_time": None,
+                "supplier_id": None,
+                "supplier_name": None,
+                "total_account": None,
+                "total_paid": "100.00",
+                "unit_id": None,
+                "unit_name": "件",
+                "unit_price": 10,
+                "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                "update_uid": User.UID.value,
+                "zone_type": None,
+                "type_index": 0,
+                "fun_index": 0
+            }, {
+                "acceptance_num": None,
+                "acceptance_num_this": 0,
+                "acceptance_time": None,
+                "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                "create_uid": User.UID.value,
+                "data_type": "成品安装",
+                "data_type_len": 26,
+                "decoration_detial": "嵌入式天花灯-改造",
+                "deleted": 0,
+                "function_zone": "甲",
+                "function_zone_len": 100,
+                "hard_deliver_audit_status": None,
+                "order_type": None,
+                "predict_delivery_date": None,
+                "project_id": self.project_id,
+                "purchase_num": "11",
+                "purchase_order_no": None,
+                "remark": None,
+                "remark_accept": None,
+                "remark_detail": "",
+                "remark_return": None,
+                "replacement_order": None,
+                "return_name": None,
+                "return_num": None,
+                "return_num_this": 0,
+                "stuff_fees_change_reason": None,
+                "stuff_list_id": None,
+                "stuff_list_status": "DRAFT",
+                "submit_time": None,
+                "supplier_id": None,
+                "supplier_name": None,
+                "total_account": None,
+                "total_paid": "264.00",
+                "unit_id": None,
+                "unit_name": "个",
+                "unit_price": 24,
+                "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                "update_uid": User.UID.value,
+                "zone_type": None,
+                "fun_index": 1,
+                "type_index": 1
+            }, {
+                "acceptance_num": None,
+                "acceptance_num_this": 0,
+                "acceptance_time": None,
+                "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                "create_uid": User.UID.value,
+                "data_type": "成品安装",
+                "data_type_len": 26,
+                "decoration_detial": "明装筒灯-改造",
+                "deleted": 0,
+                "function_zone": "甲",
+                "function_zone_len": 100,
+                "hard_deliver_audit_status": None,
+                "order_type": None,
+                "predict_delivery_date": None,
+                "project_id": self.project_id,
+                "purchase_num": "12",
+                "purchase_order_no": None,
+                "remark": None,
+                "remark_accept": None,
+                "remark_detail": "",
+                "remark_return": None,
+                "replacement_order": None,
+                "return_name": None,
+                "return_num": None,
+                "return_num_this": 0,
+                "stuff_fees_change_reason": None,
+                "stuff_list_id": None,
+                "stuff_list_status": "DRAFT",
+                "submit_time": None,
+                "supplier_id": None,
+                "supplier_name": None,
+                "total_account": None,
+                "total_paid": "403.20",
+                "unit_id": None,
+                "unit_name": "个",
+                "unit_price": 33.6,
+                "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                "update_uid": User.UID.value,
+                "zone_type": None,
+                "fun_index": 1,
+                "type_index": 1
+            }
         ]
 
         # 制定装修清单
@@ -946,110 +958,113 @@ class Decoration(object):
             def saveStuffLists():
                 preview()
                 url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationStuffController/saveStuffLists'
-                projectInfo = sqlbase.serach("select b.address,a.config_order_no,b.contract_id,b.contract_num,b.create_time,b.entrust_end_date,b.entrust_start_date,b.house_code,b.housekeep_mange_uid,b.info_id,"
-                                             "a.project_no,b.sign_date,b.city_code,b.city_name from %s.decoration_house_info b inner join  %s.new_decoration_project a on a.info_id=b.info_id and a.project_id='%s'" % (get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), self.project_id))
+                projectInfo = sqlbase.serach(
+                    "select b.address,a.config_order_no,b.contract_id,b.contract_num,b.create_time,b.entrust_end_date,b.entrust_start_date,b.house_code,b.housekeep_mange_uid,b.info_id,"
+                    "a.project_no,b.sign_date,b.city_code,b.city_name from %s.decoration_house_info b inner join  %s.new_decoration_project a on a.info_id=b.info_id and a.project_id='%s'" % (
+                        get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), self.project_id))
                 data = {
-                        "newStuffList": commonData,
-                        "project": {
-                            "address": projectInfo[0],
-                            "build_area": "120.00",
-                            "cable_laying_type": "INNERPIPEINNERLINE",
-                            "cable_laying_type_name": None,
-                            "city_code": "330100",
-                            "city_name": "杭州市",
-                            "closed_water_test_result": "Y",
-                            "complete_two_nodes": "[\"VOLUME_SCORE\",\"SURVEY_PROPERTY_DELIVERY\",\"WATER_CLOSED_TEST\",\"PROJECT_PLAN\",\"GOODS_CONFIG_LIST\"]",
-                            "complete_two_nodes_list": ["VOLUME_SCORE", "SURVEY_PROPERTY_DELIVERY", "WATER_CLOSED_TEST", "PROJECT_PLAN", "GOODS_CONFIG_LIST"],
-                            "config_list_status": "CHECKED",
-                            "config_list_status_name": "已验收",
-                            "config_order_no": projectInfo[1],
-                            "config_progress": "WAIT_DESIGN",
-                            "config_progress_name": "待设计",
-                            "config_submit_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                            "config_submit_uid": User.UID.value,
-                            "config_submit_uname": User.NAME.value,
-                            "construct_uid": "1610",
-                            "construct_uname": "徐经纬",
-                            "construct_uname_phone": "徐经纬/13105715060",
-                            "contract_id": projectInfo[2],
-                            "contract_num": projectInfo[3],
-                            "contract_type": "NEWSIGN",
-                            "contract_type_name": "新签",
-                            "create_time": projectInfo[4],
-                            "create_uid": "8AEF8688600F30F30160257579287F96",
-                            "current_one_node": "PROJECT_PLAN",
-                            "decoration_style": "WUSHE_BREEZE",
-                            "decoration_style_name": "随寓和风",
-                            "deleted": 0,
-                            "deliver_room_date": "1970-01-02 00:00:00.0",
-                            "dispach_remark": "测试",
-                            "entrust_end_date": projectInfo[5],
-                            "entrust_start_date": projectInfo[6],
-                            "entrust_type_fact": "SHARE",
-                            "entrust_type_fact_name": "合租",
-                            "grade": 20,
-                            "hidden_check_date": "1970-01-02 00:00:00.0",
-                            "house_code": projectInfo[7],
-                            "housekeep_mange_name": None,
-                            "housekeep_mange_uid": projectInfo[8],
-                            "info_id": projectInfo[9],
-                            "is_active": "Y",
-                            "is_active_name": "是",
-                            "one_level_nodes": "[\"PLACE_ORDER\",\"DISPATCH_ORDER\",\"SURVEY\",\"PROJECT_PLAN\",\"CONSTRUCTING\",\"PROJECT_CHECK\",\"PROJECT_COMPLETION\"]",
-                            "order_status_name": "进程中",
-                            "order_type_name": "新收配置订单",
-                            "overall_check_date": "1970-01-02 00:00:00.0",
-                            "phone": "18815286582",
-                            "place_order_date": "2018-03-20 20:47:38",
-                            "place_order_dep": "",
-                            "place_order_dep_name": None,
-                            "place_order_reason": "测试",
-                            "place_order_uid": User.UID.value,
-                            "place_order_uname": User.NAME.value,
-                            "plumbing_type": "INNERPIPE",
-                            "plumbing_type_name": None,
-                            "predict_complete_date": "",
-                            "predict_days": 0,
-                            "predict_hidden_check_date": '%s 00:00:00' % addDays(2),
-                            "predict_overall_check_date": '%s 00:00:00' % addDays(2),
-                            "predict_stuff_check_date": '%s 00:00:00' % addDays(2),
-                            "predict_survey_date": '%s 09:00:00' % addDays(2),
-                            "project_id": self.project_id,
-                            "project_no": projectInfo[10],
-                            "project_order_status": "INPROCESS",
-                            "project_order_type": "NEW_COLLECT_ORDER",
-                            "reform_way": "OLDRESTYLE",
-                            "reform_way_fact": "OLDRESTYLE",
-                            "reform_way_fact_name": "老房全装",
-                            "reform_way_name": "老房全装",
-                            "remark": "",
-                            "room_toilet": "3/2",
-                            "sign_date": projectInfo[11],
-                            "sign_name": None,
-                            "sign_uid": "8A2152435DC1AEAA015DDE96F9276279",
-                            "sign_user_phone": None,
-                            "start_time": '%s 00:00:00' % addDays(2),
-                            "stuff_check_date": "1970-01-02 00:00:00.0",
-                            "stuff_list_status": "DRAFT",
-                            "stuff_list_status_name": "待下单",
-                            "stuff_order_no": "",
-                            "stuff_submit_time": "1970-01-02 00:00:00.0",
-                            "stuff_submit_uid": "",
-                            "stuff_submit_uname": "",
-                            "supplier_id": "8A2152435FBAEFC3015FBAEFC3000000",
-                            "supplier_name": "测试专用硬装供应商",
-                            "supplier_uid": "8AB398CA5FBAF072015FBB26338A0002",
-                            "supplier_uname": "测试专用硬装员工",
-                            "supplier_uname_phone": "测试专用硬装员工/18815286582",
-                            "timeMap": None,
-                            "total_paid": 0,
-                            "two_level_nodes": "[\"VOLUME_SCORE\",\"SURVEY_PROPERTY_DELIVERY\",\"WATER_CLOSED_TEST\",\"DECORATION_CONFIG_LIST\",\"GOODS_CONFIG_LIST\",\"PROJECT_PLAN\",\"CONCEALMENT_ACCEPTANCE\",\"HARD_ACCEPTANCE\",\"ACCEPTANCE_PROPERTY_DELIVERY\",\"COST_SETTLEMENT\",\"OVERALL_ACCEPTANCE\",\"HOUSE_DELIVERY\",\"INDOOR_PICTURE\"]",
-                            "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                            "update_uid": "8AEF8688600F30F30160257579287F96",
-                            "wall_condition": "OLDHOUSE",
-                            "wall_condition_name": None
-                        }
+                    "newStuffList": commonData,
+                    "project": {
+                        "address": projectInfo[0],
+                        "build_area": "120.00",
+                        "cable_laying_type": "INNERPIPEINNERLINE",
+                        "cable_laying_type_name": None,
+                        "city_code": "330100",
+                        "city_name": "杭州市",
+                        "closed_water_test_result": "Y",
+                        "complete_two_nodes": "[\"VOLUME_SCORE\",\"SURVEY_PROPERTY_DELIVERY\",\"WATER_CLOSED_TEST\",\"PROJECT_PLAN\",\"GOODS_CONFIG_LIST\"]",
+                        "complete_two_nodes_list": ["VOLUME_SCORE", "SURVEY_PROPERTY_DELIVERY", "WATER_CLOSED_TEST",
+                                                    "PROJECT_PLAN", "GOODS_CONFIG_LIST"],
+                        "config_list_status": "CHECKED",
+                        "config_list_status_name": "已验收",
+                        "config_order_no": projectInfo[1],
+                        "config_progress": "WAIT_DESIGN",
+                        "config_progress_name": "待设计",
+                        "config_submit_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                        "config_submit_uid": User.UID.value,
+                        "config_submit_uname": User.NAME.value,
+                        "construct_uid": "1610",
+                        "construct_uname": "徐经纬",
+                        "construct_uname_phone": "徐经纬/13105715060",
+                        "contract_id": projectInfo[2],
+                        "contract_num": projectInfo[3],
+                        "contract_type": "NEWSIGN",
+                        "contract_type_name": "新签",
+                        "create_time": projectInfo[4],
+                        "create_uid": "8AEF8688600F30F30160257579287F96",
+                        "current_one_node": "PROJECT_PLAN",
+                        "decoration_style": "WUSHE_BREEZE",
+                        "decoration_style_name": "随寓和风",
+                        "deleted": 0,
+                        "deliver_room_date": "1970-01-02 00:00:00.0",
+                        "dispach_remark": "测试",
+                        "entrust_end_date": projectInfo[5],
+                        "entrust_start_date": projectInfo[6],
+                        "entrust_type_fact": "SHARE",
+                        "entrust_type_fact_name": "合租",
+                        "grade": 20,
+                        "hidden_check_date": "1970-01-02 00:00:00.0",
+                        "house_code": projectInfo[7],
+                        "housekeep_mange_name": None,
+                        "housekeep_mange_uid": projectInfo[8],
+                        "info_id": projectInfo[9],
+                        "is_active": "Y",
+                        "is_active_name": "是",
+                        "one_level_nodes": "[\"PLACE_ORDER\",\"DISPATCH_ORDER\",\"SURVEY\",\"PROJECT_PLAN\",\"CONSTRUCTING\",\"PROJECT_CHECK\",\"PROJECT_COMPLETION\"]",
+                        "order_status_name": "进程中",
+                        "order_type_name": "新收配置订单",
+                        "overall_check_date": "1970-01-02 00:00:00.0",
+                        "phone": "18815286582",
+                        "place_order_date": "2018-03-20 20:47:38",
+                        "place_order_dep": "",
+                        "place_order_dep_name": None,
+                        "place_order_reason": "测试",
+                        "place_order_uid": User.UID.value,
+                        "place_order_uname": User.NAME.value,
+                        "plumbing_type": "INNERPIPE",
+                        "plumbing_type_name": None,
+                        "predict_complete_date": "",
+                        "predict_days": 0,
+                        "predict_hidden_check_date": '%s 00:00:00' % addDays(2),
+                        "predict_overall_check_date": '%s 00:00:00' % addDays(2),
+                        "predict_stuff_check_date": '%s 00:00:00' % addDays(2),
+                        "predict_survey_date": '%s 09:00:00' % addDays(2),
+                        "project_id": self.project_id,
+                        "project_no": projectInfo[10],
+                        "project_order_status": "INPROCESS",
+                        "project_order_type": "NEW_COLLECT_ORDER",
+                        "reform_way": "OLDRESTYLE",
+                        "reform_way_fact": "OLDRESTYLE",
+                        "reform_way_fact_name": "老房全装",
+                        "reform_way_name": "老房全装",
+                        "remark": "",
+                        "room_toilet": "3/2",
+                        "sign_date": projectInfo[11],
+                        "sign_name": None,
+                        "sign_uid": "8A2152435DC1AEAA015DDE96F9276279",
+                        "sign_user_phone": None,
+                        "start_time": '%s 00:00:00' % addDays(2),
+                        "stuff_check_date": "1970-01-02 00:00:00.0",
+                        "stuff_list_status": "DRAFT",
+                        "stuff_list_status_name": "待下单",
+                        "stuff_order_no": "",
+                        "stuff_submit_time": "1970-01-02 00:00:00.0",
+                        "stuff_submit_uid": "",
+                        "stuff_submit_uname": "",
+                        "supplier_id": "8A2152435FBAEFC3015FBAEFC3000000",
+                        "supplier_name": "测试专用硬装供应商",
+                        "supplier_uid": "8AB398CA5FBAF072015FBB26338A0002",
+                        "supplier_uname": "测试专用硬装员工",
+                        "supplier_uname_phone": "测试专用硬装员工/18815286582",
+                        "timeMap": None,
+                        "total_paid": 0,
+                        "two_level_nodes": "[\"VOLUME_SCORE\",\"SURVEY_PROPERTY_DELIVERY\",\"WATER_CLOSED_TEST\",\"DECORATION_CONFIG_LIST\",\"GOODS_CONFIG_LIST\",\"PROJECT_PLAN\",\"CONCEALMENT_ACCEPTANCE\",\"HARD_ACCEPTANCE\",\"ACCEPTANCE_PROPERTY_DELIVERY\",\"COST_SETTLEMENT\",\"OVERALL_ACCEPTANCE\",\"HOUSE_DELIVERY\",\"INDOOR_PICTURE\"]",
+                        "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                        "update_uid": "8AEF8688600F30F30160257579287F96",
+                        "wall_condition": "OLDHOUSE",
+                        "wall_condition_name": None
                     }
+                }
                 result = myRequest(url, data)
                 if result:
                     consoleLog(u'装修清单制定完成')
@@ -1082,79 +1097,79 @@ class Decoration(object):
         def hideCheck():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/constructing/hideCheck'
             data = {
-                    "air_switch": None,
-                    "attachments": [{
-                        "attach_type": "TOILET",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 0,
-                            "type": "TOILET"
-                        }]
-                    }, {
-                        "attach_type": "KITCHEN",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 1,
-                            "type": "KITCHEN"
-                        }]
-                    }, {
-                        "attach_type": "LIVING_ROOM",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 2,
-                            "type": "LIVING_ROOM"
-                        }]
-                    }, {
-                        "attach_type": "BALCONY",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 3,
-                            "type": "BALCONY"
-                        }]
-                    }, {
-                        "attach_type": "OTHER",
-                        "imgs": []
-                    }],
-                    "check_remark": "",
-                    "closed_water_test_result": None,
-                    "curOneLevelNode": None,
-                    "curTwoLevelNode": None,
-                    "door_card": None,
-                    "door_key": None,
-                    "electricity_card": None,
-                    "electricity_meter_num": None,
-                    "electricity_meter_remain": None,
-                    "gas_card": None,
-                    "gas_meter_num": None,
-                    "gas_meter_remain": None,
-                    "grade": None,
-                    "hidden_check_date": '%s 09:00:00' % addDays(1),
-                    "landlordGoods": None,
-                    "project_id": self.project_id,
-                    "reform_way_fact": None,
-                    "reform_way_fact_name": "",
-                    "remark": None,
-                    "score_remark": None,
-                    "water_card": None,
-                    "water_card_remain": None,
-                    "water_meter_num": None
-                }
+                "air_switch": None,
+                "attachments": [{
+                    "attach_type": "TOILET",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 0,
+                        "type": "TOILET"
+                    }]
+                }, {
+                    "attach_type": "KITCHEN",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 1,
+                        "type": "KITCHEN"
+                    }]
+                }, {
+                    "attach_type": "LIVING_ROOM",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 2,
+                        "type": "LIVING_ROOM"
+                    }]
+                }, {
+                    "attach_type": "BALCONY",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 3,
+                        "type": "BALCONY"
+                    }]
+                }, {
+                    "attach_type": "OTHER",
+                    "imgs": []
+                }],
+                "check_remark": "",
+                "closed_water_test_result": None,
+                "curOneLevelNode": None,
+                "curTwoLevelNode": None,
+                "door_card": None,
+                "door_key": None,
+                "electricity_card": None,
+                "electricity_meter_num": None,
+                "electricity_meter_remain": None,
+                "gas_card": None,
+                "gas_meter_num": None,
+                "gas_meter_remain": None,
+                "grade": None,
+                "hidden_check_date": '%s 09:00:00' % addDays(1),
+                "landlordGoods": None,
+                "project_id": self.project_id,
+                "reform_way_fact": None,
+                "reform_way_fact_name": "",
+                "remark": None,
+                "score_remark": None,
+                "water_card": None,
+                "water_card_remain": None,
+                "water_meter_num": None
+            }
             result = myRequest(url, data)
             if result:
                 consoleLog(u'隐蔽验收完成')
@@ -1164,80 +1179,80 @@ class Decoration(object):
         def stufCheck():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/constructing/stufCheck'
             data = {
-                    "air_switch": None,
-                    "attachments": [{
-                        "attach_type": "TOILET",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 0,
-                            "type": "TOILET"
-                        }]
-                    }, {
-                        "attach_type": "KITCHEN",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 1,
-                            "type": "KITCHEN"
-                        }]
-                    }, {
-                        "attach_type": "LIVING_ROOM",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 2,
-                            "type": "LIVING_ROOM"
-                        }]
-                    }, {
-                        "attach_type": "ROOM",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 3,
-                            "type": "ROOM"
-                        }]
-                    }, {
-                        "attach_type": "OTHER",
-                        "imgs": []
-                    }],
-                    "check_remark": "",
-                    "closed_water_test_result": None,
-                    "curOneLevelNode": None,
-                    "curTwoLevelNode": None,
-                    "door_card": None,
-                    "door_key": None,
-                    "electricity_card": None,
-                    "electricity_meter_num": None,
-                    "electricity_meter_remain": None,
-                    "gas_card": None,
-                    "gas_meter_num": None,
-                    "gas_meter_remain": None,
-                    "grade": None,
-                    "hidden_check_date": None,
-                    "stuff_check_date": '%s 09:00:00' % addDays(1),
-                    "landlordGoods": None,
-                    "project_id": self.project_id,
-                    "reform_way_fact": None,
-                    "reform_way_fact_name": "",
-                    "remark": None,
-                    "score_remark": None,
-                    "water_card": None,
-                    "water_card_remain": None,
-                    "water_meter_num": None
-                }
+                "air_switch": None,
+                "attachments": [{
+                    "attach_type": "TOILET",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 0,
+                        "type": "TOILET"
+                    }]
+                }, {
+                    "attach_type": "KITCHEN",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 1,
+                        "type": "KITCHEN"
+                    }]
+                }, {
+                    "attach_type": "LIVING_ROOM",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 2,
+                        "type": "LIVING_ROOM"
+                    }]
+                }, {
+                    "attach_type": "ROOM",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 3,
+                        "type": "ROOM"
+                    }]
+                }, {
+                    "attach_type": "OTHER",
+                    "imgs": []
+                }],
+                "check_remark": "",
+                "closed_water_test_result": None,
+                "curOneLevelNode": None,
+                "curTwoLevelNode": None,
+                "door_card": None,
+                "door_key": None,
+                "electricity_card": None,
+                "electricity_meter_num": None,
+                "electricity_meter_remain": None,
+                "gas_card": None,
+                "gas_meter_num": None,
+                "gas_meter_remain": None,
+                "grade": None,
+                "hidden_check_date": None,
+                "stuff_check_date": '%s 09:00:00' % addDays(1),
+                "landlordGoods": None,
+                "project_id": self.project_id,
+                "reform_way_fact": None,
+                "reform_way_fact_name": "",
+                "remark": None,
+                "score_remark": None,
+                "water_card": None,
+                "water_card_remain": None,
+                "water_meter_num": None
+            }
             result = myRequest(url, data)
             if result:
                 consoleLog(u'硬装验收完成')
@@ -1252,54 +1267,54 @@ class Decoration(object):
         def wholeCheck():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proCheck/wholeCheck'
             data = {
-                    "air_switch": None,
-                    "attachments": None,
-                    "card_attachs": [{
-                        "attach_type": "CARDS",
-                        "imgs": [{
-                            "url": "http://image.ishangzu.com/rsm/2018/3/20/22/3fb11ebb-31c9-484e-a6d4-2f60f3bc8575.jpg",
-                            "img_id": "FF8080816243A912016243C596010097",
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 0,
-                            "type": ""
-                        }]
-                    }],
-                    "closed_water_test_result": None,
-                    "curOneLevelNode": None,
-                    "curTwoLevelNode": None,
-                    "door_card": None,
-                    "door_key": None,
-                    "electricity_card": None,
-                    "electricity_meter_num": None,
-                    "electricity_meter_remain": None,
-                    "gas_card": None,
-                    "gas_meter_num": None,
-                    "gas_meter_remain": None,
-                    "grade": None,
-                    "landlordGoods": None,
-                    "newStuffList": None,
-                    "overall_check_date": '%s 10:00:00' % addDays(1),
-                    "project_id": self.project_id,
-                    "remark": "",
-                    "score_remark": None,
-                    "three_attachs": [{
-                        "attach_type": "THREE",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 0,
-                            "type": ""
-                        }]
-                    }],
-                    "water_card": None,
-                    "water_card_remain": None,
-                    "water_meter_num": None
-                }
+                "air_switch": None,
+                "attachments": None,
+                "card_attachs": [{
+                    "attach_type": "CARDS",
+                    "imgs": [{
+                        "url": "http://image.ishangzu.com/rsm/2018/3/20/22/3fb11ebb-31c9-484e-a6d4-2f60f3bc8575.jpg",
+                        "img_id": "FF8080816243A912016243C596010097",
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 0,
+                        "type": ""
+                    }]
+                }],
+                "closed_water_test_result": None,
+                "curOneLevelNode": None,
+                "curTwoLevelNode": None,
+                "door_card": None,
+                "door_key": None,
+                "electricity_card": None,
+                "electricity_meter_num": None,
+                "electricity_meter_remain": None,
+                "gas_card": None,
+                "gas_meter_num": None,
+                "gas_meter_remain": None,
+                "grade": None,
+                "landlordGoods": None,
+                "newStuffList": None,
+                "overall_check_date": '%s 10:00:00' % addDays(1),
+                "project_id": self.project_id,
+                "remark": "",
+                "score_remark": None,
+                "three_attachs": [{
+                    "attach_type": "THREE",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 0,
+                        "type": ""
+                    }]
+                }],
+                "water_card": None,
+                "water_card_remain": None,
+                "water_meter_num": None
+            }
             result = myRequest(url, data)
             if result:
                 # consoleLog(u'整体验收完成')
@@ -1309,33 +1324,33 @@ class Decoration(object):
         def profee():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proCheck/profee'
             data = {
-                    "air_switch": "",
-                    "door_card": "",
-                    "door_key": "",
-                    "electricity_card": "",
-                    "electricity_meter_num": "",
-                    "electricity_meter_remain": "",
-                    "gas_card": "",
-                    "gas_meter_num": "",
-                    "gas_meter_remain": "",
-                    "project_id": self.project_id,
-                    "water_card": "",
-                    "water_card_remain": "",
-                    "water_meter_num": "",
-                    "attachments": [{
-                        "attach_type": "PROPERTY_DELIVERY_ORDER",
-                        "imgs": [{
-                            "url": get_conf('img', 'url'),
-                            "img_id": get_conf('img', 'img_id'),
-                            "create_name": "",
-                            "create_dept": "",
-                            "create_time": "",
-                            "sort": 0,
-                            "type": ""
-                        }]
-                    }],
-                    "resource": "PROJECT_CHECK"
-                }
+                "air_switch": "",
+                "door_card": "",
+                "door_key": "",
+                "electricity_card": "",
+                "electricity_meter_num": "",
+                "electricity_meter_remain": "",
+                "gas_card": "",
+                "gas_meter_num": "",
+                "gas_meter_remain": "",
+                "project_id": self.project_id,
+                "water_card": "",
+                "water_card_remain": "",
+                "water_meter_num": "",
+                "attachments": [{
+                    "attach_type": "PROPERTY_DELIVERY_ORDER",
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 0,
+                        "type": ""
+                    }]
+                }],
+                "resource": "PROJECT_CHECK"
+            }
             result = myRequest(url, data)
             if result:
                 # consoleLog(u'物业交割完成')
@@ -1361,113 +1376,113 @@ class Decoration(object):
     def indoorImg(self):
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proComp/indoor'
         data = {
-                "curOneLevelNode": None,
-                "curTwoLevelNode": None,
-                "deliver_room_date": None,
-                "house_attachs": [{
-                    "attach_type": "PUBLIC_TOILET_1",
-                    "imgs": [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
-                        "create_name": "",
-                        "create_dept": "",
-                        "create_time": "",
-                        "sort": 0,
-                        "type": "PUBLIC_TOILET_1"
-                    }]
-                }, {
-                    "attach_type": "KITCHEN_1",
-                    "imgs": [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
-                        "create_name": "",
-                        "create_dept": "",
-                        "create_time": "",
-                        "sort": 1,
-                        "type": "KITCHEN_1"
-                    }]
-                }, {
-                    "attach_type": "PARLOUR_1",
-                    "imgs": [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
-                        "create_name": "",
-                        "create_dept": "",
-                        "create_time": "",
-                        "sort": 2,
-                        "type": "PARLOUR_1"
-                    }]
-                }, {
-                    "attach_type": "METH",
-                    "imgs": [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
-                        "create_name": "",
-                        "create_dept": "",
-                        "create_time": "",
-                        "sort": 3,
-                        "type": "METH"
-                    }]
-                }, {
-                    "attach_type": "ETH",
-                    "imgs": [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
-                        "create_name": "",
-                        "create_dept": "",
-                        "create_time": "",
-                        "sort": 4,
-                        "type": "ETH"
-                    }]
-                }, {
-                    "attach_type": "PROP",
-                    "imgs": [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
-                        "create_name": "",
-                        "create_dept": "",
-                        "create_time": "",
-                        "sort": 5,
-                        "type": "PROP"
-                    }]
-                }, {
-                    "attach_type": "BALCONY_1",
-                    "imgs": [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
-                        "create_name": "",
-                        "create_dept": "",
-                        "create_time": "",
-                        "sort": 6,
-                        "type": "BALCONY_1"
-                    }]
-                }, {
-                    "attach_type": "BALCONY_2",
-                    "imgs": [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
-                        "create_name": "",
-                        "create_dept": "",
-                        "create_time": "",
-                        "sort": 7,
-                        "type": "BALCONY_2"
-                    }]
-                }],
-                "layout_attachs": [{
-                    "attach_type": "LAYOUT",
-                    "imgs": [{
-                        "url": get_conf('img','url'),
-                        "img_id":  get_conf('img','img_id'),
-                        "create_name": "",
-                        "create_dept": "",
-                        "create_time": "",
-                        "sort": 0,
-                        "type": ""
-                    }]
-                }],
-                "project_id": self.project_id,
-                "remark": None
-            }
+            "curOneLevelNode": None,
+            "curTwoLevelNode": None,
+            "deliver_room_date": None,
+            "house_attachs": [{
+                "attach_type": "PUBLIC_TOILET_1",
+                "imgs": [{
+                    "url": get_conf('img', 'url'),
+                    "img_id": get_conf('img', 'img_id'),
+                    "create_name": "",
+                    "create_dept": "",
+                    "create_time": "",
+                    "sort": 0,
+                    "type": "PUBLIC_TOILET_1"
+                }]
+            }, {
+                "attach_type": "KITCHEN_1",
+                "imgs": [{
+                    "url": get_conf('img', 'url'),
+                    "img_id": get_conf('img', 'img_id'),
+                    "create_name": "",
+                    "create_dept": "",
+                    "create_time": "",
+                    "sort": 1,
+                    "type": "KITCHEN_1"
+                }]
+            }, {
+                "attach_type": "PARLOUR_1",
+                "imgs": [{
+                    "url": get_conf('img', 'url'),
+                    "img_id": get_conf('img', 'img_id'),
+                    "create_name": "",
+                    "create_dept": "",
+                    "create_time": "",
+                    "sort": 2,
+                    "type": "PARLOUR_1"
+                }]
+            }, {
+                "attach_type": "METH",
+                "imgs": [{
+                    "url": get_conf('img', 'url'),
+                    "img_id": get_conf('img', 'img_id'),
+                    "create_name": "",
+                    "create_dept": "",
+                    "create_time": "",
+                    "sort": 3,
+                    "type": "METH"
+                }]
+            }, {
+                "attach_type": "ETH",
+                "imgs": [{
+                    "url": get_conf('img', 'url'),
+                    "img_id": get_conf('img', 'img_id'),
+                    "create_name": "",
+                    "create_dept": "",
+                    "create_time": "",
+                    "sort": 4,
+                    "type": "ETH"
+                }]
+            }, {
+                "attach_type": "PROP",
+                "imgs": [{
+                    "url": get_conf('img', 'url'),
+                    "img_id": get_conf('img', 'img_id'),
+                    "create_name": "",
+                    "create_dept": "",
+                    "create_time": "",
+                    "sort": 5,
+                    "type": "PROP"
+                }]
+            }, {
+                "attach_type": "BALCONY_1",
+                "imgs": [{
+                    "url": get_conf('img', 'url'),
+                    "img_id": get_conf('img', 'img_id'),
+                    "create_name": "",
+                    "create_dept": "",
+                    "create_time": "",
+                    "sort": 6,
+                    "type": "BALCONY_1"
+                }]
+            }, {
+                "attach_type": "BALCONY_2",
+                "imgs": [{
+                    "url": get_conf('img', 'url'),
+                    "img_id": get_conf('img', 'img_id'),
+                    "create_name": "",
+                    "create_dept": "",
+                    "create_time": "",
+                    "sort": 7,
+                    "type": "BALCONY_2"
+                }]
+            }],
+            "layout_attachs": [{
+                "attach_type": "LAYOUT",
+                "imgs": [{
+                    "url": get_conf('img', 'url'),
+                    "img_id": get_conf('img', 'img_id'),
+                    "create_name": "",
+                    "create_dept": "",
+                    "create_time": "",
+                    "sort": 0,
+                    "type": ""
+                }]
+            }],
+            "project_id": self.project_id,
+            "remark": None
+        }
         result = myRequest(url, data)
         if result:
             # consoleLog(u'室内图添加完成')
@@ -1477,10 +1492,10 @@ class Decoration(object):
     def delivery(self):
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proComp/delivery'
         data = {
-                "deliver_room_date": '%s 10:00:00' % addDays(1),
-                "project_id": self.project_id,
-                "remark": ""
-            }
+            "deliver_room_date": '%s 10:00:00' % addDays(1),
+            "project_id": self.project_id,
+            "remark": ""
+        }
         result = myRequest(url, data)
         if result:
             consoleLog(u'竣工完成')
@@ -1498,7 +1513,8 @@ class Decoration(object):
         self.hideAndStufCheck()  # 施工中
         self.projectCheck()  # 项目验收
         self.indoorImg()  # 室内图
-        # self.delivery()  # 竣工
+        self.delivery()  # 竣工
+
 
 if __name__ == '__main__':
     contractNum = u'工程1.3测试-05080958bm'

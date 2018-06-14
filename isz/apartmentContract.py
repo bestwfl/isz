@@ -4,14 +4,15 @@ import time
 from common import sqlbase, datetimes
 from common.base import consoleLog
 from common.datetimes import today, addDays, addMonths
-from common.dict import AuditStatus
+from common.dict import AuditStatus, AUDIT_STATUS
 from common.interface_wfl import myRequest, delNull
 from isz.contractBase import ContractBase
 from isz.infoClass import ApartmentContractInfo, ApartmentContractEndInfo, HouseContractInfo
 
 
 class ApartmentContract(ContractBase, ApartmentContractInfo):
-    """出租合同对应操作
+    """
+    出租合同对应操作
     :param contractIdOrNum 出租合同id或者num
     """
     def audit(self):
@@ -30,10 +31,10 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
             }
             if myRequest(url, data):
                 if activityId == '25':
-                    consoleLog(u'出租合同已初审')
+                    consoleLog('出租合同已初审')
                     time.sleep(1)
                 elif activityId == '22':
-                    consoleLog(u'出租合同已复审')
+                    consoleLog('出租合同已复审')
 
         if 'AUDIT' == self.audit_status_now:
             audit('25')
@@ -344,7 +345,7 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
         }
 
         if myRequest(url, endInfo):
-            consoleLog(u'出租终止新增成功')
+            consoleLog('出租终止新增成功')
 
     def getEndInfo(self):
         """获取终止结算基础信息，终止结算前动作"""
@@ -393,10 +394,10 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
             }
             if myRequest(url, data):
                 if AuditStatus.APARTMETN_CONTRACT_END_AUDIT_AFTER.value == afterStatus:
-                    consoleLog(u'出租终止已初审')
+                    consoleLog('出租终止已初审')
                     time.sleep(1)
                 elif AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER.value == afterStatus:
-                    consoleLog(u'出租终止已复审')
+                    consoleLog('出租终止已复审')
 
         if AuditStatus.APARTMETN_CONTRACT_END_STATUS_WAIT_AUDIT.value == endInfo.end_audit_status or AuditStatus.APARTMETN_CONTRACT_END_STATUS_REJECT.value == endInfo.end_audit_status:
             audit(AuditStatus.APARTMETN_CONTRACT_END_AUDIT_AFTER.value)  # 初审
@@ -411,14 +412,14 @@ class ApartmentContractEnd(ApartmentContractEndInfo):
     def endAudit(self):
         """终止结算审核"""
         endInfo = ApartmentContractEndInfo(self.apartment_contract_id)
-        def audit(afterStatus):
+        def audit(action):
             """审核
-            :param afterStatus 审核操作后的状态 """
+            :param action 审核操作后的状态 """
 
             url = '/isz_contract/ContractEndController/auditApartmrntContractEnd'
             data = {
                 "endBasicInfo": {
-                    "audit_status": afterStatus,
+                    "audit_status": action,
                     "content": "同意！",
                     "contract_id": self.apartment_contract_id,
                     "end_contract_num": endInfo.end_contract_num,
@@ -445,24 +446,23 @@ class ApartmentContractEnd(ApartmentContractEndInfo):
                 }
             }
             if myRequest(url, data):
-                if AuditStatus.APARTMETN_CONTRACT_END_AUDIT_AFTER.value == afterStatus:
-                    consoleLog(u'出租终止已初审')
+                if AuditStatus.APARTMETN_CONTRACT_END_AUDIT_AFTER.value == action:
+                    consoleLog('出租终止已初审')
                     time.sleep(1)
-                elif AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER.value == afterStatus:
-                    consoleLog(u'出租终止已复审')
+                elif AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER.value == action:
+                    consoleLog('出租终止已复审')
 
-        if AuditStatus.APARTMETN_CONTRACT_END_STATUS_WAIT_AUDIT.value == endInfo.end_audit_status or AuditStatus.APARTMETN_CONTRACT_END_STATUS_REJECT.value == endInfo.end_audit_status:
-            audit(AuditStatus.APARTMETN_CONTRACT_END_AUDIT_AFTER.value)  # 初审
-            audit(AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER.value)  # 复审
+        audit_status = AUDIT_STATUS.APARTMETN_CONTRACT_END.value
+        if audit_status.WAIT_AUDIT.value == endInfo.end_audit_status or audit_status.REJECT.value == endInfo.end_audit_status:
+            audit(audit_status.AUDITED.value)  # 初审
+            audit(audit_status.APPROVED.value)  # 复审
         elif AuditStatus.APARTMETN_CONTRACT_END_STATUS_AUDITED.value == endInfo.end_audit_status:
             audit(AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER.value)  # 复审
         else:
             return
 
-
-
 if __name__ == '__main__':
-    contract = ApartmentContract(u'科CH201712190854')
+    contract = ApartmentContract('科CH201712190854')
     # contract.audit()
     # contract.resign()
     contract.end()

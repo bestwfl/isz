@@ -161,12 +161,12 @@ class Apartment(ApartmentInfo):
                     "create_user": userInfo['user_name'],
                     "deleted": 0,
                     "house_id": self.house_id,
-                    "house_img_id": houseImg['house_img_id'],
-                    "img_id": houseImg['img_id'],
+                    "house_img_id": houseImgList['house_img_id'],
+                    "img_id": houseImgList['img_id'],
                     "img_type": "INDOOR_IMGS",
                     "residential_id": self.residential_id,
                     "sort": j + 1,
-                    "src": houseImg['src']
+                    "src": houseImgList['src']
                 }
                 houseImgListNew.append(houseImgNew)
         url = "/isz_house/ApartmentController/saveHouseImage.action"
@@ -206,38 +206,42 @@ class Apartment(ApartmentInfo):
         data = {}
 
     # 新增出租合同
-    def createApartmentContract(self, customerInfo, rent_price, sign_date, rent_start_date, rent_end_date, payment_cycle, contract_num=None, sign_phone=None, sign_name=None, sign_id_type=None, sign_id_no=None):
+    def createApartmentContract(self, customerInfo, rent_price, sign_date,
+                                rent_start_date, rent_end_date, payment_cycle,
+                                contract_num=None, sign_phone=None, sign_name=None,
+                                sign_id_type=None, sign_id_no=None):
         """
         新增出租合同
-        :param apartement_id: 签约的公寓ID，创建委托合同的接口会返回此信息
+        :param sign_id_no: 签约人证件号
+        :param sign_id_type: 签约人证件类型
+        :param sign_name: 签约人姓名
+        :param sign_phone: 签约人手机号
+        :param contract_num: 合同号，可以为空，默认随机生成
         :param customerInfo: 签约的租前客户信息，创建租客的接口会返回此信息
         :param rent_price: 目标出租价格（由于半年付和年付会有优惠，此价格直接为优惠后的价格）
         :param sign_date: 签约日期
         :param rent_start_date: 承租起算日
         :param rent_end_date: 承租到期日
-        :param deposit: 押金
         :param payment_cycle:付款周期
 
         :return: 返回创建的合同信息字典
         """
 
-        if self.rent_price is None or self.rent_price == 0 or self.rent_price == 'None':  # 如果房源未定价则现将房源定价，定价金额为租金金额
+        # 如果房源未定价则现将房源定价，定价金额为租金金额
+        if self.rent_price is None or self.rent_price == 0 or self.rent_price == 'None':
             self.confirmPrice(rent_price)  # 定价
-
-        url = 'isz_contract/ApartmentContractController/saveOrUpdateApartmentContract.action'
         deposit = rent_price = float(self.rent_price)
-
         sign_name = u'签约人' if not sign_name else sign_name
         sign_phone = '13600000000' if not sign_phone else sign_phone
         sign_id_type = 'PASSPORT' if not sign_id_type else sign_id_type
         sign_id_no = 'huzhao123' if not sign_id_no else sign_id_no
-
         if payment_cycle is 'HALF_YEAR':  # 付款周期和租金规则
             real_due_rent_price = rent_price * 0.985
         elif payment_cycle is 'ONE_YEAR':
             real_due_rent_price = rent_price * 0.97
         else:
             real_due_rent_price = rent_price
+        # 随机生成出租合同号
         contract_num = 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S') + get_randomString(2) if not contract_num else contract_num
         data = {
             'contract_num': contract_num,  # 合同编号
@@ -317,7 +321,8 @@ class Apartment(ApartmentInfo):
             'model': '4'
         }
 
-        def step1():
+        # 获取出租合同基础信息
+        def searchApartmentContractDetail():
             url = 'isz_contract/ApartmentContractController/searchApartmentContractDetail.action'
             requestPayload = {
                 "apartment_id": self.apartment_id,
@@ -329,7 +334,8 @@ class Apartment(ApartmentInfo):
                 for x, y in content.items():
                     data[x] = y
 
-        def step2():
+        # 获取自营房源信息
+        def getHouseContractByHouseId(request=myRequest):
             url = 'isz_contract/ApartmentContractController/getHouseContractByHouseId.action'
             requestPayload = {
                 "rent_start_date": rent_start_date,
@@ -340,11 +346,12 @@ class Apartment(ApartmentInfo):
             }
             if self.rent_type == 'ENTIRE':
                 del requestPayload['room_id']
-            result = myRequest(url, requestPayload)
+            result = request(url, requestPayload, shutdownFlag=True)
             if result:
                 data['houseContractList'] = delNull(result['obj'])
 
-        def step3():
+        #
+        def getServiceAgencyProperty():
             url = 'isz_contract/ApartmentContractController/getServiceAgencyProperty.action'
             requestPayload = {
                 "houseContractId": self.house_contract_id,  # data['houseContractList'][0]['contract_id'],
@@ -362,7 +369,8 @@ class Apartment(ApartmentInfo):
             if result:
                 data['month_server_fee'] = str(result['obj']['month_server_fee'])
 
-        def step4():
+        # 生成出租应收
+        def createApartmentContractReceivable():
             url = 'isz_contract/ApartmentContractController/createApartmentContractReceivable.action'
             requestPayload = data['apartmentContractRentInfoList']
             result = myRequest(url, requestPayload)
@@ -374,19 +382,22 @@ class Apartment(ApartmentInfo):
                     x['rowIndex'] = index
                     index += 1
 
-        step1()
-        step2()
-        step3()
-        step4()
-        result = myRequest(url, data)
+        searchApartmentContractDetail()
+        getHouseContractByHouseId()
+        getServiceAgencyProperty()
+        createApartmentContractReceivable()
+
+        url = 'isz_contract/ApartmentContractController/saveOrUpdateApartmentContract.action'
+        result = myRequest(url, data, shutdownFlag=True)  # 生成出租合同
         if result:
-            consoleLog(u'承租合同 %s 已创建完成' % data['contract_num'])
+            consoleLog('承租合同 %s 已创建完成' % data['contract_num'])
             return ApartmentContract(result['par']['contract_id'])
 
+    # 添加保修订单
     def create_repair_order(self):
         pass
 
 if __name__ == '__main__':
     apartment_id = 'SJZ1001168-01'
     apartment = ApartmentInfo(apartment_id)
-    print apartment
+    print(apartment)

@@ -94,7 +94,7 @@ class HouseContract(ContractBase, HouseContractInfo):
             result = myRequest(url, data, method='put')
             if not result:
                 consoleLog(u'委托合同"%s"应付审核失败！' % self.house_contract_num)
-                raise
+                quit()
             else:
                 consoleLog(u'委托合同"%s"应付审核通过' % self.house_contract_num)
         else:
@@ -136,8 +136,7 @@ class HouseContract(ContractBase, HouseContractInfo):
                 return
             else:
                 consoleLog(u'HOUSE CONTRACT STEP *%s* %s FAIL!!!' % (page, auditAction))
-                raise
-
+                quit()
         if 'chushen' == auditAction or 'fushen' == auditAction:
             self.auditPayable()
             if AuditStatus.HOUSE_CONTRACT_STATUS_WAIT_AUDIT.value == self.audit_status_now:
@@ -439,4 +438,4 @@ if __name__ == '__main__':
     # contract_num = 'RS-%s' % contract.contract_num
     # contract.resign(contract_num)
     landlord = contract.getLandlordInfo()
-    print landlord
+    print(landlord)
