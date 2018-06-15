@@ -7,19 +7,14 @@
 """
 
 import MySQLdb
+import time
 from MySQLdb.cursors import DictCursor
 from DBUtils.PooledDB import PooledDB
-
-from common.base import get_conf
-
-"""
-Config是一些数据库的配置文件
-"""
-
+from common.base import get_conf, consoleLog
 
 class Mysql(object):
     """
-    MYSQL数据库对象，负责产生数据库连接 , 此类中的连接采用连接池实现获取连接对象：conn = Mysql.getConn()
+    MYSQL数据库对象，负责产生数据库连接 , 此类中的连接采用连接池实现获取连接对象：conn = Mysql._getConn()
             释放连接对象;conn.close()或del conn
     """
     # 连接池对象
@@ -38,14 +33,98 @@ class Mysql(object):
         """
         if Mysql.__pool is None:
             Mysql.__pool = PooledDB(creator=MySQLdb, mincached=1, maxcached=20,
-                                  host=get_conf('db', 'host'), port=get_conf('db', 'port', int),
-                                  user=get_conf('db', 'user'), passwd=get_conf('db', 'password'),
-                                  db=get_conf('db', 'db'), use_unicode=False, charset=get_conf('db', 'charset'),
-                                  cursorclass=DictCursor)
+                                    host=get_conf('db', 'host'), port=get_conf('db', 'port', int),
+                                    user=get_conf('db', 'user'), passwd=get_conf('db', 'password'),
+                                    db=get_conf('db', 'db'), use_unicode=False, charset=get_conf('db', 'charset'))
+                                    # cursorclass=DictCursor)  # 返回字典格式
         return Mysql.__pool.connection()
 
-    def getAll(self, sql, param=None):
+    @staticmethod
+    def _convert(data):
         """
+        结果数据处理
+        :param data: 需要出的基础数据
+        :return: 数组
+        """
+        if len(data) > 0:
+            if type(data[0]) is tuple:
+                if len(data[0]) == 1:
+                    value = []
+                    for i in data:
+                        value.append(i[0])
+                    return value
+            for x, y in enumerate(data):
+                if type(data[x]) is tuple or type(data[x]) is list:
+                    data[x] = list(y)
+                    Mysql._convert(data[x])
+            return data
+        else:
+            return None
+
+    @staticmethod
+    def _convertUnicode(data):
+        """
+        转换为Unicode、int以及datetime之类的时间数据
+        :param data:
+        :return:
+        """
+        if data is None:
+            return []
+        else:
+            for x in range(len(data)):
+                if type(data[x]) is not list:
+                    if type(data[x]) is not unicode and type(data[x]) is not int:
+                        data[x] = str(data[x])
+                else:
+                    for y in range(len(data[x])):
+                        if type(data[x][y]) is not unicode and type(data[x][y]) is not int:
+                            data[x][y] = str(data[x][y])
+            return data
+
+    def query(self, sql, param=None, nullThrow=True, resarch=False):
+        """
+        返回带列名的dict数组
+        :return  list,[{'contract_id':'id','house_id':'id'}]
+        """
+        if param is None:
+            count = self._cursor.execute(sql)
+        else:
+            count = self._cursor.execute(sql, param)
+        if count > 0:
+            index = self._cursor.description
+            _result = self._cursor.fetchall()
+            result = []
+            for res in _result:
+                row = {}
+                # for key in res.keys():
+                #     if type(res[key]) is not unicode and type(res[key]) is not int:
+                #         res[key] = str(res[key])
+                # result.append(res)
+                for i in range(len(index)):
+                    if type(res[i]) is not unicode and type(res[i]) is not int:
+                        row[index[i][0]] = str(res[i])
+                    else:
+                        row[index[i][0]] = res[i]
+                result.append(row)
+            return result
+        else:
+            if resarch:
+                for i in range(3):
+                    time.sleep(3)
+                    result = self.query(sql, param, nullThrow=False, resarch=False)
+                    if result:
+                        return result
+            if nullThrow:
+                raise BaseException('there is no result searched by sql: %s ' % sql)
+            else:
+                consoleLog('there is no result searched by sql: %s ' % sql, 'w')
+                return [{}]
+
+    def getAll(self, sql, needConvert=True, param=None, nullLog=True, research=False):
+        """
+        :param needConvert:
+        :param research: 是否重复查询
+        :param nullLog: 是否打印查询为空的日志
         :summary: 执行查询，并取出所有结果集
         :param sql:查询ＳＱＬ，如果有查询条件，请只指定条件列表，并将条件值使用参数[param]传递进来
         :param param: 可选参数，条件列表值（元组/列表）
@@ -59,10 +138,31 @@ class Mysql(object):
             result = self._cursor.fetchall()
         else:
             result = False
-        return result
+            if research:
+                for i in range(3):
+                    time.sleep(3)
+                    result = self.getAll(sql, nullLog=False, research=False)
+                    if result:
+                        return result
+            if nullLog:
+                consoleLog(u'SQL查询为空!\nSQL:%s' % sql)
+        # results_list = []
+        # for i in range(len(result)):
+        #     result_list = []
+        #     for a in result[i].values():
+        #         result_list.append(a)
+        #     results_list.append(result_list)
+        result = Mysql._convert(list(result))
+        if needConvert:
+            return Mysql._convertUnicode(result)
+        else:
+            return result
 
-    def getOne(self, sql, param=None):
+    def getOne(self, sql, needConvert=True, param=None, nullLog=True, research=False):
         """
+        :param needConvert:
+        :param research:
+        :param nullLog:
         :summary: 执行查询，并取出第一条
         :param sql:查询ＳＱＬ，如果有查询条件，请只指定条件列表，并将条件值使用参数[param]传递进来
         :param param: 可选参数，条件列表值（元组/列表）
@@ -76,10 +176,26 @@ class Mysql(object):
             result = self._cursor.fetchone()
         else:
             result = False
-        return result
+            if research:
+                for i in range(3):
+                    time.sleep(3)
+                    result = self.getAll(sql, nullLog=False, research=False)
+                    if result:
+                        return result
+            if nullLog:
+                consoleLog(u'SQL查询为空!\nSQL:%s' % sql)
+        result = Mysql._convert(list(result))
+        if needConvert:
+            return Mysql._convertUnicode(result)
+        else:
+            return result
+        # return result
 
-    def getMany(self, sql, num, param=None):
+    def getMany(self, sql, num, needConvert=True, param=None, nullLog=True, research=False):
         """
+        :param needConvert:
+        :param research:
+        :param nullLog:
         :summary: 执行查询，并取出num条结果
         :param sql:查询ＳＱＬ，如果有查询条件，请只指定条件列表，并将条件值使用参数[param]传递进来
         :param num:取得的结果条数
@@ -94,7 +210,25 @@ class Mysql(object):
             result = self._cursor.fetchmany(num)
         else:
             result = False
-        return result
+            if research:
+                for i in range(3):
+                    time.sleep(3)
+                    result = self.getAll(sql, nullLog=False, research=False)
+                    if result:
+                        return result
+            if nullLog:
+                consoleLog(u'SQL查询为空!\nSQL:%s' % sql)
+        # results_list = []
+        # for i in range(len(result)):
+        #     result_list = []
+        #     for a in result[i].values():
+        #         result_list.append(a)
+        #     results_list.append(result_list)
+        result = Mysql._convert(list(result))
+        if needConvert:
+            return Mysql._convertUnicode(result)
+        else:
+            return result
 
     def insertOne(self, sql, value):
         """
@@ -174,3 +308,10 @@ class Mysql(object):
             self.end('rollback')
         self._cursor.close()
         self._conn.close()
+
+
+if __name__ == '__main__':
+    mysql = Mysql()
+    apartment_sql = "SELECT * FROM apartment LIMIT 1"
+    results = mysql.query(apartment_sql)
+    print(results)
