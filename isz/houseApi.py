@@ -6,26 +6,27 @@ from common.base import solr
 from common.dict import userInfo
 from common.interface_wfl import myRequest
 
-#杭州
+# 杭州
 # city_code = 330100
 # area_code = 310108
 # residential_address = u'杭州市 滨江区 浦沿 autoTest'
 # business_circle_name = u'浦沿'
 # taBusinessCircleString = 4
 
-#苏州
+# 苏州
 city_code = 320500
 area_code = 215010
 residential_address = u'南京市 高新区 枫桥 autoTest'
 business_circle_name = u'枫桥'
 taBusinessCircleString = 'bad6e2325ee311e69ecfd89d672b5e48'
 
-#南京
-city_code = 320100
-area_code = 320104
-residential_address = u'南京市 秦淮区 秦虹 autoTest'
-business_circle_name = u'秦虹'
-taBusinessCircleString = '4028808A5500064D01550006584B0028'
+
+# 南京
+# city_code = 320100
+# area_code = 320104
+# residential_address = u'南京市 秦淮区 秦虹 autoTest'
+# business_circle_name = u'秦虹'
+# taBusinessCircleString = '4028808A5500064D01550006584B0028'
 
 # #上海
 # city_code = 310100
@@ -35,12 +36,12 @@ taBusinessCircleString = '4028808A5500064D01550006584B0028'
 # taBusinessCircleString = '4028808A54FFAB5F0154FFAB7B390082'
 
 # 新增楼盘
-def creatResidential(cityCode = None, residentialName = None):
+def creatResidential(cityCode=None, residentialName=None):
     url = 'isz_house/ResidentialController/saveResidential.action'
-    residentialName = residentialName if residentialName else u"XX苏州测试楼盘"# + '-' + time.strftime('%m%d-%H%M%S')
-    sql = "SELECT sd.parent_id from sys_department sd INNER JOIN sys_user sur on sur.dep_id = sd.dep_id INNER JOIN sys_position spt on spt.position_id = sur.position_id " \
-            "where sd.dep_district = 320500 and sd.is_active='Y' and sd.dep_id <> '00000000000000000000000000000000' and (spt.position_name like '资产管家%' or spt.position_name like '综合管家%') and sd.dep_name not like '%培训%'" \
-            "ORDER BY RAND() LIMIT 1"
+    residentialName = residentialName if residentialName else u"XX苏州测试楼盘"  # + '-' + time.strftime('%m%d-%H%M%S')
+    sql = "SELECT sd.parent_id FROM sys_department sd INNER JOIN sys_user sur ON sur.dep_id = sd.dep_id INNER JOIN sys_position spt ON spt.position_id = sur.position_id " \
+          "WHERE sd.dep_district = 320500 AND sd.is_active='Y' AND sd.dep_id <> '00000000000000000000000000000000' AND (spt.position_name LIKE '资产管家%' OR spt.position_name LIKE '综合管家%') AND sd.dep_name NOT LIKE '%培训%'" \
+          "ORDER BY RAND() LIMIT 1"
     dutyDepID = sqlbase.serach(sql)[0]
     data = {
         "residential_name": residentialName,
@@ -57,11 +58,13 @@ def creatResidential(cityCode = None, residentialName = None):
     }
     result = myRequest(url, data)
     if result:
-        sql = "SELECT residential_id from residential where residential_name = '%s' and deleted=0" % residentialName.encode('utf-8')
+        sql = "SELECT residential_id from residential where residential_name = '%s' and deleted=0" % residentialName.encode(
+            'utf-8')
         residentialID = sqlbase.serach(sql)[0]
         residential = {'residentialName': residentialName, 'residentialID': residentialID, 'dutyDepID': dutyDepID}
         consoleLog(u'楼盘‘%s’创建成功' % residentialName)
         return residential
+
 
 # 新增栋座
 def creatBuilding():
@@ -69,12 +72,12 @@ def creatBuilding():
     residential = creatResidential()
     buildingName = u'1幢'
     data = {
-        "property_name":residential['residentialName'],
-        "building_name":buildingName,
-        "no_building":u"无",
-        "housing_type":"ordinary",
-        "residential_id":residential['residentialID'],
-        "have_elevator":"Y"
+        "property_name": residential['residentialName'],
+        "building_name": buildingName,
+        "no_building": u"无",
+        "housing_type": "ordinary",
+        "residential_id": residential['residentialID'],
+        "have_elevator": "Y"
     }
     result = myRequest(url, data)
     if result:
@@ -84,6 +87,7 @@ def creatBuilding():
         residential['buildingName'] = buildingName
         consoleLog(u'栋座‘%s’创建成功' % buildingName)
         return residential
+
 
 # 新增单元
 def creatUnit():
@@ -102,19 +106,21 @@ def creatUnit():
     # }
     unitName = u'2单元'
     data = {
-        "property_name": residential['residentialName']+residential['buildingName'],
+        "property_name": residential['residentialName'] + residential['buildingName'],
         "unit_name": unitName,
         "no_unit": u"无",
         "building_id": residential['buildingID']
     }
     result = myRequest(url, data)
     if result:
-        sql = "SELECT unit_id from residential_building_unit where building_id = '%s' order by create_time desc limit 1" % residential['buildingID']
+        sql = "SELECT unit_id from residential_building_unit where building_id = '%s' order by create_time desc limit 1" % \
+              residential['buildingID']
         unitID = sqlbase.serach(sql)[0]
         residential['unitID'] = unitID
         residential['unitName'] = unitName
         consoleLog(u'单元‘%s’创建成功' % unitName)
         return residential
+
 
 # 新增楼层
 def creatFloor(count=5):
@@ -134,13 +140,15 @@ def creatFloor(count=5):
         }
         result = myRequest(url, data)
         if result:
-            sql = "SELECT floor_id from residential_building_floor where building_id = '%s' and unit_id = '%s' order by CONVERT(floor_name,SIGNED)" % (residential['buildingID'],residential['unitID'])
+            sql = "SELECT floor_id from residential_building_floor where building_id = '%s' and unit_id = '%s' order by CONVERT(floor_name,SIGNED)" % (
+                residential['buildingID'], residential['unitID'])
             floorID = sqlbase.serach(sql, oneCount=False)[i]
             residential['floorID'] = floorID
             residential['floorName'] = floorName
             floors.append(residential)
     consoleLog(u'楼层全部创建成功')
     return floors
+
 
 # 新增房屋
 def creatHouseNum(count=4):
@@ -152,10 +160,12 @@ def creatHouseNum(count=4):
             residential = {}
             for key in floor.keys():
                 residential[key] = floor[key]
-            houseNumName = '%s0%s' % (residential['floorName'], i+1)
+            houseNumName = '%s0%s' % (residential['floorName'], i + 1)
             data = {
-                "property_name": residential['residentialName'] + residential['buildingName'] + residential['unitName'] + str(residential['floorName']) + u'层',
-                "rooms": "3", "livings": "1", "bathrooms": "2", "kitchens": "1", "balconys": "2", "build_area": "120.00","orientation": "NORTH",
+                "property_name": residential['residentialName'] + residential['buildingName'] + residential[
+                    'unitName'] + str(residential['floorName']) + u'层',
+                "rooms": "3", "livings": "1", "bathrooms": "2", "kitchens": "1", "balconys": "2",
+                "build_area": "120.00", "orientation": "NORTH",
                 "house_no": houseNumName,
                 "unit_id": residential['unitID'],
                 "building_id": residential['buildingID'],
@@ -164,13 +174,14 @@ def creatHouseNum(count=4):
             result = myRequest(url, data)
             if result:
                 sql = "SELECT house_no_id from residential_building_house_no where building_id = '%s' and unit_id = '%s' and floor_id = '%s' order by CONVERT(house_no,SIGNED)" % \
-                      (residential['buildingID'],residential['unitID'],residential['floorID'])
+                      (residential['buildingID'], residential['unitID'], residential['floorID'])
                 houseNumID = sqlbase.serach(sql, oneCount=False)[i]
                 residential['houseNumID'] = houseNumID
                 residential['houseNumName'] = houseNumName
                 houses.append(residential)
     consoleLog(u'房号全部新增成功')
     return houses
+
 
 # 新增自营房源
 def addHouse():
@@ -226,7 +237,8 @@ def addHouse():
             residential['houseDevelogID'] = houseDevelogID
             houseIds.append(residential)
     consoleLog(u'审核房源全部新增成功')
-    return  houseIds
+    return houseIds
+
 
 # 审核自营房源
 def auditHouse():
@@ -275,13 +287,15 @@ def auditHouse():
             "area_code": area_code,
             "city_code": city_code,
             "house_develop_id": houseInfo['houseDevelogID'],
-            "update_time":sqlbase.serach("SELECT update_time from house_develop where house_develop_id = '%s'" % houseInfo['houseDevelogID'])[0],
-            #"update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+            "update_time": sqlbase.serach(
+                "SELECT update_time from house_develop where house_develop_id = '%s'" % houseInfo['houseDevelogID'])[0],
+            # "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
             "audit_content": u"同意"
         }
         result = myRequest(url, data)
         if result:
-            sql = "select house_id,house_code from house where residential_id = '%s' and house_no_id = '%s'" % (houseInfo['residentialID'],houseInfo['houseNumID'])
+            sql = "select house_id,house_code from house where residential_id = '%s' and house_no_id = '%s'" % (
+                houseInfo['residentialID'], houseInfo['houseNumID'])
             house = sqlbase.serach(sql)
             houseInfo['houseID'] = house[0]
             houseInfo['houseCode'] = house[1]
@@ -291,6 +305,7 @@ def auditHouse():
             houseInfos.append(houseInfo)
     consoleLog(u'开发自营房源全部生成成功')
     return houseInfos
+
 
 if __name__ == '__main__':
     auditHouse()

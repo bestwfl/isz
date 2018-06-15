@@ -10,6 +10,7 @@ from common.dict import User
 
 
 class Decoration(object):
+
     uploadPhotoURL = 'http://decorate.ishangzu.com/isz_decoration/DecorationFileController/uploadPhoto'  # 装修工程上传图片地址
 
     def __init__(self, contractIdOrNum):
@@ -521,7 +522,7 @@ class Decoration(object):
                 ]
                 result = myRequest(url, data)
                 if result:
-                    consoleLog('物品添加完成，准备下单')
+                    consoleLog(u'物品添加完成，准备下单')
                     return
 
             def submitOrder():

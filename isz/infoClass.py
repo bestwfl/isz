@@ -1,5 +1,7 @@
 # -*- coding:utf8 -*-
 """表元素基础信息类"""
+import threading
+
 from common import sqlbase
 from common.base import consoleLog, get_conf
 
@@ -305,7 +307,7 @@ class DecorationHouseInfo(object):
 class DecorationProjectInfo(DecorationHouseInfo):
 
     def __init__(self, contractNum):
-        super().__init__(contractNum)
+        super(DecorationProjectInfo, self).__init__(contractNum)
         sql = "select * from %s.new_decoration_project where info_id='%s' " % (
             get_conf('db', 'decoration_db'), self.info_id)
         self.project_info = sqlbase.query(sql)[0]

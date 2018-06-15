@@ -25,9 +25,15 @@ def createCustomer():
         'constellation': 'VIRGO',  # 星座
         'education': 'BACHELOR',  # 学历
         'belong_did': sqlbase.serach(
+<<<<<<< Updated upstream
             "select dep_id from sys_user where user_phone = '13600000001' and user_status = 'INCUMBENCY'")[0],  # 所属部门
         'belong_uid': sqlbase.serach(
             "select user_id from sys_user where user_phone = '13600000001' and user_status = 'INCUMBENCY'")[0],  # 所属人
+=======
+            "SELECT dep_id FROM sys_user WHERE user_phone = '13600000001' AND user_status = 'INCUMBENCY'")[0],  # 所属部门
+        'belong_uid': sqlbase.serach(
+            "SELECT user_id FROM sys_user WHERE user_phone = '13600000001' AND user_status = 'INCUMBENCY'")[0],  # 所属人
+>>>>>>> Stashed changes
         'customer_from': 'FLOOR19',  # 来源
         'rent_class': 'CLASSA',  # 求租等级
         'rent_type': 'GATHERHOUSE',  # 求租类型
