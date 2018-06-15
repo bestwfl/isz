@@ -41,7 +41,7 @@ class HouseContractInfo(HouseInfo):
         super(HouseContractInfo, self).__init__(contractId[0][1])
         self.house_contract_info = sqlbase.query(sql)[0]
         self.house_contract_id = self.house_contract_info['contract_id']
-        query_house_contract = sqlbase.serach("select * from query_house_contract where contract_id='%s'" % self.house_contract_id, oneCount=False)
+        query_house_contract = sqlbase.serach("select * from query_house_contract where contract_id='%s'" % self.house_contract_id, oneCount=False, nullLog=False)
         if 1 != len(query_house_contract):  # 检查委托合同宽表
             consoleLog("there is no contract in 'query_house_contract',contract_id: %s" % self.house_contract_id, 'w')
         self.reform_way = self.house_contract_info['reform_way']
@@ -183,7 +183,7 @@ class ApartmentContractInfo(ApartmentInfo):
         sql = "select * from apartment_contract where contract_id='%s'" % contractId[0][0]
         self.apartment_contract_info = sqlbase.query(sql)[0]
         self.apartment_contract_id = self.apartment_contract_info['contract_id']
-        query_apartment_contract = sqlbase.serach("select * from query_apartment_contract where contract_id='%s'" % self.apartment_contract_id, oneCount=False)
+        query_apartment_contract = sqlbase.serach("select * from query_apartment_contract where contract_id='%s'" % self.apartment_contract_id, oneCount=False, nullLog=False)
         if 1 != len(query_apartment_contract):  # 检查出租合同宽表
             consoleLog("there is no contract in 'query_apartment_contract',contract_id: %s" % self.apartment_contract_id, 'w')
         self.apartment_contract_num = self.apartment_contract_info['contract_num']
