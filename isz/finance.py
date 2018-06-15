@@ -42,7 +42,7 @@ if __name__ == '__main__':
     # sql = "select DISTINCT a.receivable_id from apartment_contract_receivable a inner join apartment_contract b on a.contract_id=b.contract_id and b.deleted=0 and b.contract_status<>'CANCEL' inner join apartment_contract_receipts c on c.receivable_id=a.receivable_id and c.receipts_date <= CONCAT('2015-12-31', ' 23:59:59') and c.deleted=0 where a.end_status in ('HASGET','PARTGET') and a.deleted=0 and b.contract_num NOT in ('WB1-0070791','ISZWY(CZ)-0000269','ISZWY(CZ)-0001288','ISZWY(CZ)-0001288','WB1-0071977','WB1-0068237','WB1-0069391','WB1-0069391','WB1-0069391','WB1-0073856','WB1-0068392','WB1-0074356','WB1-0068438','WB1-0072831','WB1-0067046','WB1-0061284','WB1-0068236','ISZWY(CZ)-0000683','WB1-0069433','WB1-0068429','WB1-0064325','WB1-0062904','WJ1-0001114','新科C-H0000986')"
     sql = "select DISTINCT a.receivable_id from apartment_contract_receivable a inner join apartment_contract b on a.contract_id=b.contract_id and b.deleted=0 and b.contract_status<>'CANCEL' inner join apartment_contract_receipts c on c.receivable_id=a.receivable_id and c.receipts_type='INTRANSFER' and c.deleted=0 where a.end_status in ('HASGET') and a.deleted=0;"
     receivables = sqlbase.serach(sql, oneCount=False)
-    print len(receivables)
+    print(len(receivables))
     for receivable_id in receivables:
         fin.endReceivable(receivable_id)
 
