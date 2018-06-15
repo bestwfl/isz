@@ -5,8 +5,10 @@
 ２、在格式ＳＱＬ中不需要使用引号指定数据类型，系统会根据输入参数自动识别
 ３、在输入的值中不需要使用转意函数，系统会自动处理
 """
-
-import MySQLdb
+# try:
+#     import MySQLdb as mysqldb
+# except:
+import pymysql
 import time
 from MySQLdb.cursors import DictCursor
 from DBUtils.PooledDB import PooledDB
@@ -32,7 +34,7 @@ class Mysql(object):
         :return MySQLdb.connection
         """
         if Mysql.__pool is None:
-            Mysql.__pool = PooledDB(creator=MySQLdb, mincached=1, maxcached=20,
+            Mysql.__pool = PooledDB(creator=pymysql, mincached=1, maxcached=20,
                                     host=get_conf('db', 'host'), port=get_conf('db', 'port', int),
                                     user=get_conf('db', 'user'), passwd=get_conf('db', 'password'),
                                     db=get_conf('db', 'db'), use_unicode=False, charset=get_conf('db', 'charset'))
