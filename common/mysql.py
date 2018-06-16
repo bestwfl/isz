@@ -5,12 +5,10 @@
 ２、在格式ＳＱＬ中不需要使用引号指定数据类型，系统会根据输入参数自动识别
 ３、在输入的值中不需要使用转意函数，系统会自动处理
 """
-# try:
-#     import MySQLdb as mysqldb
-# except:
+
 import pymysql
 import time
-from MySQLdb.cursors import DictCursor
+# from MySQLdb.cursors import DictCursor
 from DBUtils.PooledDB import PooledDB
 from common.base import get_conf, consoleLog
 
@@ -75,11 +73,11 @@ class Mysql(object):
         else:
             for x in range(len(data)):
                 if type(data[x]) is not list:
-                    if type(data[x]) is not unicode and type(data[x]) is not int:
+                    if type(data[x]) is not str and type(data[x]) is not int:
                         data[x] = str(data[x])
                 else:
                     for y in range(len(data[x])):
-                        if type(data[x][y]) is not unicode and type(data[x][y]) is not int:
+                        if type(data[x][y]) is not str and type(data[x][y]) is not int:
                             data[x][y] = str(data[x][y])
             return data
 
@@ -103,7 +101,7 @@ class Mysql(object):
                 #         res[key] = str(res[key])
                 # result.append(res)
                 for i in range(len(index)):
-                    if type(res[i]) is not unicode and type(res[i]) is not int:
+                    if type(res[i]) is not str and type(res[i]) is not int:
                         row[index[i][0]] = str(res[i])
                     else:
                         row[index[i][0]] = res[i]

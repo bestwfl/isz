@@ -20,7 +20,7 @@ conn = pymysql.connect(host=get_conf('db', 'host'),
                        password=get_conf('db', 'password'),
                        db=get_conf('db', 'db'),
                        charset=get_conf('db', 'charset'),
-                       port=get_conf('db', 'port',int)
+                       port=get_conf('db', 'port', int)
                        )
 cursor = conn.cursor()
 
@@ -195,10 +195,12 @@ def clear_data(success):
         pass
 """
 
+
 def getsmsMtHis(destPhone):
     conn = MongoClient('mongodb://root:Ishangzu_mongodb@192.168.0.200:27020/')
     row = conn.sms.smsMtHis.find({'destPhone': destPhone}).sort([{"create_time", -1}])
     return re.findall('验证码：(.*?)，', row[0]['content'].encode('utf-8'))[0]
+
 
 def query(sql, nullThrow=True):
     """:return  list"""
@@ -208,7 +210,7 @@ def query(sql, nullThrow=True):
     for res in cursor.fetchall():
         row = {}
         for i in range(len(index)):
-            if type(res[i]) is not unicode and type(res[i]) is not int:
+            if type(res[i]) is not str and type(res[i]) is not int:
                 row[index[i][0]] = str(res[i])
             else:
                 row[index[i][0]] = res[i]
@@ -222,9 +224,12 @@ def query(sql, nullThrow=True):
         else:
             raise BaseException('there is no result searched by sql: %s ' % sql)
 
+
 def serach(sql, needConvert=True, oneCount=True, research=False, nullLog=True):
     """
     返回查询结果
+    :param nullLog:
+    :param research:
     :param sql: 查询sql
     :param needConvert: 转换为Unicode、int以及datetime之类的时间数据
     :param oneCount: 返回结果是单条还是多条
@@ -232,6 +237,7 @@ def serach(sql, needConvert=True, oneCount=True, research=False, nullLog=True):
     """
     cursor.execute(sql)
     conn.commit()
+
     def convert(data):
         if len(data) > 0:
             if type(data[0]) is tuple:
@@ -260,7 +266,7 @@ def serach(sql, needConvert=True, oneCount=True, research=False, nullLog=True):
             value = convert(list(cursor.fetchall()))
 
         # value = convert(list(cursor.fetchone()) if oneCount else list(cursor.fetchall()))
-    except TypeError, e:
+    except TypeError as e:
         consoleLog(e.message + '\n' + u'当前执行sql：%s' % sql.decode('utf-8'), level='e')
     else:
         if needConvert:
@@ -279,16 +285,15 @@ def serach(sql, needConvert=True, oneCount=True, research=False, nullLog=True):
             else:
                 for x in range(len(value)):
                     if type(value[x]) is not list:
-                        if type(value[x]) is not unicode and type(value[x]) is not int:
+                        if type(value[x]) is not str and type(value[x]) is not int:
                             value[x] = str(value[x])
                     else:
                         for y in range(len(value[x])):
-                            if type(value[x][y]) is not unicode and type(value[x][y]) is not int:
+                            if type(value[x][y]) is not str and type(value[x][y]) is not int:
                                 value[x][y] = str(value[x][y])
                 return value
         else:
             return value
-
 
     # if cursor.fetchone():
     #     try:
@@ -317,7 +322,8 @@ def serach(sql, needConvert=True, oneCount=True, research=False, nullLog=True):
     # else:
     #     return value
 
-def waitData(sql,wantReturnCount,index = 1):
+
+def waitData(sql, wantReturnCount, index=1):
     """
     等待部分异步的数据的同步，如签完合同后的业绩的创建、宽表数据的创建等，默认与预期数量不一致的情况下，查询十次，每次等待10S，一旦一致，跳出
     :param sql: 待查询的sql
@@ -330,17 +336,21 @@ def waitData(sql,wantReturnCount,index = 1):
         if count == 0 or count != wantReturnCount:
             time.sleep(5)
             index += 1
-            if waitData(sql,wantReturnCount,index):
+            if waitData(sql, wantReturnCount, index):
                 return True
             return False
         else:
             return True
+
 
 def get_count(sql):
     """返回查询数量"""
     count = cursor.execute(sql)
     return count
 
+
 if __name__ == '__main__':
-    test = serach("SELECT payable_id from house_contract_payable where contract_id = 'FF8080815F302D5F015F51481F826CA7' and deleted = 0",oneCount=False)
-    print test
+    test = serach(
+        "SELECT payable_id from house_contract_payable where contract_id = 'FF8080815F302D5F015F51481F826CA7' and deleted = 0",
+        oneCount=False)
+    print(test)

@@ -14,20 +14,23 @@ def testWithLogin(func):
         login()
         try:
             return func(*args, **kwargs)
-        except BaseException, e:
+        except BaseException:
             traceback.print_exc()
             # consoleLog(e.message)
         finally:
             return
+
     return wrapper
 
-def myRequest(url, data=None, needCookie=True, contentType='application/json', method='post', returnValue=False, shutdownFlag=False):
+
+def myRequest(url, data=None, needCookie=True, contentType='application/json', method='post', returnValue=False,
+              shutdownFlag=False):
     headers = {
         'content-type': contentType,
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
     }
     host = 'http://isz.ishangzu.com/'
-    interfaceURL = host+url if not url.startswith('http') else url
+    interfaceURL = host + url if not url.startswith('http') else url
     cookie = eval(get_conf('cookieInfo', 'cookies'))
     request = None
     if method == 'get':
@@ -65,10 +68,12 @@ def myRequest(url, data=None, needCookie=True, contentType='application/json', m
     else:
         return result
 
+
 class Image(object):
-     def __init__(self, img_id, img_url):
-         self.id = img_id
-         self.url = img_url
+    def __init__(self, img_id, img_url):
+        self.id = img_id
+        self.url = img_url
+
 
 def upLoadPhoto(url, filename, filepath, name='file'):
     """
@@ -79,7 +84,7 @@ def upLoadPhoto(url, filename, filepath, name='file'):
     :param url:上传地址
    """
     file = {
-        name: (str(filename).encode('utf-8'), open(str(filepath+filename).encode('utf-8'), 'rb'), 'image/png'),
+        name: (str(filename).encode('utf-8'), open(str(filepath + filename).encode('utf-8'), 'rb'), 'image/png'),
     }
     cookie = eval(get_conf('cookieInfo', 'cookies'))
     request = requests.post(url=url, files=file, cookies=cookie)
@@ -95,9 +100,10 @@ def upLoadPhoto(url, filename, filepath, name='file'):
         img['img_id'] = get_conf('img', 'img_id')
     return Image(img['img_id'], img['img_url'])
 
+
 def login(user=get_conf('sysUser', 'userPhone'), pwd=get_conf('sysUser', 'pwd')):
     needClient = None
-    #默认登录不使用客户端，如果报错，则赋值给needClient为True，然后调用客户端的登录接口进行校验
+    # 默认登录不使用客户端，如果报错，则赋值给needClient为True，然后调用客户端的登录接口进行校验
     url = 'http://isz.ishangzu.com/isz_base/LoginController/login.action'
     data = {
         'user_phone': user, 'user_pwd': pwd, 'auth_code': '', 'LechuuPlatform': 'LECHUU_CUSTOMER',
@@ -125,9 +131,9 @@ def login(user=get_conf('sysUser', 'userPhone'), pwd=get_conf('sysUser', 'pwd'))
         auth_key = getAuthKey()
         # 检查授权
         url = 'isz_base/LoginAuthController/checkLoginAuth.action'
-        data ={'auth_key': auth_key}
+        data = {'auth_key': auth_key}
         result = myRequest(url, data, needCookie=False)
-        msglogin =u'授权成功'
+        msglogin = u'授权成功'
         if msglogin in result['msg']:
             auth_code = result['obj']['authList'][0]['auth_code']
             authTag = result['obj']['authTag']
@@ -180,12 +186,12 @@ def login(user=get_conf('sysUser', 'userPhone'), pwd=get_conf('sysUser', 'pwd'))
         #     dep_name = u'技术开发中心'
         #     sql = "select * from sys_department_flat where dept_id=(SELECT dep_id from sys_department where dep_name = '%s') and child_id=(" \
         #           "SELECT dep_id from sys_user where user_phone = '%s' and user_status = 'INCUMBENCY')" % (dep_name, user)
-            # if sqlbase.get_count(sql) == 0 or get_conf('testCondition', 'test') == 'online':
-            #     # content = sqlbase.serach("SELECT content from sms_mt_his where destPhone = '%s' ORDER BY create_time desc limit 1" % user)[0]
-            #     # sms_code = re.findall('验证码：(.*?)，', content.encode('utf-8'))[0]
-            #     time.sleep(2)  # 线上短信可能延迟
-            #     sms_code = getsmsMtHis(user)  # mangoDB中取短信记录
-            #     data['verificationCode'] = sms_code
+        # if sqlbase.get_count(sql) == 0 or get_conf('testCondition', 'test') == 'online':
+        #     # content = sqlbase.serach("SELECT content from sms_mt_his where destPhone = '%s' ORDER BY create_time desc limit 1" % user)[0]
+        #     # sms_code = re.findall('验证码：(.*?)，', content.encode('utf-8'))[0]
+        #     time.sleep(2)  # 线上短信可能延迟
+        #     sms_code = getsmsMtHis(user)  # mangoDB中取短信记录
+        #     data['verificationCode'] = sms_code
         headers = {
             'content-type': 'application/json',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
@@ -202,10 +208,12 @@ def login(user=get_conf('sysUser', 'userPhone'), pwd=get_conf('sysUser', 'pwd'))
             consoleLog(u'接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s' % (url, data, msg.decode('utf-8')), 'w')
             raise BaseException(u'客户端登录第四步：验证码登录失败')
 
+
 def delNull(data):
     """删除字典中为null的值"""
+
     def typeDict(data):
-        for x,y in data.items():
+        for x, y in data.items():
             if y is None or y == '':
                 del data[x]
             elif type(y) is list:
@@ -214,13 +222,15 @@ def delNull(data):
                 typeDict(data[x])
 
     def typeList(data):
-        for x,y in enumerate(data):
+        for x, y in enumerate(data):
             if type(y) is dict:
                 typeDict(data[x])
             if y is None:
                 del data[x]
+
     typeDict(data) if type(data) is dict else typeList(data)
     return data
+
 
 if __name__ == '__main__':
     pass
