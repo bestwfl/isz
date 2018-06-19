@@ -102,6 +102,19 @@ class AuditStatus(Enum):
     HOUSE_CONTRACT_STATUS_AUDITED = 'PASS'  # 委托已初审
     HOUSE_CONTRACT_STATUS_APPROVED = 'APPROVED'  # 委托已复审
 
+class AUDIT_STATUS(Enum):
+
+    class APARTMETN_CONTRACT_END(Enum):
+        REJECT = 'RE_JECT'
+        AUDITED = 'PASS'
+        WAIT_AUDIT = 'NO_AUDIT'
+        APPROVED = 'RECIEW'
+
+    class HOUSE_CONTRACT(Enum):
+        WAIT_AUDIT = 'AUDIT'
+        AUDITED = 'PASS'
+        APPROVED = 'APPROVED'
+
 
 # class ApartmentList():
 #
@@ -166,5 +179,6 @@ if __name__ == '__main__':
 
     # apartment = ApartmentInfo('E48A81416386FE1001638C5A56F000C1')
     # print apartment
+    status = AUDIT_STATUS.APARTMETN_CONTRACT_END.value.REJECT.value
 
-    pass
+    print status
