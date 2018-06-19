@@ -288,11 +288,11 @@ def serach(sql, needConvert=True, oneCount=True, research=False, nullLog=True):
             else:
                 for x in range(len(value)):
                     if type(value[x]) is not list:
-                        if type(value[x]) is not str and type(value[x]) is not int:
+                        if type(value[x]) is not unicode and type(value[x]) is not int:
                             value[x] = str(value[x])
                     else:
                         for y in range(len(value[x])):
-                            if type(value[x][y]) is not str and type(value[x][y]) is not int:
+                            if type(value[x][y]) is not unicode and type(value[x][y]) is not int:
                                 value[x][y] = str(value[x][y])
                 return value
         else:
