@@ -11,7 +11,7 @@ from isz.infoClass import ApartmentInfo
 class Apartment(ApartmentInfo):
     """房源相关"""
 
-    @staticmethod   # 跟进room_id获取房间号
+    @staticmethod  # 跟进room_id获取房间号
     def roomName(room_id):
         if not (room_id is None or room_id == 'None'):
             room_no = sqlbase.serach("select room_no from house_room where room_id='%s'" % room_id)[0]
@@ -242,7 +242,8 @@ class Apartment(ApartmentInfo):
         else:
             real_due_rent_price = rent_price
         # 随机生成出租合同号
-        contract_num = 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S') + get_randomString(2) if not contract_num else contract_num
+        contract_num = 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S') + get_randomString(
+            2) if not contract_num else contract_num
         data = {
             'contract_num': contract_num,  # 合同编号
             'sign_date': sign_date,  # 签约日期
@@ -396,6 +397,7 @@ class Apartment(ApartmentInfo):
     # 添加保修订单
     def create_repair_order(self):
         pass
+
 
 if __name__ == '__main__':
     apartment_id = 'SJZ1001168-01'
