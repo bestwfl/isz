@@ -10,7 +10,7 @@ from common.interface_wfl import testWithLogin
 
 # @testWithLogin
 def test():
-    apartmentId = 'HZBJ1711220164-03'
+    apartmentId = 'ZXZ2000910-01'
     customer = createCustomer()  # 创建租客，出租合同
     contract_num_sign = u'APP兼容性'  # 合同标识
     contract_num = '%s-%s%s' % (contract_num_sign, time.strftime('%m%d%H%M'), get_randomString(2))
@@ -18,7 +18,7 @@ def test():
     sign_date = today()
     rent_price = 2000
     rent_start_date = addDays(1, today())
-    rent_end_date = addMonths(1)
+    rent_end_date = addMonths(12)
     payment_cycle = 'HALF_YEAR'
     sign_phone = '13000000000'
     contract = Apartment(apartmentId).createApartmentContract(customerInfo=customer,
