@@ -90,7 +90,7 @@ def upLoadPhoto(url, filename, filepath, name='file'):
     request = requests.post(url=url, files=file, cookies=cookie)
     result = json.loads(request.text)
     img = {}
-    if request.status_code is 200 or result['code'] is 0:
+    if result['code'] is 200 or result['code'] is 0:
         img['img_url'] = result['obj']['img_url']
         img['img_id'] = result['obj']['img_id']
     else:

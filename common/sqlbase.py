@@ -195,19 +195,22 @@ def clear_data(success):
         pass
 """
 
-
 def getsmsMtHis(destPhone):
-    conn = MongoClient('mongodb://root:Ishangzu_mongodb@192.168.0.200:27020/')
+    # conn = MongoClient('mongodb://root:Ishangzu_mongodb@192.168.0.200:27020/')
+    conn = MongoClient('mongodb://{}:{}@{}:{}/'.format(get_conf('mongodb', 'user'), get_conf('mongodb', 'pwd'),
+                                                       get_conf('mongodb', 'address'), get_conf('mongodb', 'port')))
     row = conn.sms.smsMtHis.find({'destPhone': destPhone}).sort([{"create_time", -1}])
     return re.findall('验证码：(.*?)，', row[0]['content'].encode('utf-8'))[0]
 
-
 def query(sql, nullThrow=True):
-    """:return  list"""
+    """
+    :return  list
+    """
     cursor.execute(sql)
     index = cursor.description
     result = []
-    for res in cursor.fetchall():
+    _result = cursor.fetchall()
+    for res in _result:
         row = {}
         for i in range(len(index)):
             if type(res[i]) is not str and type(res[i]) is not int:
@@ -228,12 +231,12 @@ def query(sql, nullThrow=True):
 def serach(sql, needConvert=True, oneCount=True, research=False, nullLog=True):
     """
     返回查询结果
-    :param nullLog:
-    :param research:
+    :param research: 是否重复查询，默认否，查询三次
+    :param nullLog: 是否打印返回为空提示，默认是
     :param sql: 查询sql
     :param needConvert: 转换为Unicode、int以及datetime之类的时间数据
     :param oneCount: 返回结果是单条还是多条
-    :return:list格式的查询结果
+    :return: list格式的查询结果
     """
     cursor.execute(sql)
     conn.commit()
@@ -285,11 +288,11 @@ def serach(sql, needConvert=True, oneCount=True, research=False, nullLog=True):
             else:
                 for x in range(len(value)):
                     if type(value[x]) is not list:
-                        if type(value[x]) is not str and type(value[x]) is not int:
+                        if type(value[x]) is not unicode and type(value[x]) is not int:
                             value[x] = str(value[x])
                     else:
                         for y in range(len(value[x])):
-                            if type(value[x][y]) is not str and type(value[x][y]) is not int:
+                            if type(value[x][y]) is not unicode and type(value[x][y]) is not int:
                                 value[x][y] = str(value[x][y])
                 return value
         else:
@@ -322,8 +325,7 @@ def serach(sql, needConvert=True, oneCount=True, research=False, nullLog=True):
     # else:
     #     return value
 
-
-def waitData(sql, wantReturnCount, index=1):
+def waitData(sql, wantReturnCount, index = 1):
     """
     等待部分异步的数据的同步，如签完合同后的业绩的创建、宽表数据的创建等，默认与预期数量不一致的情况下，查询十次，每次等待10S，一旦一致，跳出
     :param sql: 待查询的sql
@@ -350,7 +352,5 @@ def get_count(sql):
 
 
 if __name__ == '__main__':
-    test = serach(
-        "SELECT payable_id from house_contract_payable where contract_id = 'FF8080815F302D5F015F51481F826CA7' and deleted = 0",
-        oneCount=False)
-    print(test)
+    test = serach("SELECT payable_id from house_contract_payable where contract_id = 'FF8080815F302D5F015F51481F826CA7' and deleted = 0",oneCount=False)
+    print test
