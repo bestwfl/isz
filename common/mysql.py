@@ -309,6 +309,8 @@ class Mysql(object):
         self._cursor.close()
         self._conn.close()
 
+mysql = Mysql()
+
 
 if __name__ == '__main__':
     mysql = Mysql()
