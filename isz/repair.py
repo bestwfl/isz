@@ -1,65 +1,59 @@
 # -*- coding:utf8 -*-
-import time
 import datetime
-from isz.apartment import Apartment
+import time
 from common import sqlbase
-from common.base import consoleLog, get_conf
+from common.base import consoleLog
 from common.interface_wfl import myRequest
+from isz.infoClass import ApartmentInfo, RepairOrderInfo
 
-class Repair(object):
+
+class Repair(RepairOrderInfo):
     """报修相关
     :param apartmentIdOrNum:房源编号或者ID
     """
 
-    def __init__(self, apartmentIdOrNum):
-        apartmentInfo = sqlbase.serach("select apartment_id,apartment_code,apartment_type,rent_status,rent_type,house_id,room_id from apartment where (apartment_id='%s' or apartment_code='%s') "
-                                       "and is_active='Y' and deleted=0" % (apartmentIdOrNum, apartmentIdOrNum))
-        self.__apartment_id = apartmentInfo[0]
-        self.__apartment_code = apartmentInfo[1]
-        self.__apartment_type = apartmentInfo[2]
-        self.__rent_status = apartmentInfo[3]
-        self.__rent_type = apartmentInfo[4]
-        self.__house_id = apartmentInfo[5]
-        self.__room_id = apartmentInfo[6]
-        self.__house_property = 'INRENT'  # 房源属性	VACANCY：空置，INRENT:在租
-        #出租相关
-        apartmentContractInfo = sqlbase.serach("select a.contract_id,a.contract_num,a.sign_name,a.person_id,a.sign_phone from apartment_contract a inner join apartment_contract_relation  b on a.contract_id=b.contract_id "
-                                               "inner join apartment c on c.apartment_id=b.apartment_id where c.apartment_id='%s' and a.deleted=0 and a.is_active='Y'" % self.__apartment_id, nullLog=False)
-        if not apartmentContractInfo:
-            consoleLog(u'房源 %s 下无有效出租合同' % self.__apartment_code)
-            self.__house_property = 'VACANCY'
-        self.__apartment_contract_id = apartmentContractInfo[0] if apartmentContractInfo else None
-        self.__apartment_contract_num = apartmentContractInfo[1] if apartmentContractInfo else None
-        self.__customer_name = apartmentContractInfo[2] if apartmentContractInfo else None
-        self.__customer_id = apartmentContractInfo[3] if apartmentContractInfo else None
-        self.__customer_phone = apartmentContractInfo[4] if apartmentContractInfo else None
-        #委托相关
-        houseContractInfo = sqlbase.serach("select a.contract_id, a.contract_num,b.property_name from house_contract a inner join house b on a.house_id=b.house_id where a.house_id='%s' and a.deleted=0 "
-                                           "and a.is_active='Y'" % self.__house_id)
-        self.__house_contract_id = houseContractInfo[0]
-        self.__house_contract_num = houseContractInfo[1]
-        self.__house_property_name = houseContractInfo[2]
+    def __init__(self, orderNumOrId):
 
-    def createRepair(self):
-        """新增报修订单"""
+        super(Repair, self).__init__(orderNumOrId)
+
+    @staticmethod
+    def createRepair(apartmentCodeOrId):
+        """新增报修订单
+        :param apartmentCodeOrId 房源Code或者Id
+        """
+        apartment = ApartmentInfo(apartmentCodeOrId)
+        apartment_contract = apartment.apartment_contract
+        if apartment_contract:
+            apartment_contract_id = apartment_contract.apartment_contract_id
+            apartment_contract_num = apartment_contract.apartment_contract_num
+            customer = apartment_contract.custmoer_person()
+            customer_id = customer.person_id
+            customer_name = customer.customer_name
+            customer_phone = customer.phone
+        else:
+            apartment_contract_id = None
+            apartment_contract_num = None
+            customer_id = None
+            customer_name = None
+            customer_phone = None
         url = 'http://rsm.ishangzu.com/isz_repair/RepairsController/repairsOrder'
         data = {
-            "house_id": self.__house_id,
-            "house_contract_id": self.__house_contract_id,
-            "apartment_contract_id": self.__apartment_contract_id,
-            "apartment_contract_num": self.__apartment_contract_num,
-            "apartment_num": self.__apartment_code,
-            "apartment_type": self.__apartment_type,
-            "rent_status": self.__rent_status,
-            "rent_type": self.__rent_type,
-            "house_address": '%s%s' % (self.__house_property_name, Apartment.roomName(self.__room_id)),
-            "apartment_id": self.__apartment_id,
-            "customer_id": self.__customer_id,
-            "customer_name": self.__customer_name,
-            "house_property": self.__house_property,
-            "room_id": self.__room_id,
-            "linkman_name": self.__customer_name if self.__customer_name else u'维修联系人',
-            "linkman_phone": self.__customer_phone if self.__customer_phone else '13600000000',
+            "house_id": apartment.house_id,
+            "house_contract_id": apartment.house_contract_id,
+            "apartment_contract_id": apartment_contract_id,
+            "apartment_contract_num": apartment_contract_num,
+            "apartment_num": apartment.apartment_code,
+            "apartment_type": apartment.apartment_type,
+            "rent_status": apartment.rent_status,
+            "rent_type": apartment.rent_type,
+            "house_address": apartment.apartment_property_name,
+            "apartment_id": apartment.apartment_id,
+            "customer_id": customer_id,
+            "customer_name": customer_name,
+            "house_property": apartment.property_name,
+            "room_id": apartment.room_id,
+            "linkman_name": customer_name if customer_name else u'维修联系人',
+            "linkman_phone": customer_phone if customer_phone else '13600000000',
             "repairs_area": "WOSHI",
             "repairs_type": "WOSHIZHUTI",
             "repairs_project": "WOSHIZHUTIDIAODING",
@@ -113,48 +107,39 @@ class Repair(object):
             }],
         }
         if myRequest(url, data):
-            consoleLog(u'房源 %s 已添加报修' % self.__apartment_code)
+            consoleLog(u'房源 %s 已添加报修' % apartment.apartment_code)
 
-    @staticmethod
-    def orderNum(orderIdOrNum):
-        order_id = sqlbase.serach("select order_id from %s.repairs_order where (order_id='%s' or order_no='%s') and deleted=0" % (get_conf('db', 'rsm_db'), orderIdOrNum, orderIdOrNum))
-        if order_id:
-            return order_id[0]
-        else:
-            consoleLog(u'报修订单不存在！')
 
-    @classmethod
-    def placeOrder(cls, orderIdOrNum):
-        order_id = cls.orderNum(orderIdOrNum)
+    def placeOrder(self):
         url = 'http://rsm.ishangzu.com/isz_repair/RepairsController/order/operation/FF8080816349F0F2016349FA50C10052'
         data = {
             "cooperation_type": "Y",  # 是否合作
-                "supplier_id": "8A2152435BAF8739015BB39E767C007E",  # 供应商ID
-                "order_status": "STAYDISTRIBUTION",  # 当前订单状态
-                "remark": u'WFL下单',
-                "order_id": order_id,
-                "update_time": time.strftime('%Y-%m-%d %H:%M:%S')
+            "supplier_id": "8A2152435BAF8739015BB39E767C007E",  # 供应商ID
+            "order_status": "STAYDISTRIBUTION",  # 当前订单状态
+            "remark": u'WFL下单',
+            "order_id": self.order_id,
+            "update_time": time.strftime('%Y-%m-%d %H:%M:%S')
         }
         if myRequest(url, data):
             consoleLog(u'维修订单：%s已下单，供应商为')
 
-    @staticmethod
-    def cancel(order_id):
-        url = 'http://rsm.ishangzu.com/isz_repair/RepairsController/order/%s/cancel' % order_id
+
+    def cancel(self):
+        url = 'http://rsm.ishangzu.com/isz_repair/RepairsController/order/%s/cancel' % self.order_id
         data = {
-            'order_id': order_id,
+            'order_id': self.order_id,
             'reason': 'cancel by test',
-            'update_time': '2018-05-15 19:05:59.0'
+            'update_time': '{}{}'.format(time.strftime('%Y-%m-%d %H:%M:%S'), '.0')
         }
         if myRequest(url, data, method='put'):
-            consoleLog(u'订单：%s 已取消' % order_id)
+            consoleLog(u'订单：%s 已取消' % self.order_no)
+
 
 if __name__ == '__main__':
-    apartments = sqlbase.serach("select apartment_id,apartment_code from apartment where is_active='Y' and deleted=0 "
-                                "and rent_status<>'RENTED' and rent_type='SHARE' and city_code='330100' order by RAND() limit 1", oneCount=False)
+    apartments = sqlbase.serach("SELECT apartment_id,apartment_code FROM apartment WHERE is_active='Y' AND deleted=0 "
+                                "AND rent_status='RENTED' AND rent_type='SHARE' AND city_code='330100' ORDER BY RAND() LIMIT 1",
+                                oneCount=False)
     for apartment in apartments:
         consoleLog(u'房源编号：%s ID:%s' % (apartment[1], apartment[0]))
-        repair = Repair(apartment[0])
-
-        repair.createRepair()
+        Repair.createRepair(apartment[0])
         # Repair.cancel('FF808081636379B101636379C2960018')
