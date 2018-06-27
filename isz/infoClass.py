@@ -4,11 +4,10 @@ import threading
 
 from common import sqlbase
 from common.base import consoleLog, get_conf
-from common.mysql import mysql
+from common.mysql import Mysql
 
 
 class HouseInfo(object):
-
     def __init__(self, houseIdOrCode):
         houseId = sqlbase.serach("select house_id from house where (house_id='%s' or house_code like '%s%s') "
                                  "and deleted=0 " % (houseIdOrCode, houseIdOrCode, '%'), oneCount=False)
@@ -38,7 +37,6 @@ class HouseInfo(object):
 
 
 class HouseContractInfo(HouseInfo):
-
     def __init__(self, contractIdOrNum):
         contractId = sqlbase.serach("select contract_id,house_id from house_contract where (contract_id='%s' or "
                                     "contract_num='%s') and deleted=0" % (contractIdOrNum, contractIdOrNum),
@@ -120,17 +118,16 @@ class HouseContractInfo(HouseInfo):
                                          self.house_contract_id, step))[0]
         return step_status
 
-    # 业主信息
-    # def landlord(self):
-    #     sql = "select * from house_contract_landlord where contract_id='%s' and deleted=0" % self.house_contract_id
-    #     landlord = sqlbase.serach(
-    #         "select landlord_name,phone,email,mailing_address,emergency_name,emergency_phone from house_contract_landlord where contract_id='%s' and deleted=0" % self.contract_id)
-    #     landlordInfo = sqlbase.query(sql)
-    #     return None
+        # 业主信息
+        # def landlord(self):
+        #     sql = "select * from house_contract_landlord where contract_id='%s' and deleted=0" % self.house_contract_id
+        #     landlord = sqlbase.serach(
+        #         "select landlord_name,phone,email,mailing_address,emergency_name,emergency_phone from house_contract_landlord where contract_id='%s' and deleted=0" % self.contract_id)
+        #     landlordInfo = sqlbase.query(sql)
+        #     return None
 
 
 class HouseContractEndInfo(HouseContractInfo):
-
     def __init__(self, contractIdOrNum):
         super(HouseContractEndInfo, self).__init__(contractIdOrNum)
         sql = "select * from house_contract_end where contract_id='%s' and deleted=0" % self.house_contract_id
@@ -162,7 +159,6 @@ class HouseContractEndInfo(HouseContractInfo):
 
 
 class ApartmentInfo(HouseInfo):
-
     def __init__(self, apartmentIdOrCode):
         apartmentId = sqlbase.serach(
             "select apartment_id,house_id from apartment where (apartment_id='%s' or apartment_code "
@@ -212,16 +208,16 @@ class ApartmentInfo(HouseInfo):
     def apartment_contract(self):
         """房源对应出租合同"""
         if 'RENTED' == self.rent_status:
-            contract_id = sqlbase.serach("select a.contract_id from apartment_contract a inner join apartment_contract_relation b on a.contract_id=b.contract_id "
-                                         "inner join apartment c on b.apartment_id=c.apartment_id where c.apartment_id='%s' and a.deleted=0 and a.is_active='Y'"
-                                         % self.apartment_id)[0]
+            contract_id = sqlbase.serach(
+                "select a.contract_id from apartment_contract a inner join apartment_contract_relation b on a.contract_id=b.contract_id "
+                "inner join apartment c on b.apartment_id=c.apartment_id where c.apartment_id='%s' and a.deleted=0 and a.is_active='Y'"
+                % self.apartment_id)[0]
             return ApartmentContractInfo(contract_id)
         else:
             return None
 
 
 class ApartmentContractInfo(ApartmentInfo):
-
     def __init__(self, contractIdOrNum):
         contractId = sqlbase.serach("select ac.contract_id,a.apartment_id from apartment_contract ac "
                                     "inner join apartment_contract_relation acr on ac.contract_id=acr.contract_id "
@@ -235,12 +231,13 @@ class ApartmentContractInfo(ApartmentInfo):
         sql = "select * from apartment_contract where contract_id='%s'" % contractId[0][0]
         self.apartment_contract_info = sqlbase.query(sql)[0]
         self.apartment_contract_id = self.apartment_contract_info['contract_id']
-        # threading.Thread(target=check_query_table, args=(self.apartment_contract_id, 'apartment_contract')).start()
-        query_apartment_contract = sqlbase.serach("select * from query_apartment_contract where contract_id='%s'" %
-                                                  self.apartment_contract_id, oneCount=False, nullLog=False)
-        if 1 != len(query_apartment_contract):  # 检查出租合同宽表
-            consoleLog(
-                "there is no contract in 'query_apartment_contract',contract_id: %s" % self.apartment_contract_id, 'w')
+        threading.Thread(target=check_query_table, args=(self.apartment_contract_id, 'apartment_contract')).start()
+        # query_apartment_contract = sqlbase.serach("select * from query_apartment_contract where contract_id='%s'" %
+        #                                           self.apartment_contract_id, oneCount=False, nullLog=False)
+        # query_apartment_contract = Mysql().getAll("select * from query_apartment_contract where contract_id='%s'" % self.apartment_contract_id)
+        # if 1 != len(query_apartment_contract):  # 检查出租合同宽表
+        #     consoleLog(
+        #         "there is no contract in 'query_apartment_contract',contract_id: %s" % self.apartment_contract_id, 'w')
         self.apartment_contract_num = self.apartment_contract_info['contract_num']
         self.is_active = self.apartment_contract_info['is_active']
         if 'N' == self.is_active:
@@ -304,15 +301,14 @@ class ApartmentContractInfo(ApartmentInfo):
         """承租人信息"""
         sql = "select (select person_id from customer_person_relation cpr where cpr.contract_id=ac.contract_id ) person_id from apartment_contract ac " \
               "where contract_id='%s'" % self.apartment_contract_id
-        person_id = mysql.getOne(sql)[0]
+        person_id = Mysql().getOne(sql)[0]
         return CustomerPersonInfo(person_id)
 
 
 class CustomerPersonInfo(object):
-
     def __init__(self, person_id):
         sql = "select * from customer_person where person_id='%s'" % person_id
-        self.customer_info = mysql.query(sql)[0]
+        self.customer_info = Mysql().query(sql)[0]
         self.person_id = person_id
         self.customer_num = self.customer_info['customer_num']
         self.address = self.customer_info['address']
@@ -324,7 +320,6 @@ class CustomerPersonInfo(object):
 
 
 class ApartmentContractEndInfo(ApartmentContractInfo):
-
     def __init__(self, contract_id):
         super(ApartmentContractEndInfo, self).__init__(contract_id)
         sql = "select * from apartment_contract_end where contract_id='%s' and deleted=0" % contract_id
@@ -350,7 +345,6 @@ class ApartmentContractEndInfo(ApartmentContractInfo):
 
 
 class DecorationHouseInfo(object):
-
     def __init__(self, contractNum):
         sql = "select * from %s.decoration_house_info where contract_num='%s' and deleted=0" % (
             get_conf('db', 'decoration_db'), contractNum)
@@ -359,7 +353,6 @@ class DecorationHouseInfo(object):
 
 
 class DecorationProjectInfo(DecorationHouseInfo):
-
     def __init__(self, contractNum):
         super(DecorationProjectInfo, self).__init__(contractNum)
         sql = "select * from %s.new_decoration_project where info_id='%s' " % (
@@ -445,10 +438,10 @@ class Payable(object):
 
 
 class RepairOrderInfo(object):
-
     def __init__(self, orderNumOrId):
-        sql = "select * from %s.repairs_order where (order_no='%s' or order_id='%s') and deleted=0" % (get_conf('db', 'rsm_db'), orderNumOrId, orderNumOrId)
-        self.repairs_order_info = mysql.query(sql)[0]
+        sql = "select * from %s.repairs_order where (order_no='%s' or order_id='%s') and deleted=0" % (
+            get_conf('db', 'rsm_db'), orderNumOrId, orderNumOrId)
+        self.repairs_order_info = Mysql().query(sql)[0]
         self.order_id = self.repairs_order_info['order_id']
         self.order_no = self.repairs_order_info['order_no']
         self.apartment_id = self.repairs_order_info['apartment_id']
@@ -465,18 +458,18 @@ class RepairOrderInfo(object):
         self.customer_phone = self.repairs_order_info['customer_phone']
 
 
-def check_query_table(contract_id, contract_type):  # FF80808163F413680163F42A6D9904CF
-    sql = "select * from query_{} where contract_id='{}'".format(contract_type, contract_id)
-    result = sqlbase.serach(sql, research=True, nullLog=False)
+def check_query_table(param, type):  # FF80808163F413680163F42A6D9904CF
+    sql = "select * from query_{} where contract_id='{}'".format(type, param)
+    result = Mysql().getOne(sql, research=True, nullLog=False)
     if not result:
-        consoleLog('宽表合同：{} 未生成'.format(contract_id))
+        consoleLog('{}宽表：{} 未生成'.format(type, param))
 
 
 if __name__ == '__main__':
     # end = HouseContractEndInfo('WFL工程1.4-06010149Qx')
     # print(end)
     # check_query_table('FF80808163F413680163F42A6D9904CF', 'apartment_contract')
-    print ApartmentContractInfo('物CH201709140151').custmoer_person().customer_name
+    print ApartmentContractInfo('物CH201709140151')
     # order = RepairOrder('WX20180626000014')
     # print order.repairs_order_info
     # print ApartmentInfo('13816').apartment_contract
