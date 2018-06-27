@@ -4,6 +4,7 @@ import threading
 
 from common import sqlbase
 from common.base import consoleLog, get_conf
+from common.mysql import mysql
 
 
 class HouseInfo(object):
@@ -34,6 +35,7 @@ class HouseInfo(object):
         self.property_type = self.house_info['property_type']  # 物业类型
         self.property_use = self.house_info['property_use']  # 物业用途
         self.property_right = self.house_info['property_right']  # 物业熟悉
+
 
 class HouseContractInfo(HouseInfo):
 
@@ -188,6 +190,35 @@ class ApartmentInfo(HouseInfo):
         self.set_delivery_date = self.apartment_info['set_delivery_date']
         self.total_cost = self.apartment_info['total_cost']
 
+    @property
+    def room_no(self):
+        """房屋编号"""
+        if self.rent_type == 'SHARE':
+            sql = "select (select dict_value from sys_dict_item where room_no=dict_e_value and deleted=0 limit 1) room_no " \
+                  "from house_room where room_id='%s'" % self.room_id
+            return sqlbase.serach(sql, oneCount=True)[0]
+        else:
+            return None
+
+    @property
+    def apartment_property_name(self):
+        """房屋地址+房屋编号"""
+        if self.room_no:
+            return '%s%s' % (self.property_name, self.room_no)
+        else:
+            return self.property_name
+
+    @property
+    def apartment_contract(self):
+        """房源对应出租合同"""
+        if 'RENTED' == self.rent_status:
+            contract_id = sqlbase.serach("select a.contract_id from apartment_contract a inner join apartment_contract_relation b on a.contract_id=b.contract_id "
+                                         "inner join apartment c on b.apartment_id=c.apartment_id where c.apartment_id='%s' and a.deleted=0 and a.is_active='Y'"
+                                         % self.apartment_id)[0]
+            return ApartmentContractInfo(contract_id)
+        else:
+            return None
+
 
 class ApartmentContractInfo(ApartmentInfo):
 
@@ -204,7 +235,7 @@ class ApartmentContractInfo(ApartmentInfo):
         sql = "select * from apartment_contract where contract_id='%s'" % contractId[0][0]
         self.apartment_contract_info = sqlbase.query(sql)[0]
         self.apartment_contract_id = self.apartment_contract_info['contract_id']
-        threading.Thread(target=check_query_table, args=(self.apartment_contract_id, 'apartment_contract')).start()
+        # threading.Thread(target=check_query_table, args=(self.apartment_contract_id, 'apartment_contract')).start()
         query_apartment_contract = sqlbase.serach("select * from query_apartment_contract where contract_id='%s'" %
                                                   self.apartment_contract_id, oneCount=False, nullLog=False)
         if 1 != len(query_apartment_contract):  # 检查出租合同宽表
@@ -259,8 +290,8 @@ class ApartmentContractInfo(ApartmentInfo):
         else:
             consoleLog(u'合同：%s 对应字段：%s 查询结果为空' % (contractNumOrId, field))
 
-    # 出租合同对应所有未删除的应收
     def receivables(self):
+        """出租合同对应所有未删除的应收"""
         sql = "select * from apartment_contract_receivable where contract_id='%s' and deleted=0" % self.apartment_contract_id
         receivables = sqlbase.query(sql)
         receivablesVo = []
@@ -268,6 +299,28 @@ class ApartmentContractInfo(ApartmentInfo):
             receivableVo = Receivable(receivable['receivable_id'])
             receivablesVo.append(receivableVo)
         return receivablesVo
+
+    def custmoer_person(self):
+        """承租人信息"""
+        sql = "select (select person_id from customer_person_relation cpr where cpr.contract_id=ac.contract_id ) person_id from apartment_contract ac " \
+              "where contract_id='%s'" % self.apartment_contract_id
+        person_id = mysql.getOne(sql)[0]
+        return CustomerPersonInfo(person_id)
+
+
+class CustomerPersonInfo(object):
+
+    def __init__(self, person_id):
+        sql = "select * from customer_person where person_id='%s'" % person_id
+        self.customer_info = mysql.query(sql)[0]
+        self.person_id = person_id
+        self.customer_num = self.customer_info['customer_num']
+        self.address = self.customer_info['address']
+        self.gender = self.customer_info['gender']
+        self.customer_name = self.customer_info['customer_name']
+        self.phone = self.customer_info['phone']
+        self.card_type = self.customer_info['card_type']
+        self.id_card = self.customer_info['id_card']
 
 
 class ApartmentContractEndInfo(ApartmentContractInfo):
@@ -294,6 +347,7 @@ class ApartmentContractEndInfo(ApartmentContractInfo):
         self.end_type_detail = self.apartment_contract_end_info['end_type_detail']
         self.payer = self.apartment_contract_end_info['payer']
         self.end_audit_status = self.apartment_contract_end_info['audit_status']
+
 
 class DecorationHouseInfo(object):
 
@@ -389,14 +443,42 @@ class Payable(object):
                                              "and deleted=0" % self.payable_id)[0]
         return self.__audit_status
 
+
+class RepairOrderInfo(object):
+
+    def __init__(self, orderNumOrId):
+        sql = "select * from %s.repairs_order where (order_no='%s' or order_id='%s') and deleted=0" % (get_conf('db', 'rsm_db'), orderNumOrId, orderNumOrId)
+        self.repairs_order_info = mysql.query(sql)[0]
+        self.order_id = self.repairs_order_info['order_id']
+        self.order_no = self.repairs_order_info['order_no']
+        self.apartment_id = self.repairs_order_info['apartment_id']
+        self.apartment_type = self.repairs_order_info['apartment_type']
+        self.rent_status = self.repairs_order_info['rent_status']
+        self.rent_type = self.repairs_order_info['rent_type']
+        self.house_id = self.repairs_order_info['house_id']
+        self.room_id = self.repairs_order_info['room_id']
+        self.apartment_contract_id = self.repairs_order_info['apartment_contract_id']
+        self.apartment_contract_num = self.repairs_order_info['apartment_contract_num']
+        self.customer_id = self.repairs_order_info['customer_id']
+        self.house_contract_id = self.repairs_order_info['house_contract_id']
+        self.house_address = self.repairs_order_info['house_address']
+        self.customer_phone = self.repairs_order_info['customer_phone']
+
+
 def check_query_table(contract_id, contract_type):  # FF80808163F413680163F42A6D9904CF
     sql = "select * from query_{} where contract_id='{}'".format(contract_type, contract_id)
     result = sqlbase.serach(sql, research=True, nullLog=False)
     if not result:
         consoleLog('宽表合同：{} 未生成'.format(contract_id))
 
+
 if __name__ == '__main__':
     # end = HouseContractEndInfo('WFL工程1.4-06010149Qx')
     # print(end)
     # check_query_table('FF80808163F413680163F42A6D9904CF', 'apartment_contract')
-    ApartmentContractInfo('FF80808163F413680163F42A6D9904CF')
+    print ApartmentContractInfo('物CH201709140151').custmoer_person().customer_name
+    # order = RepairOrder('WX20180626000014')
+    # print order.repairs_order_info
+    # print ApartmentInfo('13816').apartment_contract
+    # customer = CustomerPersonInfo('8A2152435E76882D015E7EB80D3E21AE2')
+    # print customer
