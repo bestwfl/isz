@@ -92,19 +92,19 @@ def creatBuilding():
 # 新增单元
 def creatUnit():
     url = 'isz_house/ResidentialBuildingController/saveResidentialBuildingUnit.action'
-    residential = creatBuilding()
+    # residential = creatBuilding()
     # 楼盘下栋座新增单元
-    # residentialInfo = sqlbase.serach("select r.residential_name,r.residential_id,rb.building_name,rb.building_id,rd.did from residential r inner join residential_building rb "
-    #                                  "on r.residential_id=rb.residential_id inner join residential_department rd on r.residential_id=rd.residential_id "
-    #                                  "where r.residential_id='FF80808162FB87C80162FBE191260006'and building_id='FF80808162FB12D10162FBE1929A014F'")
-    # residential = {
-    #     'residentialName': residentialInfo[0],
-    #     'residentialID': residentialInfo[1],
-    #     'buildingName': residentialInfo[2],
-    #     'buildingID': residentialInfo[3],
-    #     'dutyDepID': residentialInfo[4],
-    # }
-    unitName = u'2单元'
+    residentialInfo = sqlbase.serach("select r.residential_name,r.residential_id,rb.building_name,rb.building_id,rd.did from residential r inner join residential_building rb "
+                                     "on r.residential_id=rb.residential_id inner join residential_department rd on r.residential_id=rd.residential_id "
+                                     "where r.residential_id='FF80808163F7FB92016420236FA2000F'and building_id='FF80808163F7FB95016420306DB103EB'")
+    residential = {
+        'residentialName': residentialInfo[0],
+        'residentialID': residentialInfo[1],
+        'buildingName': residentialInfo[2],
+        'buildingID': residentialInfo[3],
+        'dutyDepID': residentialInfo[4],
+    }
+    unitName = u'1单元'
     data = {
         "property_name": residential['residentialName'] + residential['buildingName'],
         "unit_name": unitName,
@@ -239,9 +239,68 @@ def addHouse():
     consoleLog(u'审核房源全部新增成功')
     return houseIds
 
+# 单个审核房源
+def auditHouse(house):
+    url = 'isz_house/HouseController/auditHouseDevelop.action'
+    houseInfo = {}
+    for key in house.keys():
+        houseInfo[key] = house[key]
+    data = {
+        "residential_name_search": houseInfo['residentialID'],
+        "building_name_search": houseInfo['buildingID'],
+        "unit_search": houseInfo['unitID'],
+        "house_no_search": houseInfo['houseNumID'],
+        "residential_name": houseInfo['residentialName'],
+        "building_name": houseInfo['buildingName'],
+        "floor": houseInfo['floorName'],
+        "house_no_suffix": "xxx",
+        "residential_address": residential_address,
+        "residential_department_did": houseInfo['dutyDepID'],
+        "house_status": "WAITING_RENT",
+        "category": "NOLIMIT",
+        "rental_price": "2500.00",
+        "build_area": "120.00",
+        "rooms": "3",
+        "livings": "1",
+        "kitchens": "1",
+        "bathrooms": "2",
+        "balconys": "2",
+        "orientation": "NORTH",
+        "source": "INTRODUCE",
+        "houseRent": {
+            "house_status": "WAITING_RENT",
+            "category": "NOLIMIT",
+            "source": "INTRODUCE",
+            "rental_price": "2500.00"
+        }, "audit_status": "PASS",
+        "building_id": houseInfo['buildingID'],
+        "residential_id": houseInfo['residentialID'],
+        "unit_id": houseInfo['unitID'],
+        "unit": houseInfo['unitName'],
+        "floor_id": houseInfo['floorID'],
+        "house_no_id": houseInfo['houseNumID'],
+        "house_no": houseInfo['houseNumName'],
+        "area_code": area_code,
+        "city_code": city_code,
+        "house_develop_id": houseInfo['houseDevelogID'],
+        "update_time": sqlbase.serach(
+            "SELECT update_time from house_develop where house_develop_id = '%s'" % houseInfo['houseDevelogID'])[0],
+        # "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+        "audit_content": u"同意"
+    }
+    result = myRequest(url, data)
+    if result:
+        sql = "select house_id,house_code from house where residential_id = '%s' and house_no_id = '%s'" % (
+            houseInfo['residentialID'], houseInfo['houseNumID'])
+        house = sqlbase.serach(sql)
+        houseInfo['houseID'] = house[0]
+        houseInfo['houseCode'] = house[1]
+        # 避免等待时间太长，生成的房源没有出来，此处调用solr的增量操作
+        # solr('house', get_conf('testCondition', 'test'))
+        consoleLog('%s ADD SUCCESSFUL!' % data['house_no'])
 
-# 审核自营房源
-def auditHouse():
+# 批量审核自营房源
+def auditHouses():
     url = 'isz_house/HouseController/auditHouseDevelop.action'
     houseIds = addHouse()
     houseInfos = []
@@ -308,4 +367,4 @@ def auditHouse():
 
 
 if __name__ == '__main__':
-    auditHouse()
+    auditHouses()
