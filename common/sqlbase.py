@@ -213,7 +213,7 @@ def query(sql, nullThrow=True):
     for res in _result:
         row = {}
         for i in range(len(index)):
-            if type(res[i]) is not str and type(res[i]) is not int:
+            if type(res[i]) is not unicode and type(res[i]) is not int:
                 row[index[i][0]] = str(res[i])
             else:
                 row[index[i][0]] = res[i]

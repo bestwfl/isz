@@ -312,8 +312,8 @@ class Mysql(object):
 mysql = Mysql()
 
 
-if __name__ == '__main__':
-    mysql = Mysql()
-    apartment_sql = "SELECT * FROM apartment LIMIT 1"
-    results = mysql.query(apartment_sql)
-    print(results)
+# if __name__ == '__main__':
+#     mysql = Mysql()
+#     apartment_sql = "SELECT * FROM apartment LIMIT 1"
+#     results = mysql.query(apartment_sql)
+#     print(results)
