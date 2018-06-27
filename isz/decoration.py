@@ -10,7 +10,7 @@ from common.dict import User
 
 
 class Decoration(object):
-
+    """装修工程"""
     uploadPhotoURL = 'http://decorate.ishangzu.com/isz_decoration/DecorationFileController/uploadPhoto'  # 装修工程上传图片地址
 
     def __init__(self, contractIdOrNum):
@@ -40,10 +40,10 @@ class Decoration(object):
         consoleLog(u'开始工程管理')
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/changeProgress/placeOrder'
         data = {
-            'place_order_dep': User.DID.value,
+            'place_order_dep': User.DID,
             'place_order_reason': u'测试',
-            'place_order_uid': User.UID.value,
-            'place_order_uname': User.NAME.value,
+            'place_order_uid': User.UID,
+            'place_order_uname': User.NAME,
             'place_order_date': time.strftime('%Y-%m-%d %H:%M:%S'),
             'predict_survey_date': '%s 09:00' % addDays(1),
             'project_id': self.project_id
@@ -140,9 +140,21 @@ class Decoration(object):
                     }]
                 }, {
                     'attach_type': 'OTHER',
-                    'imgs': []
+                    'imgs': [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        'create_name': '',
+                        'create_dept': '',
+                        'create_time': '',
+                        'sort': 4,
+                        'type': 'OTHER'
+                    }]
                 }]
             }
+            for attachment in data['attachments']:
+                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+                attachment['imgs'][0]['url'] = IMG.url
+                attachment['imgs'][0]['img_id'] = IMG.id
             result = myRequest(url, data)
             if result:
                 # consoleLog(u'测量完成')
@@ -151,6 +163,7 @@ class Decoration(object):
         # 物业交割
         def profee():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/survey/profee'
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='PROPERTY_DELIVERY_ORDER.png', filepath=r"C:\Users\user\Desktop\Image\\")
             data = {
                 'air_switch': '',
                 'door_card': '',
@@ -168,8 +181,8 @@ class Decoration(object):
                 'attachments': [{
                     'attach_type': 'PROPERTY_DELIVERY_ORDER',
                     'imgs': [{
-                        "url": get_conf('img', 'url'),
-                        "img_id": get_conf('img', 'img_id'),
+                        "url": IMG.url,
+                        "img_id": IMG.id,
                         'create_name': '',
                         'create_dept': '',
                         'create_time': '',
@@ -187,13 +200,14 @@ class Decoration(object):
         # 闭水
         def closed():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/survey/closed'
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='SCENE.png', filepath=r"C:\Users\user\Desktop\Image\\")
             data = {
                 'air_switch': None,
                 'attachments': [{
                     'attach_type': 'SCENE',
                     'imgs': [{
-                        "url": get_conf('img', 'url'),
-                        "img_id": get_conf('img', 'img_id'),
+                        "url": IMG.url,
+                        "img_id": IMG.id,
                         'create_name': '',
                         'create_dept': '',
                         'create_time': '',
@@ -822,7 +836,7 @@ class Decoration(object):
                 "acceptance_num_this": 0,
                 "acceptance_time": None,
                 "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "create_uid": User.UID.value,
+                "create_uid": User.UID,
                 "data_type": "成品安装",
                 "data_type_len": 26,
                 "decoration_detial": "家具安装",
@@ -855,7 +869,7 @@ class Decoration(object):
                 "unit_name": "件",
                 "unit_price": 10,
                 "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "update_uid": User.UID.value,
+                "update_uid": User.UID,
                 "zone_type": None,
                 "type_index": 0,
                 "fun_index": 0
@@ -864,7 +878,7 @@ class Decoration(object):
                 "acceptance_num_this": 0,
                 "acceptance_time": None,
                 "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "create_uid": User.UID.value,
+                "create_uid": User.UID,
                 "data_type": "成品安装",
                 "data_type_len": 26,
                 "decoration_detial": "嵌入式天花灯-改造",
@@ -897,7 +911,7 @@ class Decoration(object):
                 "unit_name": "个",
                 "unit_price": 24,
                 "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "update_uid": User.UID.value,
+                "update_uid": User.UID,
                 "zone_type": None,
                 "fun_index": 1,
                 "type_index": 1
@@ -906,7 +920,7 @@ class Decoration(object):
                 "acceptance_num_this": 0,
                 "acceptance_time": None,
                 "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "create_uid": User.UID.value,
+                "create_uid": User.UID,
                 "data_type": "成品安装",
                 "data_type_len": 26,
                 "decoration_detial": "明装筒灯-改造",
@@ -939,7 +953,7 @@ class Decoration(object):
                 "unit_name": "个",
                 "unit_price": 33.6,
                 "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "update_uid": User.UID.value,
+                "update_uid": User.UID,
                 "zone_type": None,
                 "fun_index": 1,
                 "type_index": 1
@@ -982,8 +996,8 @@ class Decoration(object):
                         "config_progress": "WAIT_DESIGN",
                         "config_progress_name": "待设计",
                         "config_submit_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                        "config_submit_uid": User.UID.value,
-                        "config_submit_uname": User.NAME.value,
+                        "config_submit_uid": User.UID,
+                        "config_submit_uname": User.NAME,
                         "construct_uid": "1610",
                         "construct_uname": "徐经纬",
                         "construct_uname_phone": "徐经纬/13105715060",
@@ -1020,8 +1034,8 @@ class Decoration(object):
                         "place_order_dep": "",
                         "place_order_dep_name": None,
                         "place_order_reason": "测试",
-                        "place_order_uid": User.UID.value,
-                        "place_order_uname": User.NAME.value,
+                        "place_order_uid": User.UID,
+                        "place_order_uname": User.NAME,
                         "plumbing_type": "INNERPIPE",
                         "plumbing_type_name": None,
                         "predict_complete_date": "",
@@ -1145,7 +1159,15 @@ class Decoration(object):
                     }]
                 }, {
                     "attach_type": "OTHER",
-                    "imgs": []
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 4,
+                        "type": "OTHER"
+                    }]
                 }],
                 "check_remark": "",
                 "closed_water_test_result": None,
@@ -1171,6 +1193,10 @@ class Decoration(object):
                 "water_card_remain": None,
                 "water_meter_num": None
             }
+            for attachment in data['attachments']:
+                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+                attachment['imgs'][0]['url'] = IMG.url
+                attachment['imgs'][0]['img_id'] = IMG.id
             result = myRequest(url, data)
             if result:
                 consoleLog(u'隐蔽验收完成')
@@ -1227,7 +1253,15 @@ class Decoration(object):
                     }]
                 }, {
                     "attach_type": "OTHER",
-                    "imgs": []
+                    "imgs": [{
+                        "url": get_conf('img', 'url'),
+                        "img_id": get_conf('img', 'img_id'),
+                        "create_name": "",
+                        "create_dept": "",
+                        "create_time": "",
+                        "sort": 4,
+                        "type": "OTHER"
+                    }]
                 }],
                 "check_remark": "",
                 "closed_water_test_result": None,
@@ -1254,6 +1288,10 @@ class Decoration(object):
                 "water_card_remain": None,
                 "water_meter_num": None
             }
+            for attachment in data['attachments']:
+                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+                attachment['imgs'][0]['url'] = IMG.url
+                attachment['imgs'][0]['img_id'] = IMG.id
             result = myRequest(url, data)
             if result:
                 consoleLog(u'硬装验收完成')
@@ -1267,14 +1305,16 @@ class Decoration(object):
         # 整体验收
         def wholeCheck():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proCheck/wholeCheck'
+            IMG_CARDS = upLoadPhoto(url=self.uploadPhotoURL, filename='CARDS.png', filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG_THREE = upLoadPhoto(url=self.uploadPhotoURL, filename='THREE.png', filepath=r"C:\Users\user\Desktop\Image\\")
             data = {
                 "air_switch": None,
                 "attachments": None,
                 "card_attachs": [{
                     "attach_type": "CARDS",
                     "imgs": [{
-                        "url": "http://image.ishangzu.com/rsm/2018/3/20/22/3fb11ebb-31c9-484e-a6d4-2f60f3bc8575.jpg",
-                        "img_id": "FF8080816243A912016243C596010097",
+                        "url": IMG_CARDS.url,
+                        "img_id": IMG_CARDS.id,
                         "create_name": "",
                         "create_dept": "",
                         "create_time": "",
@@ -1303,8 +1343,8 @@ class Decoration(object):
                 "three_attachs": [{
                     "attach_type": "THREE",
                     "imgs": [{
-                        "url": get_conf('img', 'url'),
-                        "img_id": get_conf('img', 'img_id'),
+                        "url": IMG_THREE.url,
+                        "img_id": IMG_THREE.id,
                         "create_name": "",
                         "create_dept": "",
                         "create_time": "",
@@ -1324,6 +1364,8 @@ class Decoration(object):
         # 物业交割验收
         def profee():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proCheck/profee'
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='PROPERTY_DELIVERY_ORDER.png',
+                              filepath=r"C:\Users\user\Desktop\Image\\")
             data = {
                 "air_switch": "",
                 "door_card": "",
@@ -1341,8 +1383,8 @@ class Decoration(object):
                 "attachments": [{
                     "attach_type": "PROPERTY_DELIVERY_ORDER",
                     "imgs": [{
-                        "url": get_conf('img', 'url'),
-                        "img_id": get_conf('img', 'img_id'),
+                        "url": IMG.url,
+                        "img_id": IMG.id,
                         "create_name": "",
                         "create_dept": "",
                         "create_time": "",
@@ -1376,6 +1418,15 @@ class Decoration(object):
     # 室内图
     def indoorImg(self):
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proComp/indoor'
+        # IMG_PUBLIC_TOILET_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='PUBLIC_TOILET_1.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        # IMG_KITCHEN_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='KITCHEN_1.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        # IMG_PARLOUR_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='PARLOUR_1.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        # IMG_METH = upLoadPhoto(url=self.uploadPhotoURL, filename='METH.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        # IMG_ETH = upLoadPhoto(url=self.uploadPhotoURL, filename='ETH.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        # IMG_PROP = upLoadPhoto(url=self.uploadPhotoURL, filename='PROP.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        # IMG_BALCONY_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='BALCONY_1.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        # IMG_BALCONY_2 = upLoadPhoto(url=self.uploadPhotoURL, filename='BALCONY_2.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        IMG_LAYOUT = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png', filepath=r"C:\Users\user\Desktop\Image\\")
         data = {
             "curOneLevelNode": None,
             "curTwoLevelNode": None,
@@ -1383,8 +1434,8 @@ class Decoration(object):
             "house_attachs": [{
                 "attach_type": "PUBLIC_TOILET_1",
                 "imgs": [{
-                    "url": get_conf('img', 'url'),
-                    "img_id": get_conf('img', 'img_id'),
+                    "url": None,  # IMG_PUBLIC_TOILET_1.url,
+                    "img_id": None,  # IMG_PUBLIC_TOILET_1.id,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1394,8 +1445,8 @@ class Decoration(object):
             }, {
                 "attach_type": "KITCHEN_1",
                 "imgs": [{
-                    "url": get_conf('img', 'url'),
-                    "img_id": get_conf('img', 'img_id'),
+                    "url": None,  # IMG_KITCHEN_1.url,
+                    "img_id": None,  # IMG_KITCHEN_1.id,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1405,8 +1456,8 @@ class Decoration(object):
             }, {
                 "attach_type": "PARLOUR_1",
                 "imgs": [{
-                    "url": get_conf('img', 'url'),
-                    "img_id": get_conf('img', 'img_id'),
+                    "url": None,  # IMG_PARLOUR_1.url,
+                    "img_id": None,  # IMG_PARLOUR_1.id,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1416,8 +1467,8 @@ class Decoration(object):
             }, {
                 "attach_type": "METH",
                 "imgs": [{
-                    "url": get_conf('img', 'url'),
-                    "img_id": get_conf('img', 'img_id'),
+                    "url": None,  # IMG_METH.url,
+                    "img_id": None,  # IMG_METH.id,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1427,8 +1478,8 @@ class Decoration(object):
             }, {
                 "attach_type": "ETH",
                 "imgs": [{
-                    "url": get_conf('img', 'url'),
-                    "img_id": get_conf('img', 'img_id'),
+                    "url": None,  # IMG_ETH.url,
+                    "img_id": None,  # IMG_ETH.id,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1438,8 +1489,8 @@ class Decoration(object):
             }, {
                 "attach_type": "PROP",
                 "imgs": [{
-                    "url": get_conf('img', 'url'),
-                    "img_id": get_conf('img', 'img_id'),
+                    "url": None,  # IMG_PROP.url,
+                    "img_id": None,  # IMG_PROP.id,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1449,8 +1500,8 @@ class Decoration(object):
             }, {
                 "attach_type": "BALCONY_1",
                 "imgs": [{
-                    "url": get_conf('img', 'url'),
-                    "img_id": get_conf('img', 'img_id'),
+                    "url": None,  # IMG_BALCONY_1.url,
+                    "img_id": None,  # IMG_BALCONY_1.id,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1460,8 +1511,8 @@ class Decoration(object):
             }, {
                 "attach_type": "BALCONY_2",
                 "imgs": [{
-                    "url": get_conf('img', 'url'),
-                    "img_id": get_conf('img', 'img_id'),
+                    "url": None,  # IMG_BALCONY_2.url,
+                    "img_id": None,  # IMG_BALCONY_2.id,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1472,8 +1523,8 @@ class Decoration(object):
             "layout_attachs": [{
                 "attach_type": "LAYOUT",
                 "imgs": [{
-                    "url": get_conf('img', 'url'),
-                    "img_id": get_conf('img', 'img_id'),
+                    "url": IMG_LAYOUT.url,
+                    "img_id": IMG_LAYOUT.id,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1484,6 +1535,10 @@ class Decoration(object):
             "project_id": self.project_id,
             "remark": None
         }
+        for house_attach in data['house_attachs']:
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % house_attach['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+            house_attach['imgs'][0]['url'] = IMG.url
+            house_attach['imgs'][0]['img_id'] = IMG.id
         result = myRequest(url, data)
         if result:
             # consoleLog(u'室内图添加完成')

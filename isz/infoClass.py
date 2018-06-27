@@ -345,33 +345,63 @@ class ApartmentContractEndInfo(ApartmentContractInfo):
 
 
 class DecorationHouseInfo(object):
-    def __init__(self, contractNum):
-        sql = "select * from %s.decoration_house_info where contract_num='%s' and deleted=0" % (
-            get_conf('db', 'decoration_db'), contractNum)
-        self.decoration_house_info = sqlbase.query(sql)[0]
+    """工程管理房屋信息"""
+    def __init__(self, contractNumOrId):
+        sql = "select * from %s.decoration_house_info where (contract_num='%s' or contract_id='%s') and deleted=0" % (
+            get_conf('db', 'decoration_db'), contractNumOrId, contractNumOrId)
+        self.decoration_house_info = Mysql().query(sql)[0]
         self.info_id = self.decoration_house_info['info_id']
+
+    @staticmethod
+    def searchByInfoId(info_id):
+        """根据info_id查询房屋信息
+        :param info_id
+        :return 房屋信息对象
+        """
+        sql = "select contract_id from %s.decoration_house_info where info_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), info_id)
+        contract_id = Mysql().getOne(sql)[0]
+        return DecorationHouseInfo(contract_id)
 
 
 class DecorationProjectInfo(DecorationHouseInfo):
-    def __init__(self, contractNum):
-        super(DecorationProjectInfo, self).__init__(contractNum)
+    """工程订单"""
+    def __init__(self, contractNumOrId):
+        super(DecorationProjectInfo, self).__init__(contractNumOrId)
         sql = "select * from %s.new_decoration_project where info_id='%s' " % (
             get_conf('db', 'decoration_db'), self.info_id)
         self.project_info = sqlbase.query(sql)[0]
         self.project_id = self.project_info['project_id']
 
-    # 获取装修清单配置信息
+    @staticmethod
+    def searchByInfoId(info_id):
+        """根据info_id查询工程订单
+        :param info_id
+        :return 工程订单对象
+        """
+        sql = "select contract_id from %s.decoration_house_info where info_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), info_id)
+        contract_id = Mysql().getOne(sql)[0]
+        return DecorationProjectInfo(contract_id)
+
+    @staticmethod
+    def searchByInfoId(project_id):
+        """根据project_id查询工程订单
+        :param project_id
+        :return 工程订单对象
+        """
+        sql = "select info_id from %s.new_decoration_project where project_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), project_id)
+        info_id = Mysql().getOne(sql)[0]
+        return DecorationProjectInfo.searchByInfoId(info_id)
+
     def get_stuff_list(self):
-        sql = "select * from %s.new_stuff_list where project_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'),
-                                                                                       self.project_id)
-        stuff_lists = sqlbase.query(sql)
+        """获取装修清单配置信息"""
+        sql = "select * from %s.new_stuff_list where project_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), self.project_id)
+        stuff_lists = Mysql().query(sql)
         return stuff_lists
 
-    # 获取物品清单配置信息
     def get_config_list(self):
-        sql = "select * from %s.new_stuff_list where project_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'),
-                                                                                       self.project_id)
-        config_lists = sqlbase.query(sql)
+        """获取物品清单配置信息"""
+        sql = "select * from %s.new_stuff_list where project_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), self.project_id)
+        config_lists = Mysql().query(sql)
         return config_lists
 
 
@@ -464,14 +494,3 @@ def check_query_table(param, type):  # FF80808163F413680163F42A6D9904CF
     if not result:
         consoleLog('{}宽表：{} 未生成'.format(type, param))
 
-
-if __name__ == '__main__':
-    # end = HouseContractEndInfo('WFL工程1.4-06010149Qx')
-    # print(end)
-    # check_query_table('FF80808163F413680163F42A6D9904CF', 'apartment_contract')
-    print ApartmentContractInfo('物CH201709140151')
-    # order = RepairOrder('WX20180626000014')
-    # print order.repairs_order_info
-    # print ApartmentInfo('13816').apartment_contract
-    # customer = CustomerPersonInfo('8A2152435E76882D015E7EB80D3E21AE2')
-    # print customer
