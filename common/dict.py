@@ -2,8 +2,7 @@
 
 from collections import OrderedDict
 
-from eric6.ThirdParty.enum import Enum
-
+from enum import Enum
 from common import sqlbase
 from common.base import get_conf
 
@@ -181,4 +180,4 @@ if __name__ == '__main__':
     # print apartment
     status = AUDIT_STATUS.APARTMETN_CONTRACT_END.value.REJECT.value
 
-    print status
+    print(status)
