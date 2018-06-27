@@ -5,7 +5,7 @@ from isz.houseContract import HouseContract
 from common import sqlbase
 from common.base import consoleLog, get_conf
 from common.datetimes import addDays
-from common.interface_wfl import myRequest, login, upLoadPhoto
+from common.interface_wfl import myRequest, upLoadPhoto
 from common.dict import User
 
 
@@ -1515,19 +1515,3 @@ class Decoration(object):
         self.projectCheck()  # 项目验收
         self.indoorImg()  # 室内图
         self.delivery()  # 竣工
-
-
-if __name__ == '__main__':
-    contractNum = u'工程1.3测试-05080958bm'
-    decoration = Decoration(contractNum)
-    decoration.placeOrder()  # 下单
-    decoration.dispatchOrder()  # 派单
-    decoration.acceptOrder()  # 接单
-    decoration.survey(is_need_waterproofing='Y')  # 勘测
-    decoration.projectOrder()  # 项目计划
-    # decoration.configList()  # 物品清单
-    # decoration.stuffList()  # 装修清单
-    # decoration.hideAndStufCheck()  # 施工中
-    # decoration.projectCheck()  # 项目验收
-    # decoration.indoorImg()  # 室内图
-    # decoration.delivery()  # 竣工

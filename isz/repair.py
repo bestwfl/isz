@@ -1,9 +1,8 @@
 # -*- coding:utf8 -*-
 import datetime
 import time
-from common import sqlbase
 from common.base import consoleLog
-from common.interface_wfl import myRequest
+from common.interface_wfl import myRequest, upLoadPhoto
 from isz.infoClass import ApartmentInfo, RepairOrderInfo
 
 
@@ -11,13 +10,14 @@ class Repair(RepairOrderInfo):
     """报修相关
     :param apartmentIdOrNum:房源编号或者ID
     """
+    _uploadPhotoURL = 'http://rsm.ishangzu.com/isz_repair/CommUploadPhotoController/uploadPhoto'
 
     def __init__(self, orderNumOrId):
 
         super(Repair, self).__init__(orderNumOrId)
 
-    @staticmethod
-    def createRepair(apartmentCodeOrId):
+    @classmethod
+    def createRepair(cls, apartmentCodeOrId):
         """新增报修订单
         :param apartmentCodeOrId 房源Code或者Id
         """
@@ -37,6 +37,8 @@ class Repair(RepairOrderInfo):
             customer_name = None
             customer_phone = None
         url = 'http://rsm.ishangzu.com/isz_repair/RepairsController/repairsOrder'
+        img = upLoadPhoto(url=cls._uploadPhotoURL, filename='AddRepairs.png',
+                          filepath=r"C:\Users\user\Desktop\Image\\")  # 报修图片上传
         data = {
             "house_id": apartment.house_id,
             "house_contract_id": apartment.house_contract_id,
@@ -100,8 +102,8 @@ class Repair(RepairOrderInfo):
                 }]
             },
             "repairsAttachments": [{
-                "img_id": "FF80808162FB8AF70162FC3396F209A7",
-                "img_url": "http://file.ishangzu.com/rsm/2018/4/25/17/9c014540-b3fe-4403-924e-d9b51c7862e3.png",
+                "img_id": img.id,
+                "img_url": img.url,
                 "remark": "",
                 "sort": ""
             }],
@@ -134,12 +136,3 @@ class Repair(RepairOrderInfo):
         if myRequest(url, data, method='put'):
             consoleLog(u'订单：%s 已取消' % self.order_no)
 
-
-if __name__ == '__main__':
-    apartments = sqlbase.serach("SELECT apartment_id,apartment_code FROM apartment WHERE is_active='Y' AND deleted=0 "
-                                "AND rent_status='RENTED' AND rent_type='SHARE' AND city_code='330100' ORDER BY RAND() LIMIT 1",
-                                oneCount=False)
-    for apartment in apartments:
-        consoleLog(u'房源编号：%s ID:%s' % (apartment[1], apartment[0]))
-        Repair.createRepair(apartment[0])
-        # Repair.cancel('FF808081636379B101636379C2960018')
