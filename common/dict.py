@@ -1,7 +1,6 @@
 # -*- coding:utf8 -*-
 
 from collections import OrderedDict
-
 from enum import Enum
 from common import sqlbase
 from common.base import get_conf
@@ -178,6 +177,6 @@ if __name__ == '__main__':
 
     # apartment = ApartmentInfo('E48A81416386FE1001638C5A56F000C1')
     # print apartment
-    status = AUDIT_STATUS.APARTMETN_CONTRACT_END.value.REJECT.value
-
-    print(status)
+    # status = AUDIT_STATUS.APARTMETN_CONTRACT_END.value.REJECT.value
+    print User.NAME
+    # print(status)
