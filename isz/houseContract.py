@@ -139,17 +139,17 @@ class HouseContract(ContractBase, HouseContractInfo):
                 quit()
         if 'chushen' == auditAction or 'fushen' == auditAction:
             self.auditPayable()
-            if AuditStatus.HOUSE_CONTRACT_STATUS_WAIT_AUDIT.value == self.audit_status_now:
+            if AuditStatus.HOUSE_CONTRACT_STATUS_WAIT_AUDIT == self.audit_status_now:
                 for step in step_Par.keys():
-                    if AuditStatus.HOUSE_CONTRACT_STATUS_WAIT_AUDIT.value == self.step_status(step) :
+                    if AuditStatus.HOUSE_CONTRACT_STATUS_WAIT_AUDIT == self.step_status(step) :
                         auditBase(step, 'chushen')
-                if AuditStatus.HOUSE_CONTRACT_STATUS_AUDITED.value == self.audit_status_now:
+                if AuditStatus.HOUSE_CONTRACT_STATUS_AUDITED == self.audit_status_now:
                     consoleLog(u'委托合同已初审')
-            if 'fushen' == auditAction and AuditStatus.HOUSE_CONTRACT_STATUS_AUDITED.value == self.audit_status_now:
+            if 'fushen' == auditAction and AuditStatus.HOUSE_CONTRACT_STATUS_AUDITED == self.audit_status_now:
                 for step in step_Par.keys():
-                    if AuditStatus.HOUSE_CONTRACT_STATUS_AUDITED.value == self.step_status(step):
+                    if AuditStatus.HOUSE_CONTRACT_STATUS_AUDITED == self.step_status(step):
                         auditBase(step, auditAction)
-                if AuditStatus.HOUSE_CONTRACT_STATUS_APPROVED.value == self.audit_status_now:
+                if AuditStatus.HOUSE_CONTRACT_STATUS_APPROVED == self.audit_status_now:
                     consoleLog(u'委托合同已复审')
 
     # 续签
