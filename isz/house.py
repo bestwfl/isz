@@ -13,11 +13,13 @@ class House(HouseInfo):
     """业主房源信息"""
 
     # 新签委托合同
-    def createHouseContract(self, contract_num, apartment_type, entrust_type, sign_date, owner_sign_date, entrust_start_date,
-                         entrust_year, rent, parking=None, payment_cycle='HALF_YEAR',fitment_start_date=None, fitment_end_date=None,
-                         contract_type='NEWSIGN'):
+    def createHouseContract(self, contract_num, apartment_type, entrust_type, sign_date, owner_sign_date,
+                            entrust_start_date, entrust_year, rent, parking=None, payment_cycle='HALF_YEAR',
+                            fitment_start_date=None, fitment_end_date=None, contract_type='NEWSIGN'):
         """
         新增委托合同以及分割交房之后同时定价
+        :param entrust_year:
+        :param contract_num:
         :param apartment_type: 公寓类型
         :param entrust_type: 合同类型
         :param sign_date: 签约日期
@@ -369,10 +371,10 @@ class House(HouseInfo):
 
         houseContract = {
             'houseContractFrist': houseContractFirst,
-             'houseContractSecond': houseContractSecond,
-             'houseContractThird': houseContractThird,
-             'houseContractFour': houseContractFour,
-             'houseContractFive': houseContractFive
+            'houseContractSecond': houseContractSecond,
+            'houseContractThird': houseContractThird,
+            'houseContractFour': houseContractFour,
+            'houseContractFive': houseContractFive
         }
 
         result = contractbase.saveHouseContract(houseContract)
@@ -383,4 +385,3 @@ class House(HouseInfo):
             consoleLog(u'新签委托合同成功！')
             consoleLog(u'合同编号 : %s 合同ID : %s' % (houseContractInfo[1], houseContractInfo[0]))
             return HouseContract(houseContractInfo[0])
-

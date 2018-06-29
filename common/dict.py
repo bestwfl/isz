@@ -4,6 +4,7 @@ from collections import OrderedDict
 from enum import Enum
 from common import sqlbase
 from common.base import get_conf
+from common.mysql import Mysql
 
 """字典"""
 
@@ -12,12 +13,24 @@ def get_dict_value(dict_e_value, dict_code = None):
     if dict_code:
         dict_code = "and dict_code=%s" % dict_code
     sql = "select dict_value from sys_dict_item where dict_e_value = '%s' and deleted=0 and is_active='Y' %s" % (dict_e_value, dict_code)
-    return sqlbase.serach(sql)
+    return Mysql().getAll(sql)
+
+class UserInfo(object):
+
+    def __init__(self, phone):
+        self.user_info = Mysql().query("select * from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
+                                       "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % phone)[0]
+        self.user_name = self.user_info['user_name']
+        self.user_id = self.user_info['user_id']
+        self.user_phone = self.user_info['user_phone']
+        self.user_status = self.user_info['user_status']
+        self.dep_id = self.user_info['dep_id']
+        self.dep_name = self.user_info['dep_name']
 
 # 获取登录用户信息
 def getUserInfo():
-    exhouseSql = sqlbase.serach("select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
-                                "where a.user_phone='%s' and a.user_status='INCUMBENCY'"  % get_conf('sysUser', 'userphone'))
+    exhouseSql = Mysql().getAll("select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
+                                "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone'))[0]
     userInfo = {
         'user_name': exhouseSql[0],
         'uid': exhouseSql[1],
@@ -82,8 +95,8 @@ landlord = {
 class User(Enum):
     """登录用户信息"""
 
-    exhouseSql = sqlbase.serach("select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
-                                "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone'))
+    exhouseSql = Mysql().getAll("select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
+                                "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone'))[0]
     UID = exhouseSql[1]
     DID = exhouseSql[2]
     NAME = exhouseSql[0]
@@ -178,5 +191,6 @@ if __name__ == '__main__':
     # apartment = ApartmentInfo('E48A81416386FE1001638C5A56F000C1')
     # print apartment
     # status = AUDIT_STATUS.APARTMETN_CONTRACT_END.value.REJECT.value
-    print User.NAME
+    user = UserInfo('18815286582')
+    print user
     # print(status)

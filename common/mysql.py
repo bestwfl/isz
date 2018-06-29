@@ -73,11 +73,11 @@ class Mysql(object):
         else:
             for x in range(len(data)):
                 if type(data[x]) is not list:
-                    if type(data[x]) is not str and type(data[x]) is not int:
+                    if type(data[x]) is not unicode and type(data[x]) is not int:
                         data[x] = str(data[x])
                 else:
                     for y in range(len(data[x])):
-                        if type(data[x][y]) is not str and type(data[x][y]) is not int:
+                        if type(data[x][y]) is not unicode and type(data[x][y]) is not int:
                             data[x][y] = str(data[x][y])
             return data
 
@@ -101,7 +101,7 @@ class Mysql(object):
                 #         res[key] = str(res[key])
                 # result.append(res)
                 for i in range(len(index)):
-                    if type(res[i]) is not str and type(res[i]) is not int:
+                    if type(res[i]) is not unicode and type(res[i]) is not int:
                         row[index[i][0]] = str(res[i])
                     else:
                         row[index[i][0]] = res[i]
@@ -128,7 +128,8 @@ class Mysql(object):
         :summary: 执行查询，并取出所有结果集
         :param sql:查询ＳＱＬ，如果有查询条件，请只指定条件列表，并将条件值使用参数[param]传递进来
         :param param: 可选参数，条件列表值（元组/列表）
-        :return result list(字典对象)/boolean 查询到的结果集
+        :return result list(字典对象)/boolean 查询到的结果集;查询单列结果返回格式 ['id1']/['id1','id2']
+                        查询多列结果返回格式[['id1','code1']]/[['id1','code1'],['id2','code2']]
         """
         if param is None:
             count = self._cursor.execute(sql)
@@ -166,7 +167,7 @@ class Mysql(object):
         :summary: 执行查询，并取出第一条
         :param sql:查询ＳＱＬ，如果有查询条件，请只指定条件列表，并将条件值使用参数[param]传递进来
         :param param: 可选参数，条件列表值（元组/列表）
-        :return: result list/boolean 查询到的结果集
+        :return: result list/boolean 查询到的结果集['']/['','']
         """
         if param is None:
             count = self._cursor.execute(sql)
@@ -189,7 +190,6 @@ class Mysql(object):
             return Mysql._convertUnicode(result)
         else:
             return result
-        # return result
 
     def getMany(self, sql, num, needConvert=True, param=None, nullLog=True, research=False):
         """
@@ -200,7 +200,8 @@ class Mysql(object):
         :param sql:查询ＳＱＬ，如果有查询条件，请只指定条件列表，并将条件值使用参数[param]传递进来
         :param num:取得的结果条数
         :param param: 可选参数，条件列表值（元组/列表）
-        :return: result list/boolean 查询到的结果集
+        :return: result list/boolean 查询到的结果集;查询单列结果返回格式 ['id1']/['id1','id2']
+                        查询多列结果返回格式[['id1','code1']]/[['id1','code1'],['id2','code2']]
         """
         if param is None:
             count = self._cursor.execute(sql)

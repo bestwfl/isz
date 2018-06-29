@@ -51,6 +51,7 @@ def myRequest(url, data=None, needCookie=True, contentType='application/json', m
     try:
         result = json.loads(request.text)
     except ValueError:
+        consoleLog(request)
         raise ValueError('ERROR')
     if request.status_code is not 200 or (result['code'] is not 0 and result['code'] is not 1):
         msg = result['msg'].encode('utf-8')

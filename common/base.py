@@ -10,6 +10,7 @@ import random
 import re
 import string
 import time
+from threading import RLock
 
 import requests
 import yaml
@@ -38,6 +39,16 @@ logger.addHandler(fileHandler)
 logger.addHandler(consoleHandler)
 
 currentDriver = None
+lock = RLock()
+
+def tlock(func):
+    def wrapper(*args, **kwargs):
+        lock.acquire()
+        try:
+            func(*args, **kwargs)
+        finally:
+            lock.release()
+    return wrapper
 
 def log(func):
     def wrapper(*args, **kwargs):

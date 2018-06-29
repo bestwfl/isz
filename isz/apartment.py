@@ -391,7 +391,7 @@ class Apartment(ApartmentInfo):
         url = 'isz_contract/ApartmentContractController/saveOrUpdateApartmentContract.action'
         result = myRequest(url, data, shutdownFlag=True)  # 生成出租合同
         if result:
-            consoleLog('承租合同 %s 已创建完成' % data['contract_num'])
+            consoleLog(u'承租合同 %s 已创建完成' % data['contract_num'])
             return ApartmentContract(result['par']['contract_id'])
 
     # 添加保修订单

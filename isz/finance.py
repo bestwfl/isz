@@ -8,7 +8,7 @@ from common.interface_wfl import myRequest
 from isz.infoClass import Receivable, ApartmentContractInfo
 
 
-class Finance():
+class Finance(object):
     """财务相关接口"""
 
     # 应收对应合同

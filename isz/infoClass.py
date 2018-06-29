@@ -2,6 +2,7 @@
 """表元素基础信息类"""
 import threading
 
+# from common import sqlbase
 from common import sqlbase
 from common.base import consoleLog, get_conf
 from common.mysql import Mysql
@@ -9,12 +10,12 @@ from common.mysql import Mysql
 
 class HouseInfo(object):
     def __init__(self, houseIdOrCode):
-        houseId = sqlbase.serach("select house_id from house where (house_id='%s' or house_code like '%s%s') "
-                                 "and deleted=0 " % (houseIdOrCode, houseIdOrCode, '%'), oneCount=False)
+        houseId = Mysql().getOne("select house_id from house where (house_id='%s' or house_code like '%s%s') "
+                                 "and deleted=0 " % (houseIdOrCode, houseIdOrCode, '%'))
         if 1 != len(houseId):
             raise ValueError('the house_code is not one but: %s! search for:%s' % (len(houseId), houseIdOrCode))
         sql = "select * from house where house_id='%s' and deleted=0" % houseId[0]
-        self.house_info = sqlbase.query(sql)[0]
+        self.house_info = Mysql().query(sql)[0]
         self.house_id = self.house_info['house_id']
         self.residential_id = self.house_info['residential_id']
         self.building_id = self.house_info['building_id']
@@ -38,20 +39,20 @@ class HouseInfo(object):
 
 class HouseContractInfo(HouseInfo):
     def __init__(self, contractIdOrNum):
-        contractId = sqlbase.serach("select contract_id,house_id from house_contract where (contract_id='%s' or "
+        contractId = Mysql().getAll("select contract_id,house_id from house_contract where (contract_id='%s' or "
                                     "contract_num='%s') and deleted=0" % (contractIdOrNum, contractIdOrNum),
-                                    oneCount=False, nullLog=False)
+                                    nullLog=False)
         if 1 != len(contractId):
             raise ValueError('the contract_num is not one but: %s! search for:%s' % (len(contractId), contractIdOrNum))
         sql = "select * from house_contract where contract_id='%s' and deleted=0" % contractId[0][0]
         super(HouseContractInfo, self).__init__(contractId[0][1])
-        self.house_contract_info = sqlbase.query(sql)[0]
+        self.house_contract_info = Mysql().query(sql)[0]
         self.house_contract_id = self.house_contract_info['contract_id']
-        # threading.Thread(target=check_query_table, args=(self.house_contract_id, 'house_contract')).start()
-        query_house_contract = sqlbase.serach("select * from query_house_contract where contract_id='%s'" %
-                                              self.house_contract_id, oneCount=False, nullLog=False)
-        if 1 != len(query_house_contract):  # 检查委托合同宽表
-            consoleLog("there is no contract in 'query_house_contract',contract_id: %s" % self.house_contract_id, 'w')
+        threading.Thread(target=check_query_table, args=(self.house_contract_id, 'house_contract')).start()
+        # query_house_contract = sqlbase.serach("select * from query_house_contract where contract_id='%s'" %
+        #                                       self.house_contract_id, oneCount=False, nullLog=False)
+        # if 1 != len(query_house_contract):  # 检查委托合同宽表
+        #     consoleLog("there is no contract in 'query_house_contract',contract_id: %s" % self.house_contract_id, 'w')
         self.reform_way = self.house_contract_info['reform_way']
         self.is_active = self.house_contract_info['is_active']
         if 'N' == self.is_active:
@@ -92,18 +93,18 @@ class HouseContractInfo(HouseInfo):
         self.entrust_year = self.house_contract_info['entrust_year']
         self.free_days = self.house_contract_info['free_days']
 
-    # 委托合同实时审核状态
     @property
     def audit_status_now(self):
-        self.__audit_status = sqlbase.serach("select audit_status from house_contract where contract_id='%s' "
+        """ 委托合同实时审核状态"""
+        self.__audit_status = Mysql().getOne("select audit_status from house_contract where contract_id='%s' "
                                              "and deleted=0" % self.house_contract_id)[0]
         return self.__audit_status
 
-    # 委托合同应付，默认读取未审核的应付租金
     def payables(self, audit_status='NOTAUDIT', money_type='RENT'):
+        """ 委托合同应付，默认读取未审核的应付租金"""
         payablesVo = []
         sql = "select * from house_contract_payable where contract_id='%s' and deleted=0" % self.house_contract_id
-        payables = sqlbase.query(sql)
+        payables = Mysql().query(sql)
         for payable in payables:
             payableVo = Payable(payable['payable_id'])
             if not audit_status or audit_status == payableVo.audit_status:
@@ -111,27 +112,19 @@ class HouseContractInfo(HouseInfo):
                     payablesVo.append(payableVo)
         return payablesVo
 
-    # 委托合同分步审核状态
     def step_status(self, step):
-        step_status = sqlbase.serach("select status from house_contract_step_audit_status where contract_id = '%s' and "
+        """委托合同分步审核状态"""
+        step_status = Mysql().getOne("select status from house_contract_step_audit_status where contract_id = '%s' and "
                                      "step = '%s' and deleted=0 order by step_id desc limit 1" % (
                                          self.house_contract_id, step))[0]
         return step_status
-
-        # 业主信息
-        # def landlord(self):
-        #     sql = "select * from house_contract_landlord where contract_id='%s' and deleted=0" % self.house_contract_id
-        #     landlord = sqlbase.serach(
-        #         "select landlord_name,phone,email,mailing_address,emergency_name,emergency_phone from house_contract_landlord where contract_id='%s' and deleted=0" % self.contract_id)
-        #     landlordInfo = sqlbase.query(sql)
-        #     return None
 
 
 class HouseContractEndInfo(HouseContractInfo):
     def __init__(self, contractIdOrNum):
         super(HouseContractEndInfo, self).__init__(contractIdOrNum)
         sql = "select * from house_contract_end where contract_id='%s' and deleted=0" % self.house_contract_id
-        self.house_contract_end_info = sqlbase.query(sql, nullThrow=False)[0]
+        self.house_contract_end_info = Mysql().query(sql, nullThrow=False)[0]
         if not self.house_contract_end_info:
             consoleLog("there is no house_contract_end,contract_id: %s" % self.house_contract_id, 'e')
             return
@@ -150,20 +143,19 @@ class HouseContractEndInfo(HouseContractInfo):
         self.pay_object = self.house_contract_end_info['pay_object']
         self.bank = self.house_contract_end_info['bank']
 
-    # 终止结算实时审核状态
     @property
     def end_audit_status_now(self):
-        self.__end_audit_status = sqlbase.serach("select audit_status from house_contract_end where contract_id='%s' "
+        """终止结算实时审核状态"""
+        self.__end_audit_status = Mysql().getOne("select audit_status from house_contract_end where contract_id='%s' "
                                                  "and deleted=0" % self.house_contract_id)[0]
         return self.__end_audit_status
 
 
 class ApartmentInfo(HouseInfo):
     def __init__(self, apartmentIdOrCode):
-        apartmentId = sqlbase.serach(
+        apartmentId = Mysql().getAll(
             "select apartment_id,house_id from apartment where (apartment_id='%s' or apartment_code "
-            "like '%s%s') and deleted=0 and is_active='Y'" % (apartmentIdOrCode, apartmentIdOrCode, '%'),
-            oneCount=False)
+            "like '%s%s') and deleted=0 and is_active='Y'" % (apartmentIdOrCode, apartmentIdOrCode, '%'))
         if 1 != len(apartmentId):
             raise ValueError(
                 'apartment_id num is not one but: %s! search for:%s' % (len(apartmentId), apartmentIdOrCode))
@@ -192,7 +184,7 @@ class ApartmentInfo(HouseInfo):
         if self.rent_type == 'SHARE':
             sql = "select (select dict_value from sys_dict_item where room_no=dict_e_value and deleted=0 limit 1) room_no " \
                   "from house_room where room_id='%s'" % self.room_id
-            return sqlbase.serach(sql, oneCount=True)[0]
+            return Mysql().getOne(sql)[0]
         else:
             return None
 
@@ -208,7 +200,7 @@ class ApartmentInfo(HouseInfo):
     def apartment_contract(self):
         """房源对应出租合同"""
         if 'RENTED' == self.rent_status:
-            contract_id = sqlbase.serach(
+            contract_id = Mysql().getOne(
                 "select a.contract_id from apartment_contract a inner join apartment_contract_relation b on a.contract_id=b.contract_id "
                 "inner join apartment c on b.apartment_id=c.apartment_id where c.apartment_id='%s' and a.deleted=0 and a.is_active='Y'"
                 % self.apartment_id)[0]
@@ -219,17 +211,17 @@ class ApartmentInfo(HouseInfo):
 
 class ApartmentContractInfo(ApartmentInfo):
     def __init__(self, contractIdOrNum):
-        contractId = sqlbase.serach("select ac.contract_id,a.apartment_id from apartment_contract ac "
+        contractId = Mysql().getAll("select ac.contract_id,a.apartment_id from apartment_contract ac "
                                     "inner join apartment_contract_relation acr on ac.contract_id=acr.contract_id "
                                     "inner join apartment a on a.apartment_id=acr.apartment_id "
                                     "where (ac.contract_id='%s' or ac.contract_num='%s') and ac.deleted=0 " %
-                                    (contractIdOrNum, contractIdOrNum), oneCount=False)
+                                    (contractIdOrNum, contractIdOrNum))
         if 1 != len(contractId):
             raise ValueError(
                 'contract_id number is not one but: %s! search for:%s' % (len(contractId), contractIdOrNum))
         super(ApartmentContractInfo, self).__init__(contractId[0][1])
         sql = "select * from apartment_contract where contract_id='%s'" % contractId[0][0]
-        self.apartment_contract_info = sqlbase.query(sql)[0]
+        self.apartment_contract_info = Mysql().query(sql)[0]
         self.apartment_contract_id = self.apartment_contract_info['contract_id']
         threading.Thread(target=check_query_table, args=(self.apartment_contract_id, 'apartment_contract')).start()
         # query_apartment_contract = sqlbase.serach("select * from query_apartment_contract where contract_id='%s'" %
@@ -272,14 +264,16 @@ class ApartmentContractInfo(ApartmentInfo):
         self.entrust_type = self.apartment_contract_info['entrust_type']
 
     @property
-    def audit_status_now(self):  # 出租实时审核状态
-        self.__audit_status = sqlbase.serach("select audit_status from apartment_contract where contract_id='%s'" %
+    def audit_status_now(self):
+        """出租实时审核状态"""
+        self.__audit_status = Mysql().getOne("select audit_status from apartment_contract where contract_id='%s'" %
                                              self.apartment_contract_id)[0]
         return self.__audit_status
 
-    @staticmethod  # 查询合同字段
+    @staticmethod
     def contract_field(contractNumOrId, field):
-        fieldRetrun = sqlbase.serach(
+        """查询合同字段"""
+        fieldRetrun = Mysql().getOne(
             "select %s from apartment_contract where (contract_num='%s' or contract_id='%s') and deleted=0" %
             (field, contractNumOrId, contractNumOrId))
         if fieldRetrun:
@@ -290,7 +284,7 @@ class ApartmentContractInfo(ApartmentInfo):
     def receivables(self):
         """出租合同对应所有未删除的应收"""
         sql = "select * from apartment_contract_receivable where contract_id='%s' and deleted=0" % self.apartment_contract_id
-        receivables = sqlbase.query(sql)
+        receivables = Mysql().query(sql)
         receivablesVo = []
         for receivable in receivables:
             receivableVo = Receivable(receivable['receivable_id'])
@@ -306,6 +300,8 @@ class ApartmentContractInfo(ApartmentInfo):
 
 
 class CustomerPersonInfo(object):
+    """承租客户信息"""
+
     def __init__(self, person_id):
         sql = "select * from customer_person where person_id='%s'" % person_id
         self.customer_info = Mysql().query(sql)[0]
@@ -320,10 +316,12 @@ class CustomerPersonInfo(object):
 
 
 class ApartmentContractEndInfo(ApartmentContractInfo):
+    """出租合同终止信息"""
+
     def __init__(self, contract_id):
         super(ApartmentContractEndInfo, self).__init__(contract_id)
         sql = "select * from apartment_contract_end where contract_id='%s' and deleted=0" % contract_id
-        self.apartment_contract_end_info = sqlbase.query(sql)[0]
+        self.apartment_contract_end_info = Mysql().query(sql)[0]
         self.end_id = self.apartment_contract_end_info['end_id']
         self.end_contract_num = self.apartment_contract_end_info['end_contract_num']
         self.end_date = self.apartment_contract_end_info['end_date']
@@ -346,6 +344,7 @@ class ApartmentContractEndInfo(ApartmentContractInfo):
 
 class DecorationHouseInfo(object):
     """工程管理房屋信息"""
+
     def __init__(self, contractNumOrId):
         sql = "select * from %s.decoration_house_info where (contract_num='%s' or contract_id='%s') and deleted=0" % (
             get_conf('db', 'decoration_db'), contractNumOrId, contractNumOrId)
@@ -358,18 +357,20 @@ class DecorationHouseInfo(object):
         :param info_id
         :return 房屋信息对象
         """
-        sql = "select contract_id from %s.decoration_house_info where info_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), info_id)
+        sql = "select contract_id from %s.decoration_house_info where info_id='%s' and deleted=0" % (
+            get_conf('db', 'decoration_db'), info_id)
         contract_id = Mysql().getOne(sql)[0]
         return DecorationHouseInfo(contract_id)
 
 
 class DecorationProjectInfo(DecorationHouseInfo):
     """工程订单"""
+
     def __init__(self, contractNumOrId):
         super(DecorationProjectInfo, self).__init__(contractNumOrId)
         sql = "select * from %s.new_decoration_project where info_id='%s' " % (
             get_conf('db', 'decoration_db'), self.info_id)
-        self.project_info = sqlbase.query(sql)[0]
+        self.project_info = Mysql().query(sql)[0]
         self.project_id = self.project_info['project_id']
 
     @staticmethod
@@ -378,7 +379,8 @@ class DecorationProjectInfo(DecorationHouseInfo):
         :param info_id
         :return 工程订单对象
         """
-        sql = "select contract_id from %s.decoration_house_info where info_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), info_id)
+        sql = "select contract_id from %s.decoration_house_info where info_id='%s' and deleted=0" % (
+            get_conf('db', 'decoration_db'), info_id)
         contract_id = Mysql().getOne(sql)[0]
         return DecorationProjectInfo(contract_id)
 
@@ -388,19 +390,22 @@ class DecorationProjectInfo(DecorationHouseInfo):
         :param project_id
         :return 工程订单对象
         """
-        sql = "select info_id from %s.new_decoration_project where project_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), project_id)
+        sql = "select info_id from %s.new_decoration_project where project_id='%s' and deleted=0" % (
+            get_conf('db', 'decoration_db'), project_id)
         info_id = Mysql().getOne(sql)[0]
         return DecorationProjectInfo.searchByInfoId(info_id)
 
     def get_stuff_list(self):
         """获取装修清单配置信息"""
-        sql = "select * from %s.new_stuff_list where project_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), self.project_id)
+        sql = "select * from %s.new_stuff_list where project_id='%s' and deleted=0" % (
+            get_conf('db', 'decoration_db'), self.project_id)
         stuff_lists = Mysql().query(sql)
         return stuff_lists
 
     def get_config_list(self):
         """获取物品清单配置信息"""
-        sql = "select * from %s.new_stuff_list where project_id='%s' and deleted=0" % (get_conf('db', 'decoration_db'), self.project_id)
+        sql = "select * from %s.new_stuff_list where project_id='%s' and deleted=0" % (
+            get_conf('db', 'decoration_db'), self.project_id)
         config_lists = Mysql().query(sql)
         return config_lists
 
@@ -410,7 +415,7 @@ class Receivable(object):
 
     def __init__(self, receivable_id):
         sql = "select * from apartment_contract_receivable where receivable_id='%s' and deleted=0" % receivable_id
-        receivable = sqlbase.query(sql)[0]
+        receivable = Mysql().query(sql)[0]
         self.receivable_id = receivable['receivable_id']
         self.contract_id = receivable['contract_id']
         self.finance_num = receivable['finance_num']
@@ -425,10 +430,10 @@ class Receivable(object):
         self.end_type = receivable['end_type']
 
     @property
-    def end_status_now(self):  # 实时应收状态
-        self.__end_status = \
-            sqlbase.serach("select end_status from apartment_contract_receivable where receivable_id='%s' "
-                           "and deleted=0" % self.receivable_id)[0]
+    def end_status_now(self):
+        """实时应收状态"""
+        self.__end_status = Mysql().getOne("select end_status from apartment_contract_receivable where receivable_id='%s' "
+                                           "and deleted=0" % self.receivable_id)[0]
         return self.__end_status
 
 
@@ -438,7 +443,7 @@ class Payable(object):
     def __init__(self, payable_id):
         self.payable_id = payable_id
         sql = "select * from house_contract_payable where payable_id='%s' and deleted=0" % self.payable_id
-        payable = sqlbase.query(sql)[0]
+        payable = Mysql().query(sql)[0]
         self.contract_id = payable['contract_id']
         self.finance_num = payable['finance_num']
         self.money_type = payable['money_type']
@@ -455,19 +460,23 @@ class Payable(object):
         self.deduction_amount = payable['deduction_amount']  # 扣款金额
 
     @property
-    def end_stuatus_now(self):  # 实时完结状态
-        self.__end_status = sqlbase.serach("select end_status from house_contract_payable where payable_id='%s' "
+    def end_stuatus_now(self):
+        """实时完结状态"""
+        self.__end_status = Mysql().getOne("select end_status from house_contract_payable where payable_id='%s' "
                                            "and deleted=0" % self.payable_id)[0]
         return self.__end_status
 
     @property
     def audit_status_now(self):
-        self.__audit_status = sqlbase.serach("select audit_status from house_contract_payable where payable_id='%s' "
+        """实时审核状态"""
+        self.__audit_status = Mysql().getOne("select audit_status from house_contract_payable where payable_id='%s' "
                                              "and deleted=0" % self.payable_id)[0]
         return self.__audit_status
 
 
 class RepairOrderInfo(object):
+    """报修订单信息"""
+
     def __init__(self, orderNumOrId):
         sql = "select * from %s.repairs_order where (order_no='%s' or order_id='%s') and deleted=0" % (
             get_conf('db', 'rsm_db'), orderNumOrId, orderNumOrId)
@@ -488,9 +497,11 @@ class RepairOrderInfo(object):
         self.customer_phone = self.repairs_order_info['customer_phone']
 
 
-def check_query_table(param, type):  # FF80808163F413680163F42A6D9904CF
+def check_query_table(param, type):
+    """检查宽表数据是否生成"""
     sql = "select * from query_{} where contract_id='{}'".format(type, param)
     result = Mysql().getOne(sql, research=True, nullLog=False)
     if not result:
         consoleLog('{}宽表：{} 未生成'.format(type, param))
-
+    # else:
+    #     consoleLog('宽表数据已生成')
