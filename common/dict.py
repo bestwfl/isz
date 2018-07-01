@@ -13,15 +13,16 @@ from common.mysql import Mysql
 def get_dict_value(dict_e_value, dict_code=None):
     if dict_code:
         dict_code = "and dict_code=%s" % dict_code
-    sql = "select dict_value from sys_dict_item where dict_e_value = '%s' and deleted=0 and is_active='Y' %s" % (
+    sql = "select dict_value from sys_dict_item where dict_e_value = '%s' and deleted=0 and is_active='1' %s" % (
         dict_e_value, dict_code)
-    return Mysql().getAll(sql)
+    return Mysql().getAll(sql)[0]
 
 
 class UserInfo(object):
-    def __init__(self, phone):
+    """用户信息"""
+    def __init__(self, user_id):
         self.user_info = Mysql().query("select * from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
-                                       "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % phone)[0]
+                                       "where a.user_id='%s' and a.user_status='INCUMBENCY'" % user_id)[0]
         self.user_name = self.user_info['user_name']
         self.user_id = self.user_info['user_id']
         self.user_phone = self.user_info['user_phone']
@@ -29,6 +30,12 @@ class UserInfo(object):
         self.dep_id = self.user_info['dep_id']
         self.dep_name = self.user_info['dep_name']
 
+    @staticmethod
+    def getUserByPhone(phone):
+        """根据手机号获取用户信息"""
+        user_id = Mysql().getOne("select user_id from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
+                                 "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % phone)[0]
+        return UserInfo(user_id)
 
 # 获取登录用户信息
 def getUserInfo():
@@ -123,13 +130,17 @@ class AuditStatus(Enum):
 
 
 class AUDIT_STATUS(Enum):
+    """审核状态"""
+
     class APARTMETN_CONTRACT_END(Enum):
+        """出租合同终止结算"""
         REJECT = 'RE_JECT'
         AUDITED = 'PASS'
         WAIT_AUDIT = 'NO_AUDIT'
         APPROVED = 'RECIEW'
 
     class HOUSE_CONTRACT(Enum):
+        """委托合同"""
         WAIT_AUDIT = 'AUDIT'
         AUDITED = 'PASS'
         APPROVED = 'APPROVED'

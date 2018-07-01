@@ -141,7 +141,6 @@ class Mysql(object):
         if count > 0:
             result = self._cursor.fetchall()
         else:
-            result = False
             if research:
                 for i in range(3):
                     time.sleep(3)
@@ -150,6 +149,7 @@ class Mysql(object):
                         return result
             if nullLog:
                 consoleLog(u'SQL查询为空!\nSQL:%s' % sql)
+            return None
         # results_list = []
         # for i in range(len(result)):
         #     result_list = []
@@ -179,7 +179,6 @@ class Mysql(object):
         if count > 0:
             result = self._cursor.fetchone()
         else:
-            result = False
             if research:
                 for i in range(3):
                     time.sleep(3)
@@ -188,6 +187,7 @@ class Mysql(object):
                         return result
             if nullLog:
                 consoleLog(u'SQL查询为空!\nSQL:%s' % sql)
+            return None
         result = Mysql._convert(list(result))
         if needConvert:
             return Mysql._convertUnicode(result)
@@ -213,7 +213,6 @@ class Mysql(object):
         if count > 0:
             result = self._cursor.fetchmany(num)
         else:
-            result = False
             if research:
                 for i in range(3):
                     time.sleep(3)
@@ -222,6 +221,7 @@ class Mysql(object):
                         return result
             if nullLog:
                 consoleLog(u'SQL查询为空!\nSQL:%s' % sql)
+            return None
         # results_list = []
         # for i in range(len(result)):
         #     result_list = []

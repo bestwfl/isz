@@ -348,8 +348,23 @@ class DecorationHouseInfo(object):
     def __init__(self, contractNumOrId):
         sql = "select * from %s.decoration_house_info where (contract_num='%s' or contract_id='%s') and deleted=0" % (
             get_conf('db', 'decoration_db'), contractNumOrId, contractNumOrId)
-        self.decoration_house_info = Mysql().query(sql)[0]
+        self.decoration_house_info = Mysql().query(sql, resarch=True)[0]
         self.info_id = self.decoration_house_info['info_id']
+        self.house_code = self.decoration_house_info['house_code']
+        self.house_id = self.decoration_house_info['house_id']
+        self.build_area = self.decoration_house_info['build_area']
+        self.entrust_type = self.decoration_house_info['entrust_type']
+        self.address = self.decoration_house_info['address']
+        self.contract_id = self.decoration_house_info['contract_id']
+        self.contract_num = self.decoration_house_info['contract_num']
+        self.contract_type = self.decoration_house_info['contract_type']
+        self.create_time = self.decoration_house_info['create_time']
+        self.create_uid = self.decoration_house_info['create_uid']
+        self.entrust_end_date = self.decoration_house_info['entrust_end_date']
+        self.entrust_start_date = self.decoration_house_info['entrust_start_date']
+        self.housekeep_mange_uid = self.decoration_house_info['housekeep_mange_uid']
+        self.city_code = self.decoration_house_info['city_code']
+        self.city_name = self.decoration_house_info['city_name']
 
     @staticmethod
     def searchByInfoId(info_id):
@@ -362,6 +377,40 @@ class DecorationHouseInfo(object):
         contract_id = Mysql().getOne(sql)[0]
         return DecorationHouseInfo(contract_id)
 
+    def zones(self):
+        sql = "select zone_id from %s.funcation_zone where info_id='%s' and deleted=0" % (
+            get_conf('db', 'decoration_db'), self.info_id)
+        zone_ids = Mysql().getAll(sql)
+        zones = []
+        if zone_ids:
+            for zone_id in zone_ids:
+                zones.append(self.Zone(zone_id))
+        else:
+            consoleLog(u'房屋未分割')
+        return zones
+
+    @staticmethod
+    class Zone(object):
+
+        def __init__(self, zone_id):
+            sql = "select * from %s.funcation_zone where zone_id='%s' and deleted=0" % (
+                get_conf('db', 'decoration_db'), zone_id)
+            self.zone_id = zone_id
+            self.zone_info = Mysql().query(sql[0])
+            self.zone_type = self.zone_info['zone_type']
+            self.room_no = self.zone_info['room_no']
+            self.usearea = self.zone_info['usearea']
+            self.zone_orientation = self.zone_info['zone_orientation']
+            self.have_toilet = self.zone_info['have_toilet']
+            self.toilet_area = self.zone_info['toilet_area']
+            self.have_balcony = self.zone_info['have_balcony']
+            self.balcony_area = self.zone_info['balcony_area']
+            self.window_area = self.zone_info['window_area']
+            self.window_type = self.zone_info['window_type']
+            self.zone_status = self.zone_info['zone_status']
+            self.is_fictitious_room = self.zone_info['is_fictitious_room']
+
+
 
 class DecorationProjectInfo(DecorationHouseInfo):
     """工程订单"""
@@ -370,8 +419,39 @@ class DecorationProjectInfo(DecorationHouseInfo):
         super(DecorationProjectInfo, self).__init__(contractNumOrId)
         sql = "select * from %s.new_decoration_project where info_id='%s' " % (
             get_conf('db', 'decoration_db'), self.info_id)
-        self.project_info = Mysql().query(sql)[0]
+        self.project_info = Mysql().query(sql, resarch=True)[0]
         self.project_id = self.project_info['project_id']
+        self.project_no = self.project_info['project_no']
+        self.config_order_no = self.project_info['config_order_no']
+        self.one_level_nodes = self.project_info['one_level_nodes']
+        self.place_order_date = self.project_info['place_order_date']
+        self.config_submit_uid = self.project_info['config_submit_uid']
+        self.config_submit_uname = self.project_info['config_submit_uname']
+        self.construct_uid = self.project_info['construct_uid']
+        self.construct_uname = self.project_info['construct_uname']
+        self.closed_water_test_result = self.project_info['closed_water_test_result']
+        self.complete_two_nodes = self.project_info['complete_two_nodes']
+        self.config_list_status = self.project_info['config_list_status']
+        self.config_progress = self.project_info['config_progress']
+        self.current_one_node = self.project_info['current_one_node']
+
+    def update(self):
+        """更新订单部分字段"""
+        sql = "select * from %s.new_decoration_project where info_id='%s' " % (
+            get_conf('db', 'decoration_db'), self.info_id)
+        newInfo = Mysql().query(sql)[0]
+        self.config_order_no = newInfo['config_order_no']
+        self.one_level_nodes = newInfo['one_level_nodes']
+        self.place_order_date = newInfo['place_order_date']
+        self.config_submit_uid = newInfo['config_submit_uid']
+        self.config_submit_uname = newInfo['config_submit_uname']
+        self.construct_uid = newInfo['construct_uid']
+        self.construct_uname = newInfo['construct_uname']
+        self.closed_water_test_result = newInfo['closed_water_test_result']
+        self.complete_two_nodes = newInfo['complete_two_nodes']
+        self.config_list_status = newInfo['config_list_status']
+        self.config_progress = newInfo['config_progress']
+        self.current_one_node = newInfo['current_one_node']
 
     @staticmethod
     def searchByInfoId(info_id):
@@ -385,7 +465,7 @@ class DecorationProjectInfo(DecorationHouseInfo):
         return DecorationProjectInfo(contract_id)
 
     @staticmethod
-    def searchByInfoId(project_id):
+    def searchByProjectId(project_id):
         """根据project_id查询工程订单
         :param project_id
         :return 工程订单对象
@@ -409,6 +489,15 @@ class DecorationProjectInfo(DecorationHouseInfo):
         config_lists = Mysql().query(sql)
         return config_lists
 
+    @property
+    def config_suppliers(self):
+        """订单所有物品供应商id"""
+        sql = "select distinct supplier_id from %s.new_stuff_list where project_id='%s' and deleted=0" % (
+            get_conf('db', 'decoration_db'), self.project_id)
+        supplier_ids = Mysql().getAll(sql)
+        if not supplier_ids:
+            consoleLog(u'订单配置供应商不存在')
+        return supplier_ids
 
 class Receivable(object):
     """出租合同应收"""
@@ -432,8 +521,9 @@ class Receivable(object):
     @property
     def end_status_now(self):
         """实时应收状态"""
-        self.__end_status = Mysql().getOne("select end_status from apartment_contract_receivable where receivable_id='%s' "
-                                           "and deleted=0" % self.receivable_id)[0]
+        self.__end_status = \
+        Mysql().getOne("select end_status from apartment_contract_receivable where receivable_id='%s' "
+                       "and deleted=0" % self.receivable_id)[0]
         return self.__end_status
 
 
