@@ -60,7 +60,7 @@ def get_cookie():
     elif u'密码错误' in result['msg']:
         msg = result['msg'].encode('utf-8')
         consoleLog(u'接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s' % (url, data, msg.decode('utf-8')), 'w')
-        raise
+        raise Exception(u'密码错误')
     else:
         needClient = True
 
