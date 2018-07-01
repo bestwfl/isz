@@ -15,6 +15,7 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
     出租合同对应操作
     :param contractIdOrNum 出租合同id或者num
     """
+
     def audit(self):
         """审核
         初审25
@@ -22,6 +23,7 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
         反审 24
         驳回 23
         """
+
         def audit(activityId):
             url = 'isz_contract/ApartmentContractController/apartmentContractAudit.action'
             data = {
@@ -49,8 +51,6 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
         :return: 完成所有实收和审核
         """
         url = 'isz_finance/ApartmentContractReceiptsController/saveOrUpdateNewReceipts.action'
-        # info = sqlbase.serach(
-        #     "select receivable_money,receivable_id from apartment_contract_receivable where contract_id = '%s' and deleted = 0" % self.apartment_contract_id, oneCount=False)
         receivables = self.receivables()
         for receivable in receivables:
             data = {
@@ -315,7 +315,6 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
             "img_id": "FF80808162F6DA2E0162F77B1C9C0649",
             "src": "erp/2018/4/24/19/f1348bc6-cce6-4c49-9837-a0322c0b6c81.png"
         }]
-
         receivable = 0
         for i in endInfo['apartmentContractEndReceivableList']:
             receivable = receivable + float(i['receivable_amount'])
@@ -343,7 +342,6 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
             "bank": "未知发卡银行",
             "receipt_bank_location": "海创支行"
         }
-
         if myRequest(url, endInfo):
             consoleLog('出租终止新增成功')
 
@@ -359,9 +357,11 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
     def endAudit(self):
         """终止结算审核"""
         endInfo = ApartmentContractEndInfo(self.apartment_contract_id)
+
         def audit(afterStatus):
             """审核
-            :param afterStatus 审核操作后的状态 """
+            :param afterStatus 审核操作后的状态
+            """
 
             url = '/isz_contract/ContractEndController/auditApartmrntContractEnd'
             data = {
@@ -407,11 +407,12 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
         else:
             return
 
-class ApartmentContractEnd(ApartmentContractEndInfo):
 
+class ApartmentContractEnd(ApartmentContractEndInfo):
     def endAudit(self):
         """终止结算审核"""
         endInfo = ApartmentContractEndInfo(self.apartment_contract_id)
+
         def audit(action):
             """审核
             :param action 审核操作后的状态 """
@@ -460,6 +461,7 @@ class ApartmentContractEnd(ApartmentContractEndInfo):
             audit(AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER)  # 复审
         else:
             return
+
 
 if __name__ == '__main__':
     contract = ApartmentContract('科CH201712190854')

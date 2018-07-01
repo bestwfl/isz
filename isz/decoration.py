@@ -304,7 +304,8 @@ class Decoration(object):
                     "zone_status": "FOUND",
                     "usearea": "4",
                     "window_type": "ORDINARYWINDOW",
-                    "zone_id": ""
+                    "zone_id": "",
+                    "is_fictitious_room": "N"
                 },
                 {
                     "zone_type": "KITCHEN",
@@ -325,7 +326,8 @@ class Decoration(object):
                     "zone_status": "FOUND",
                     "usearea": "8",
                     "window_type": "ORDINARYWINDOW",
-                    "zone_id": ""
+                    "zone_id": "",
+                    "is_fictitious_room": "N"
                 },
                 {
                     "zone_type": "PARLOUR",
@@ -346,7 +348,8 @@ class Decoration(object):
                     "zone_status": "FOUND",
                     "usearea": "16",
                     "window_type": "ORDINARYWINDOW",
-                    "zone_id": ""
+                    "zone_id": "",
+                    "is_fictitious_room": "N"
                 },
                 {
                     "zone_type": "ROOM",
@@ -367,7 +370,8 @@ class Decoration(object):
                     "zone_status": "FOUND",
                     "usearea": "11",
                     "window_type": "ORDINARYWINDOW",
-                    "zone_id": ""
+                    "zone_id": "",
+                    "is_fictitious_room": "N"
                 },
                 {
                     "zone_type": "ROOM",
@@ -388,7 +392,8 @@ class Decoration(object):
                     "zone_status": "FOUND",
                     "usearea": "12",
                     "window_type": "ORDINARYWINDOW",
-                    "zone_id": ""
+                    "zone_id": "",
+                    "is_fictitious_room": "N"
                 },
                 {
                     "zone_type": "ROOM",
@@ -409,7 +414,8 @@ class Decoration(object):
                     "zone_status": "FOUND",
                     "usearea": "13",
                     "window_type": "ORDINARYWINDOW",
-                    "zone_id": ""
+                    "zone_id": "",
+                    "is_fictitious_room": "N"
                 },
                 {
                     "zone_type": "BALCONY",
@@ -430,7 +436,8 @@ class Decoration(object):
                     "zone_status": "FOUND",
                     "usearea": "2",
                     "window_type": "ORDINARYWINDOW",
-                    "zone_id": ""
+                    "zone_id": "",
+                    "is_fictitious_room": "N"
                 },
                 {
                     "zone_type": "BALCONY",
@@ -451,7 +458,8 @@ class Decoration(object):
                     "zone_status": "FOUND",
                     "usearea": "3",
                     "window_type": "ORDINARYWINDOW",
-                    "zone_id": ""
+                    "zone_id": "",
+                    "is_fictitious_room": "N"
                 }
             ],
             'project_id': self.project_id,
@@ -1108,8 +1116,10 @@ class Decoration(object):
 
     # 施工中
     def hideAndStufCheck(self):
-        # 隐蔽验收
+
+
         def hideCheck():
+            """隐蔽验收"""
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/constructing/hideCheck'
             data = {
                 "air_switch": None,

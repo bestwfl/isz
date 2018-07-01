@@ -8,15 +8,17 @@ from common.mysql import Mysql
 
 """字典"""
 
+
 # 字典参转中
-def get_dict_value(dict_e_value, dict_code = None):
+def get_dict_value(dict_e_value, dict_code=None):
     if dict_code:
         dict_code = "and dict_code=%s" % dict_code
-    sql = "select dict_value from sys_dict_item where dict_e_value = '%s' and deleted=0 and is_active='Y' %s" % (dict_e_value, dict_code)
+    sql = "select dict_value from sys_dict_item where dict_e_value = '%s' and deleted=0 and is_active='Y' %s" % (
+        dict_e_value, dict_code)
     return Mysql().getAll(sql)
 
-class UserInfo(object):
 
+class UserInfo(object):
     def __init__(self, phone):
         self.user_info = Mysql().query("select * from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
                                        "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % phone)[0]
@@ -27,10 +29,12 @@ class UserInfo(object):
         self.dep_id = self.user_info['dep_id']
         self.dep_name = self.user_info['dep_name']
 
+
 # 获取登录用户信息
 def getUserInfo():
-    exhouseSql = Mysql().getAll("select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
-                                "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone'))[0]
+    exhouseSql = Mysql().getAll(
+        "select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
+        "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone'))[0]
     userInfo = {
         'user_name': exhouseSql[0],
         'uid': exhouseSql[1],
@@ -38,6 +42,8 @@ def getUserInfo():
         'did': exhouseSql[2],
     }
     return userInfo
+
+
 userInfo = getUserInfo()
 
 # 委托合同审核步骤
@@ -92,18 +98,20 @@ landlord = {
     'mailing_address': u'海创基地',
 }
 
+
 class User(Enum):
     """登录用户信息"""
 
-    exhouseSql = Mysql().getAll("select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
-                                "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone'))[0]
+    exhouseSql = Mysql().getAll(
+        "select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
+        "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone'))[0]
     UID = exhouseSql[1]
     DID = exhouseSql[2]
     NAME = exhouseSql[0]
     D_NAME = exhouseSql[3]
 
-class AuditStatus(Enum):
 
+class AuditStatus(Enum):
     APARTMETN_CONTRACT_END_STATUS_REJECT = 'RE_JECT'  # 出租终止驳回
     APARTMETN_CONTRACT_END_STATUS_WAIT_AUDIT = 'NO_AUDIT'  # 出租终止待审核
     APARTMETN_CONTRACT_END_STATUS_AUDITED = 'PASS'  # 出租终止已初审
@@ -113,8 +121,8 @@ class AuditStatus(Enum):
     HOUSE_CONTRACT_STATUS_AUDITED = 'PASS'  # 委托已初审
     HOUSE_CONTRACT_STATUS_APPROVED = 'APPROVED'  # 委托已复审
 
-class AUDIT_STATUS(Enum):
 
+class AUDIT_STATUS(Enum):
     class APARTMETN_CONTRACT_END(Enum):
         REJECT = 'RE_JECT'
         AUDITED = 'PASS'
@@ -175,22 +183,4 @@ class AUDIT_STATUS(Enum):
 #             raise ValueError('apartment search sql return null')
 
 if __name__ == '__main__':
-    # apartment = ApartmentList()
-    # apartment.set_retrun('house_id')
-    # apartment.set_condition({'apartment_id': '0953b669345811e7801bd89d672b5e48', 'is_active': 'Y'})
-    # print apartment.list()
-
-    # apartment = ApartmentInfo('0953b669345811e7801bd89d672b5e48')
-    # contract = ApartmentContractInfo('8A2152435DC188BD015DC5DD113458EF')
-    # print contract.apartment_contract_info
-    # decoration = DecorationProjectInfo('7')
-    # print decoration.project_info
-    # end = ApartmentContractEndInfo('FF8080816348B9C10163499D4B1D2BCD')
-    # print end.apartment_contract_end_info
-
-    # apartment = ApartmentInfo('E48A81416386FE1001638C5A56F000C1')
-    # print apartment
-    # status = AUDIT_STATUS.APARTMETN_CONTRACT_END.value.REJECT.value
-    user = UserInfo('18815286582')
-    print user
-    # print(status)
+    print AUDIT_STATUS.APARTMETN_CONTRACT_END.APPROVED

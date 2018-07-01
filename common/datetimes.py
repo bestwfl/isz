@@ -2,6 +2,7 @@
 from time import strftime, localtime
 from datetime import timedelta, date, datetime
 import calendar
+
 from common.base import tlock
 
 year = strftime("%Y", localtime())
@@ -19,7 +20,6 @@ def nowTime():
     """返回当前时间的str类型YYYY-MM-DD HH:MM:SS"""
     return strftime("%Y-%m-%d %H:%M:%S", localtime())
 
-@tlock
 def addDays(days=0, mydate=None):
     """在当前的前提下加减天数，返回date类型YYYY-MM-DD"""
     if days < 0:
@@ -30,12 +30,11 @@ def addDays(days=0, mydate=None):
             return str(date.today() - timedelta(days=abs(days)))
     else:
         if mydate:
-            time = datetime.strptime(mydate,'%Y-%m-%d') + timedelta(days=(days))
+            time = datetime.strptime(mydate, '%Y-%m-%d') + timedelta(days=days)
             return time.strftime('%Y-%m-%d')
         else:
             return str(date.today() + timedelta(days=days))
 
-@tlock
 def addMonths(months=0, date=None):
     """在当前的前提下加减月数，返回date类型YYYY-MM-DD"""
     (y, m, d) = getyearandmonth(months) if not date else getyearandmonth(months,date)
@@ -48,7 +47,7 @@ def get_days_of_date(year, mon):
     """"返回指定月份的天数"""
     return calendar.monthrange(year, mon)[1]
 
-@tlock
+
 def getyearandmonth(n=0,date=None):
     '''''
     get the year,month,days from today
@@ -143,7 +142,6 @@ def addzero(n):
     else:
         return nabs
 
-@tlock
 def addMonthExDay(exDay, months=1, date=None):
     if date:
         time = date.split('-')

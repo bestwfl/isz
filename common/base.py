@@ -42,12 +42,16 @@ currentDriver = None
 lock = RLock()
 
 def tlock(func):
+
     def wrapper(*args, **kwargs):
         lock.acquire()
         try:
             func(*args, **kwargs)
+        except:
+            consoleLog(func.__doc__)
         finally:
             lock.release()
+
     return wrapper
 
 def log(func):

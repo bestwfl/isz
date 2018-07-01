@@ -12,7 +12,6 @@ from isz.infoClass import HouseInfo
 class House(HouseInfo):
     """业主房源信息"""
 
-    # 新签委托合同
     def createHouseContract(self, contract_num, apartment_type, entrust_type, sign_date, owner_sign_date,
                             entrust_start_date, entrust_year, rent, parking=None, payment_cycle='HALF_YEAR',
                             fitment_start_date=None, fitment_end_date=None, contract_type='NEWSIGN'):
@@ -35,6 +34,7 @@ class House(HouseInfo):
         """
 
         contractbase = ContractBase()
+        fileType = contractbase.FileType()
         signUser = getUserInfo()
         signUser = {
             'sign_user_name': signUser['user_name'],
@@ -107,7 +107,7 @@ class House(HouseInfo):
                     "img_id": "FF80808162756A8E0162850B52960257"
                 }],
                 "file_type": "主页（业主姓名/物业地址）",
-                "file_type_id": contractbase.getFileTypeId("主页(有业主姓名/物业地址页)"),
+                "file_type_id": fileType.getFileIdByTpye("主页(有业主姓名/物业地址页)"),
                 "is_active": "Y",
                 "is_approved_need": "N",
                 "is_audit_need": "Y",
@@ -125,7 +125,7 @@ class House(HouseInfo):
                     "img_id": "FF80808162756A8E0162850F184C0260"
                 }],
                 "file_type": "带证号页(产权证编号)",
-                "file_type_id": contractbase.getFileTypeId("带证号页(有产权证编号页)"),
+                "file_type_id": fileType.getFileIdByTpye("带证号页(有产权证编号页)"),
                 "is_active": "Y",
                 "is_approved_need": "N",
                 "is_audit_need": "N",
@@ -143,7 +143,7 @@ class House(HouseInfo):
                     "img_id": "FF80808162756A8E0162850F2BE30262"
                 }],
                 "file_type": "附记页",
-                "file_type_id": contractbase.getFileTypeId("附记页"),
+                "file_type_id": fileType.getFileIdByTpye("附记页"),
                 "is_active": "Y",
                 "is_approved_need": "N",
                 "is_audit_need": "N",
@@ -161,7 +161,7 @@ class House(HouseInfo):
                     "img_id": "FF80808162756A8E0162850EEA88025E"
                 }],
                 "file_type": "分户图",
-                "file_type_id": contractbase.getFileTypeId("分户图"),
+                "file_type_id": fileType.getFileIdByTpye("分户图"),
                 "is_active": "Y",
                 "is_approved_need": "N",
                 "is_audit_need": "N",
@@ -179,7 +179,7 @@ class House(HouseInfo):
                     "img_id": "FF80808162756A8E0162850EFC5E025F"
                 }],
                 "file_type": "原户型图",
-                "file_type_id": contractbase.getFileTypeId("原户型图"),
+                "file_type_id": fileType.getFileIdByTpye("原户型图"),
                 "is_active": "Y",
                 "is_approved_need": "N",
                 "is_audit_need": "N",
@@ -197,7 +197,7 @@ class House(HouseInfo):
                     "img_id": "FF80808162756A8E0162850EDB0C025D"
                 }],
                 "file_type": "其他",
-                "file_type_id": contractbase.getFileTypeId("其他"),
+                "file_type_id": fileType.getFileIdByTpye("其他"),
                 "is_active": "Y",
                 "is_approved_need": "N",
                 "is_audit_need": "N",

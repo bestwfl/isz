@@ -6,11 +6,14 @@
 ３、在输入的值中不需要使用转意函数，系统会自动处理
 """
 
-import pymysql
 import time
+
+import pymysql
 # from MySQLdb.cursors import DictCursor
 from DBUtils.PooledDB import PooledDB
+
 from common.base import get_conf, consoleLog
+
 
 class Mysql(object):
     """
@@ -32,11 +35,11 @@ class Mysql(object):
         :return MySQLdb.connection
         """
         if Mysql.__pool is None:
-            Mysql.__pool = PooledDB(creator=pymysql, mincached=1, maxcached=20,
+            Mysql.__pool = PooledDB(creator=pymysql, mincached=1, maxcached=100,
                                     host=get_conf('db', 'host'), port=get_conf('db', 'port', int),
                                     user=get_conf('db', 'user'), passwd=get_conf('db', 'password'),
                                     db=get_conf('db', 'db'), use_unicode=False, charset=get_conf('db', 'charset'))
-                                    # cursorclass=DictCursor)  # 返回字典格式
+            # cursorclass=DictCursor)  # 返回字典格式
         return Mysql.__pool.connection()
 
     @staticmethod
@@ -309,12 +312,3 @@ class Mysql(object):
             self.end('rollback')
         self._cursor.close()
         self._conn.close()
-
-mysql = Mysql()
-
-
-# if __name__ == '__main__':
-#     mysql = Mysql()
-#     apartment_sql = "SELECT * FROM apartment LIMIT 1"
-#     results = mysql.query(apartment_sql)
-#     print(results)
