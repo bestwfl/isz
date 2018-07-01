@@ -77,7 +77,7 @@ def get_cookie():
         else:
             msg = result['msg'].encode('utf-8')
             consoleLog(u'接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s' % (url, data, msg.decode('utf-8')), 'w')
-            raise u'客户端登录第一步：检查授权失败'
+            raise Exception(u'客户端登录第一步：检查授权失败')
 
         # 检查用户名密码
         url = 'isz_base/LoginController/checkUserPassWord.action'
@@ -90,7 +90,7 @@ def get_cookie():
         if u'用户名密码正确' not in result['msg']:
             msg = result['msg'].encode('utf-8')
             consoleLog(u'接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s' % (url, data, msg.decode('utf-8')), 'w')
-            raise u'客户端登录第二步：检查用户名密码失败'
+            raise Exception(u'客户端登录第二步：检查用户名密码失败')
 
         # 获取短信验证码
         url = 'isz_base/LoginController/getVerificationCode.action'
@@ -102,7 +102,7 @@ def get_cookie():
         if result['msg'] != 'ok' and u'验证码发送过于频繁' not in result['msg']:
             msg = result['msg'].encode('utf-8')
             consoleLog(u'接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s' % (url, data, msg.decode('utf-8')), 'w')
-            raise u'客户端登录第三步：获取短信验证码失败'
+            raise Exception(u'客户端登录第三步：获取短信验证码失败')
 
         # 验证码登录
         url = 'isz_base/LoginController/checkVerificationCode.action'
@@ -135,7 +135,7 @@ def get_cookie():
         else:
             msg = result['msg'].encode('utf-8')
             consoleLog(u'接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s' % (url, data, msg.decode('utf-8')), 'w')
-            raise u'客户端登录第四步：验证码登录失败'
+            raise Exception(u'客户端登录第四步：验证码登录失败')
 
 def delNull(data):
     """删除字典中为null的值"""
@@ -160,9 +160,9 @@ def delNull(data):
 def creatResidential():
     url = 'isz_house/ResidentialController/saveResidential.action'
     residentialName = 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S')
-    sql = "SELECT sd.parent_id from sys_department sd INNER JOIN sys_user sur on sur.dep_id = sd.dep_id INNER JOIN sys_position spt on spt.position_id = sur.position_id " \
-            "where sd.dep_district = '330100' and sd.dep_id <> '00000000000000000000000000000000' and (spt.position_name like '资产管家%' or spt.position_name like '综合管家%') " \
-            "ORDER BY RAND() LIMIT 1"
+    sql = "SELECT sd.parent_id FROM sys_department sd INNER JOIN sys_user sur ON sur.dep_id = sd.dep_id INNER JOIN sys_position spt ON spt.position_id = sur.position_id " \
+          "WHERE sd.dep_district = '330100' AND sd.dep_id <> '00000000000000000000000000000000' AND (spt.position_name LIKE '资产管家%' OR spt.position_name LIKE '综合管家%') " \
+          "ORDER BY RAND() LIMIT 1"
     dutyDepID = sqlbase.serach(sql)[0]
     data = {
         "residential_name":residentialName,
