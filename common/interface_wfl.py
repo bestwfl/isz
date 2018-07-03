@@ -8,8 +8,20 @@ from common.base import consoleLog, set_conf
 from common.base import get_conf
 from common.sqlbase import getsmsMtHis
 
+def checckLogin(func):
+    """检验登录状态"""
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        loginmsg = '请重新登陆'
+        loginmsg2 = '请先登录系统'
+        if loginmsg.encode('utf-8') in result or loginmsg2.encode('utf-8') in result:
+            consoleLog('登录状态失效，尝试重新登录！')
+            login()
+            return func(*args, **kwargs)
+    return wrapper
 
 def testWithLogin(func):
+
     def wrapper(*args, **kwargs):
         login()
         try:
@@ -75,7 +87,7 @@ class Image(object):
         self.id = img_id
         self.url = img_url
 
-
+# @checckLogin
 def upLoadPhoto(url, filename, filepath, name='file'):
     """
     上传图片
@@ -92,7 +104,7 @@ def upLoadPhoto(url, filename, filepath, name='file'):
         cookie = eval(get_conf('cookieInfo', 'cookies'))
         request = requests.post(url=url, files=file, cookies=cookie)
         result = json.loads(request.text)
-        if result['code'] is 200 or result['code'] is 0:
+        if result['code'] is 200 or result['code'] == u'200' or result['code'] is 0:
             try:
                 img['img_url'] = result['obj']['img_url']
             except:
