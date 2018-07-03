@@ -50,10 +50,6 @@ class HouseContractInfo(HouseInfo):
         self.house_contract_info = Mysql().query(sql)[0]
         self.house_contract_id = self.house_contract_info['contract_id']
         threading.Thread(target=check_query_table, args=(self.house_contract_id, 'house_contract')).start()
-        # query_house_contract = sqlbase.serach("select * from query_house_contract where contract_id='%s'" %
-        #                                       self.house_contract_id, oneCount=False, nullLog=False)
-        # if 1 != len(query_house_contract):  # 检查委托合同宽表
-        #     consoleLog("there is no contract in 'query_house_contract',contract_id: %s" % self.house_contract_id, 'w')
         self.reform_way = self.house_contract_info['reform_way']
         self.is_active = self.house_contract_info['is_active']
         if 'N' == self.is_active:
@@ -102,7 +98,9 @@ class HouseContractInfo(HouseInfo):
         return self.__audit_status
 
     def payables(self, audit_status='NOTAUDIT', money_type='RENT'):
-        """ 委托合同应付，默认读取未审核的应付租金"""
+        """ 委托合同应付，默认读取未审核的应付租金
+        :return 应付ID的集合
+        """
         payablesVo = []
         sql = "select * from house_contract_payable where contract_id='%s' and deleted=0" % self.house_contract_id
         payables = Mysql().query(sql)

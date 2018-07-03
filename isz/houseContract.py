@@ -46,9 +46,10 @@ class HouseContract(ContractBase, HouseContractInfo):
         """审核应付"""
         consoleLog(u'开始审核委托合同应付')
         url = 'http://erp.ishangzu.com/isz_finance/HouseContractPayableController/updatePayableAuditStatusById'
-        payableIds = sqlbase.serach(
-            "select payable_id from house_contract_payable where contract_id='%s' and audit_status = 'NOTAUDIT' and deleted = 0 "
-            "and money_type = 'RENT' " % self.house_contract_id, oneCount=False, research=True, nullLog=False)
+        # payableIds = sqlbase.serach(
+        #     "select payable_id from house_contract_payable where contract_id='%s' and audit_status = 'NOTAUDIT' and deleted = 0 "
+        #     "and money_type = 'RENT' " % self.house_contract_id, oneCount=False, research=True, nullLog=False)
+        payableIds = self.payables()
         if len(payableIds) > 0:
             data = {
                 "audit_status": "AUDITED",
