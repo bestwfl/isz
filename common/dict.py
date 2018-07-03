@@ -2,7 +2,6 @@
 
 from collections import OrderedDict
 from enum import Enum
-from common import sqlbase
 from common.base import get_conf
 from common.mysql import Mysql
 
@@ -13,16 +12,18 @@ from common.mysql import Mysql
 def get_dict_value(dict_e_value, dict_code=None):
     if dict_code:
         dict_code = "and dict_code=%s" % dict_code
-    sql = "select dict_value from sys_dict_item where dict_e_value = '%s' and deleted=0 and is_active='1' %s" % (
-        dict_e_value, dict_code)
+    sql = "select dict_value from sys_dict_item where dict_e_value = '%s' and deleted=0 " \
+          "and is_active='1' %s" % (dict_e_value, dict_code)
     return Mysql().getAll(sql)[0]
 
 
 class UserInfo(object):
     """用户信息"""
+
     def __init__(self, user_id):
-        self.user_info = Mysql().query("select * from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
-                                       "where a.user_id='%s' and a.user_status='INCUMBENCY'" % user_id)[0]
+        sql = "select * from sys_user a inner join sys_department b on a.dep_id=b.dep_id " \
+              "where a.user_id='%s' and a.user_status='INCUMBENCY'" % user_id
+        self.user_info = Mysql().query(sql)[0]
         self.user_name = self.user_info['user_name']
         self.user_id = self.user_info['user_id']
         self.user_phone = self.user_info['user_phone']
@@ -33,15 +34,17 @@ class UserInfo(object):
     @staticmethod
     def getUserByPhone(phone):
         """根据手机号获取用户信息"""
-        user_id = Mysql().getOne("select user_id from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
-                                 "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % phone)[0]
+        sql = "select user_id from sys_user a inner join sys_department b on a.dep_id=b.dep_id " \
+              "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % phone
+        user_id = Mysql().getOne(sql)[0]
         return UserInfo(user_id)
 
-# 获取登录用户信息
+
 def getUserInfo():
-    exhouseSql = Mysql().getAll(
-        "select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b on a.dep_id=b.dep_id "
-        "where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone'))[0]
+    """获取登录用户信息"""
+    sql = "select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b " \
+          "on a.dep_id=b.dep_id where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone')
+    exhouseSql = Mysql().getAll(sql)[0]
     userInfo = {
         'user_name': exhouseSql[0],
         'uid': exhouseSql[1],
@@ -95,7 +98,7 @@ ROOM_NAME = {
     'DEC': u'癸'
 }
 
-# 委托合同产权人
+# 委托合同签约默认产权人
 landlord = {
     'landlord_name': u'产权人',
     'card_type': 'PASSPORT',
@@ -144,6 +147,12 @@ class AUDIT_STATUS(Enum):
         WAIT_AUDIT = 'AUDIT'
         AUDITED = 'PASS'
         APPROVED = 'APPROVED'
+
+    class HOUSE_CONTRACT_END(Enum):
+        """委托合同终止结算"""
+        WAIT_AUDIT = 'NO_AUDIT'
+        AUDITED = 'PASS'
+        APPROVED = 'REVIEW'
 
 
 # class ApartmentList():

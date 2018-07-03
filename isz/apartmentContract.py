@@ -1,10 +1,9 @@
 # -*- coding:utf8 -*-
 import time
-
-from common import sqlbase, datetimes
+from common import datetimes
 from common.base import consoleLog
 from common.datetimes import today, addDays, addMonths
-from common.dict import AuditStatus, AUDIT_STATUS
+from common.dict import AUDIT_STATUS
 from common.interface_wfl import myRequest, delNull
 from isz.contractBase import ContractBase
 from isz.infoClass import ApartmentContractInfo, ApartmentContractEndInfo, HouseContractInfo
@@ -393,17 +392,17 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
                 }
             }
             if myRequest(url, data):
-                if AuditStatus.APARTMETN_CONTRACT_END_AUDIT_AFTER == afterStatus:
+                if AUDIT_STATUS.APARTMETN_CONTRACT_END.AUDITED == afterStatus:
                     consoleLog('出租终止已初审')
                     time.sleep(1)
-                elif AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER == afterStatus:
+                elif AUDIT_STATUS.APARTMETN_CONTRACT_END.APPROVED == afterStatus:
                     consoleLog('出租终止已复审')
 
-        if AuditStatus.APARTMETN_CONTRACT_END_STATUS_WAIT_AUDIT == endInfo.end_audit_status or AuditStatus.APARTMETN_CONTRACT_END_STATUS_REJECT == endInfo.end_audit_status:
-            audit(AuditStatus.APARTMETN_CONTRACT_END_AUDIT_AFTER)  # 初审
-            audit(AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER)  # 复审
-        elif AuditStatus.APARTMETN_CONTRACT_END_STATUS_AUDITED == endInfo.end_audit_status:
-            audit(AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER)  # 复审
+        if AUDIT_STATUS.APARTMETN_CONTRACT_END.WAIT_AUDIT == endInfo.end_audit_status or AUDIT_STATUS.APARTMETN_CONTRACT_END.REJECT == endInfo.end_audit_status:
+            audit(AUDIT_STATUS.APARTMETN_CONTRACT_END.AUDITED)  # 初审
+            audit(AUDIT_STATUS.APARTMETN_CONTRACT_END.APPROVED)  # 复审
+        elif AUDIT_STATUS.APARTMETN_CONTRACT_END.AUDITED == endInfo.end_audit_status:
+            audit(AUDIT_STATUS.APARTMETN_CONTRACT_END.APPROVED)  # 复审
         else:
             return
 
@@ -447,18 +446,18 @@ class ApartmentContractEnd(ApartmentContractEndInfo):
                 }
             }
             if myRequest(url, data):
-                if AuditStatus.APARTMETN_CONTRACT_END_AUDIT_AFTER == action:
+                if AUDIT_STATUS.APARTMETN_CONTRACT_END.AUDITED == action:
                     consoleLog('出租终止已初审')
                     time.sleep(1)
-                elif AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER == action:
+                elif AUDIT_STATUS.APARTMETN_CONTRACT_END.APPROVED == action:
                     consoleLog('出租终止已复审')
 
         audit_status = AUDIT_STATUS.APARTMETN_CONTRACT_END
         if audit_status.WAIT_AUDIT == endInfo.end_audit_status or audit_status.REJECT == endInfo.end_audit_status:
             audit(audit_status.AUDITED)  # 初审
             audit(audit_status.APPROVED)  # 复审
-        elif AuditStatus.APARTMETN_CONTRACT_END_STATUS_AUDITED == endInfo.end_audit_status:
-            audit(AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER)  # 复审
+        elif AUDIT_STATUS.APARTMETN_CONTRACT_END.AUDITED == endInfo.end_audit_status:
+            audit(audit_status.APPROVED)  # 复审
         else:
             return
 

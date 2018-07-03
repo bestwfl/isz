@@ -5,8 +5,8 @@ from isz.contractBase import ContractBase
 from common import sqlbase
 from common.base import consoleLog
 from common.datetimes import today, addDays, addMonths, addMonthExDay
-from common.dict import house_contract_dict, free_date_par, userInfo, AuditStatus
-from common.interface_wfl import myRequest, login
+from common.dict import house_contract_dict, free_date_par, userInfo, AUDIT_STATUS
+from common.interface_wfl import myRequest
 from isz.infoClass import HouseContractInfo, HouseContractEndInfo
 
 
@@ -14,28 +14,6 @@ class HouseContract(ContractBase, HouseContractInfo):
     """
     委托合同相关，包括初审复审续签，终止及审核...
     """
-
-    @staticmethod
-    def contract_field(contractNumOrId, field):
-        fieldRetrun = sqlbase.serach(
-            "select %s from house_contract where (contract_num='%s' or contract_id='%s') and deleted=0" % (field, contractNumOrId, contractNumOrId))
-        if fieldRetrun:
-            return fieldRetrun[0]
-        else:
-            consoleLog(u'合同：%s 对应字段：%s 查询结果为空' % (contractNumOrId, field))
-
-    # 合同产权人信息
-    def getLandlordInfo(self):
-        landlord = sqlbase.serach("select landlord_name,phone,email,mailing_address,emergency_name,emergency_phone from house_contract_landlord where contract_id='%s' and deleted=0" % self.house_contract_id)
-        landlordInfo ={
-            'landlord_name': landlord[0],
-            'phone': landlord[1],
-            'email': landlord[2],
-            'mailing_address': landlord[3],
-            'emergency_name': landlord[4],
-            'emergency_phone': landlord[5],
-        }
-        return landlordInfo
 
     # 合同照片
     def contractPhotos(self):
@@ -59,34 +37,18 @@ class HouseContract(ContractBase, HouseContractInfo):
         }
         return contractPhotos
 
-    # 查询委托合同字段
-    def __field(self, field):
-        fieldRetrun = sqlbase.serach("select %s from house_contract where contract_id='%s' and deleted=0 and is_active='Y'" % (field, self.house_contract_id))
-        if fieldRetrun:
-            return fieldRetrun[0]
-        else:
-            consoleLog(u'合同：%s 对应字段：%s 查询结果为空' % (self.contract_num, field))
-
-    # 委托合同审核状态
-    # def audit_status(self):
-    #     contractStatus = sqlbase.serach("select audit_status from house_contract where contract_id='%s' and deleted=0" % self.house_contract_id)[0]
-    #     return contractStatus
-
-    # 委托合同分步审核状态
-
-
-    # 合同详情
     def getHouseContractInfo(self):
+        """合同详情"""
         url = "http://erp.ishangzu.com/isz_housecontract/houseContractController/searchHouseContractInfo/%s" % self.house_contract_id
         return myRequest(url, needCookie=True, method='get')['obj']
 
-    # 审核应付
     def auditPayable(self):
-        # time.sleep(3)
+        """审核应付"""
         consoleLog(u'开始审核委托合同应付')
         url = 'http://erp.ishangzu.com/isz_finance/HouseContractPayableController/updatePayableAuditStatusById'
-        payableIds = sqlbase.serach("select payable_id from house_contract_payable where contract_id='%s' and audit_status = 'NOTAUDIT' and deleted = 0 "
-                                    "and money_type = 'RENT' " % self.house_contract_id, oneCount=False, research=True, nullLog=False)
+        payableIds = sqlbase.serach(
+            "select payable_id from house_contract_payable where contract_id='%s' and audit_status = 'NOTAUDIT' and deleted = 0 "
+            "and money_type = 'RENT' " % self.house_contract_id, oneCount=False, research=True, nullLog=False)
         if len(payableIds) > 0:
             data = {
                 "audit_status": "AUDITED",
@@ -101,9 +63,8 @@ class HouseContract(ContractBase, HouseContractInfo):
         else:
             consoleLog('委托合同"%s"没有待审核应付' % self.house_contract_num)
 
-    # 审核
     def audit(self, auditAction='fushen'):
-
+        """审核"""
         step_Par = house_contract_dict['step_Par']
         auditStatus_Par = house_contract_dict['auditStatus_Par']
         contractInfo = self.getHouseContractInfo()
@@ -138,28 +99,32 @@ class HouseContract(ContractBase, HouseContractInfo):
             else:
                 consoleLog(u'HOUSE CONTRACT STEP *%s* %s FAIL!!!' % (page, auditAction))
                 quit()
+
         if 'chushen' == auditAction or 'fushen' == auditAction:
             self.auditPayable()
-            if AuditStatus.HOUSE_CONTRACT_STATUS_WAIT_AUDIT == self.audit_status_now:
+            if AUDIT_STATUS.HOUSE_CONTRACT.WAIT_AUDIT == self.audit_status_now:
                 for step in step_Par.keys():
-                    if AuditStatus.HOUSE_CONTRACT_STATUS_WAIT_AUDIT == self.step_status(step) :
+                    if AUDIT_STATUS.HOUSE_CONTRACT.WAIT_AUDIT == self.step_status(step):
                         auditBase(step, 'chushen')
-                if AuditStatus.HOUSE_CONTRACT_STATUS_AUDITED == self.audit_status_now:
-                    consoleLog(u'委托合同已初审')
-            if 'fushen' == auditAction and AuditStatus.HOUSE_CONTRACT_STATUS_AUDITED == self.audit_status_now:
+                if AUDIT_STATUS.HOUSE_CONTRACT.AUDITED == self.audit_status_now:
+                    consoleLog('委托合同已初审')
+            if 'fushen' == auditAction and AUDIT_STATUS.HOUSE_CONTRACT.AUDITED == self.audit_status_now:
                 for step in step_Par.keys():
-                    if AuditStatus.HOUSE_CONTRACT_STATUS_AUDITED == self.step_status(step):
+                    if AUDIT_STATUS.HOUSE_CONTRACT.AUDITED == self.step_status(step):
                         auditBase(step, auditAction)
-                if AuditStatus.HOUSE_CONTRACT_STATUS_APPROVED == self.audit_status_now:
-                    consoleLog(u'委托合同已复审')
+                if AUDIT_STATUS.HOUSE_CONTRACT.APPROVED == self.audit_status_now:
+                    consoleLog('委托合同已复审')
 
-    # 续签
-    def resign(self, contract_num, apartment_type=None, entrust_type=None, sign_date=today(), owner_sign_date=today(), entrust_start_date=None,
-               entrust_year=None, payment_cycle=None, fitment_start_date=None, fitment_end_date=None, rent_money=None):
+    def resign(self, contract_num, apartment_type=None, entrust_type=None, sign_date=today(), owner_sign_date=today(),
+               entrust_start_date=None, entrust_year=None, payment_cycle=None, fitment_start_date=None,
+               fitment_end_date=None,
+               rent_money=None):
+        """续签"""
 
-        # 获取合同续签信息
         def getcontractInfo():
-            url = "http://erp.ishangzu.com/isz_housecontract/houseContractController/searchHouseContractInfoBase?contract_type=RENEWSIGN&house_id=%s&parent_id=%s" % (self.house_id, self.house_contract_id)
+            """获取合同续签信息"""
+            url = "http://erp.ishangzu.com/isz_housecontract/houseContractController/searchHouseContractInfoBase?contract_type=RENEWSIGN&house_id=%s&parent_id=%s" % (
+                self.house_id, self.house_contract_id)
             return myRequest(url, method='get')['obj']
 
         # 基础字段
@@ -173,8 +138,11 @@ class HouseContract(ContractBase, HouseContractInfo):
         else:
             fitment_start_date = None
             fitment_end_date = None
-        entrust_start_date = entrust_start_date if entrust_start_date else (addDays(1, fitment_end_date) if fitment_end_date else addDays(1, self.entrust_end_date))  # 续签开始日期默认为装修期结束日后一天，没有装修期的话就是原合同到期日的后一天
-        entrust_year = entrust_year if entrust_year else (self.entrust_year if self.entrust_year else 3)  # 委托年限默认原合同年限，原合同没有的话3年
+        entrust_start_date = entrust_start_date if entrust_start_date else (
+            addDays(1, fitment_end_date) if fitment_end_date else addDays(1,
+                                                                          self.entrust_end_date))  # 续签开始日期默认为装修期结束日后一天，没有装修期的话就是原合同到期日的后一天
+        entrust_year = entrust_year if entrust_year else (
+            self.entrust_year if self.entrust_year else 3)  # 委托年限默认原合同年限，原合同没有的话3年
         payment_cycle = payment_cycle if payment_cycle else self.payment_cycle  # 付款周期默认与原合同相同
         entrust_year_after = addDays(-1, addMonths(12 * int(entrust_year), entrust_start_date))
         entrust_end_date = addDays(free_date_par[payment_cycle] * int(entrust_year), entrust_year_after)  # 委托到期日
@@ -182,17 +150,17 @@ class HouseContract(ContractBase, HouseContractInfo):
         first_pay_date = addMonthExDay(30, months=0, date=entrust_start_date)  # 付款日 默认委托下个月30号为第一次
         second_pay_date = addMonthExDay(30, months=2, date=entrust_start_date)  # 目前不影响第二次应付的时间，实际为第一次付款日加付款周期后的时间
         contractInfo = getcontractInfo()
-        landlordInfo = self.getLandlordInfo()
+        landlordInfo = self.landlord()
         contractPhotos = self.contractPhotos()
         houseContractFirst = contractInfo['houseContractFrist']  # 房源信息
         houseContractSecond = {
             'agreedRentOriginalStatements': [],
             'any_agent': '0',  # 有无代理人 （默认无代理人）
             'assetsOfLessor': [{
-                'landlord_name': landlordInfo['landlord_name'],
-                'phone': landlordInfo['phone'],
-                'email': landlordInfo['email'],
-                'mailing_address': landlordInfo['mailing_address']
+                'landlord_name': landlordInfo.landlord_name,
+                'phone': landlordInfo.phone,
+                'email': landlordInfo.email,
+                'mailing_address': landlordInfo.mailing_address
             }],  # 资产出租人
             'contract_id': None,
             'houseContractSign': {
@@ -226,8 +194,8 @@ class HouseContract(ContractBase, HouseContractInfo):
             }],  # 证件照片
             'payee_card_type': self.payee_card_type,  # 证件类型
             'payee_card_type_cn': '',
-            'payee_emergency_name': landlordInfo['emergency_name'],  # 紧急人姓名（默认）
-            'payee_emergency_phone': landlordInfo['emergency_phone'],  # 紧急人手机号码（默认）
+            'payee_emergency_name': landlordInfo.emergency_name,  # 紧急人姓名（默认）
+            'payee_emergency_phone': landlordInfo.emergency_phone,  # 紧急人手机号码（默认）
             'payee_id_card': self.payee_id_card,  # 证件号
             'payee_type': self.payee_type,  # 收款人类型 （默认产权人）
             'payee_type_cn': ''
@@ -350,10 +318,10 @@ class HouseContract(ContractBase, HouseContractInfo):
         houseContractFive = self.createContractPayable(contractPayableData)
         houseContract = {
             'houseContractFrist': houseContractFirst,
-             'houseContractSecond': houseContractSecond,
-             'houseContractThird': houseContractThird,
-             'houseContractFour': houseContractFour,
-             'houseContractFive': houseContractFive
+            'houseContractSecond': houseContractSecond,
+            'houseContractThird': houseContractThird,
+            'houseContractFour': houseContractFour,
+            'houseContractFive': houseContractFive
         }
         result = self.saveHouseContract(houseContract)
         if result:
@@ -364,13 +332,13 @@ class HouseContract(ContractBase, HouseContractInfo):
             consoleLog(u'合同编号 : %s 合同ID : %s' % (contract_num, houseContractInfo[0]))
             return houseContractInfo[0]
 
-    # 请求获取终止结算基础数据
     def __getEndBase(self):
+        """获取终止结算基础数据"""
         url = "http://erp.ishangzu.com/isz_housecontract/houseContractEndController/searchHouseContractEndMsg/%s" % self.house_contract_id
         return myRequest(url, method='get')['obj']
 
-    # 提交终止结算
     def end(self):
+        """提交终止结算"""
         if not HouseContractEndInfo(self.house_contract_id).house_contract_end_info:
             self.audit('fushen')
             url = "http://erp.ishangzu.com/isz_housecontract/houseContractEndController/saveHouseContractEnd"
@@ -399,11 +367,17 @@ class HouseContract(ContractBase, HouseContractInfo):
             consoleLog('委托合同 "%s"，已经终止' % self.house_contract_num)
         return HouseContractEnd(self.house_contract_id)
 
-class HouseContractEnd(HouseContractEndInfo):
 
-    # 终止结算审核
+class HouseContractEnd(HouseContractEndInfo):
+    """终止结算"""
+
     def end_audit(self):
+        """终止结算审核"""
+
         def audit(activityId):
+            """审核
+            :param activityId 审核步骤ID
+            """
             url = "http://erp.ishangzu.com/isz_contract/endAgreementControl/houseContractEndAudit.action"
             data = {
                 "achieveid": self.end_id,
@@ -413,14 +387,15 @@ class HouseContractEnd(HouseContractEndInfo):
             if myRequest(url, data):
                 return True
 
-        if self.end_audit_status == 'NO_AUDIT':
+        if AUDIT_STATUS.HOUSE_CONTRACT_END.WAIT_AUDIT == self.end_audit_status:
             if audit('18'):
                 consoleLog('委托终止编号：%s,终止结算已初审' % self.house_contract_num)
-        if self.end_audit_status_now == 'PASS':
+        if AUDIT_STATUS.HOUSE_CONTRACT_END.AUDITED == self.end_audit_status_now:
             if audit('19'):
                 consoleLog('委托终止编号：%s,终止结算已复审' % self.house_contract_num)
-        if 'REVIEW' == self.end_audit_status_now:
+        if AUDIT_STATUS.HOUSE_CONTRACT_END.APPROVED == self.end_audit_status_now:
             consoleLog('委托终止编号：%s，终止结算状态为已复审' % self.house_contract_num)
+
 
 if __name__ == '__main__':
     # login()

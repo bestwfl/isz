@@ -38,6 +38,7 @@ class HouseInfo(object):
 
 
 class HouseContractInfo(HouseInfo):
+
     def __init__(self, contractIdOrNum):
         contractId = Mysql().getAll("select contract_id,house_id from house_contract where (contract_id='%s' or "
                                     "contract_num='%s') and deleted=0" % (contractIdOrNum, contractIdOrNum),
@@ -118,6 +119,29 @@ class HouseContractInfo(HouseInfo):
                                      "step = '%s' and deleted=0 order by step_id desc limit 1" % (
                                          self.house_contract_id, step))[0]
         return step_status
+
+    def landlord(self):
+        return HouseContractLandlordInfo(self.house_contract_id)
+
+
+class HouseContractLandlordInfo(object):
+    """业主信息"""
+
+    def __init__(self, contract_id):
+        sql = "select * from house_contract_landlord where contract_id='%s' and deleted=0" % contract_id
+        self.landlord_info = Mysql().query(sql)[0]
+        self.contract_landlord_id = self.landlord_info['contract_landlord_id']
+        self.phone = self.landlord_info['phone']
+        self.other_contact = self.landlord_info['other_contact']
+        self.card_type = self.landlord_info['card_type']
+        self.landlord_name = self.landlord_info['landlord_name']
+        self.id_card = self.landlord_info['id_card']
+        self.landlord_type = self.landlord_info['landlord_type']
+        self.mailing_address = self.landlord_info['mailing_address']
+        self.is_leaser = self.landlord_info['is_leaser']
+        self.email = self.landlord_info['email']
+        self.emergency_name = self.landlord_info['emergency_name']
+        self.emergency_phone = self.landlord_info['emergency_phone']
 
 
 class HouseContractEndInfo(HouseContractInfo):
@@ -411,7 +435,6 @@ class DecorationHouseInfo(object):
             self.is_fictitious_room = self.zone_info['is_fictitious_room']
 
 
-
 class DecorationProjectInfo(DecorationHouseInfo):
     """工程订单"""
 
@@ -498,6 +521,7 @@ class DecorationProjectInfo(DecorationHouseInfo):
         if not supplier_ids:
             consoleLog(u'订单配置供应商不存在')
         return supplier_ids
+
 
 class Receivable(object):
     """出租合同应收"""

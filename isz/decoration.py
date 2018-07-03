@@ -18,7 +18,7 @@ class Decoration(object):
         nullLog = False
         for i in range(5):
             project = sqlbase.serach(
-                "select project_id,b.contract_num from %s.new_decoration_project a inner join %s.decoration_house_info b "
+                "select project_id,b.contract_num,b.sign_uid from %s.new_decoration_project a inner join %s.decoration_house_info b "
                 "on a.info_id=b.info_id  where b.deleted=0 and (b.contract_num='%s' or b.contract_id='%s')"
                 "limit 1" % (
                     get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), contractIdOrNum, contractIdOrNum),
@@ -26,7 +26,7 @@ class Decoration(object):
             if project:
                 self.project_id = project[0]
                 self.contract_num = project[1]
-                self.sign_uid = HouseContract.contract_field(contractIdOrNum, 'sign_uid')
+                self.sign_uid = project[2]
                 break
             elif i < 4:
                 time.sleep(1)
