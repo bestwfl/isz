@@ -10,9 +10,9 @@ from common.interface_wfl import testWithLogin
 
 # @testWithLogin
 def test():
-    apartmentId = 'ZXZ2000910-01'
+    apartmentId = 'HZXC1705280168-02'
     customer = createCustomer()  # 创建租客，出租合同
-    contract_num_sign = u'APP兼容性'  # 合同标识
+    contract_num_sign = u'WFL修改服务消息模式'  # 合同标识
     contract_num = '%s-%s%s' % (contract_num_sign, time.strftime('%m%d%H%M'), get_randomString(2))
 
     sign_date = today()
@@ -25,7 +25,7 @@ def test():
                                                               rent_price=rent_price, sign_date=sign_date,
                                                               rent_start_date=rent_start_date, rent_end_date=rent_end_date,
                                                               payment_cycle=payment_cycle, contract_num=contract_num,sign_phone=sign_phone)
-    print contract.apartment_contract_id
+    print(contract.apartment_contract_id)
     # 审核合同
     # contract.audit()
     # contract.resign()

@@ -3,7 +3,7 @@
 from common.base import log, consoleLog, Base
 from common import sqlbase
 import time
-
+import platform
 
 class ResInfo(object):
      def __init__(self, res_id):
@@ -21,4 +21,4 @@ class Res(object):
 
 
 if __name__ == '__main__':
-    res = Res.createRes('res_name')
+    print platform.system()

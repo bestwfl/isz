@@ -49,8 +49,11 @@ class HouseContract(ContractBase, HouseContractInfo):
         # payableIds = sqlbase.serach(
         #     "select payable_id from house_contract_payable where contract_id='%s' and audit_status = 'NOTAUDIT' and deleted = 0 "
         #     "and money_type = 'RENT' " % self.house_contract_id, oneCount=False, research=True, nullLog=False)
-        payableIds = self.payables()
-        if len(payableIds) > 0:
+        payables = self.payables()
+        if len(payables) > 0:
+            payableIds = []
+            for payable in payables:
+                payableIds.append(payable.payable_id)
             data = {
                 "audit_status": "AUDITED",
                 "payableIds": payableIds
@@ -400,7 +403,7 @@ class HouseContractEnd(HouseContractEndInfo):
 
 if __name__ == '__main__':
     # login()
-    contract = HouseContract('zll2018-07-02wjx011')
+    contract = HouseContract('WFL工程1.5-07051013Oe')
     # contract_num = 'RS-%s' % contract.contract_num
     # contract.resign(contract_num)
     contract.end()

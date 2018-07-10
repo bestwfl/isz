@@ -463,9 +463,9 @@ class ApartmentContractEnd(ApartmentContractEndInfo):
 
 
 if __name__ == '__main__':
-    contract = ApartmentContract('科CH201712190854')
+    contract = ApartmentContract('WFL修改服务消息模式-07100943c6')
     # contract.audit()
     # contract.resign()
     contract.end()
-    contract.endAudit()
+    # contract.endAudit()
     # print AuditStatus.APARTMETN_CONTRACT_END_STATUS_WAIT_AUDIT

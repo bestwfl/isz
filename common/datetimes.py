@@ -30,7 +30,10 @@ def addDays(days=0, mydate=None):
             return str(date.today() - timedelta(days=abs(days)))
     else:
         if mydate:
-            time = datetime.strptime(mydate, '%Y-%m-%d') + timedelta(days=days)
+            try:
+                time = datetime.strptime(mydate, '%Y-%m-%d') + timedelta(days=days)
+            except:
+                pass
             return time.strftime('%Y-%m-%d')
         else:
             return str(date.today() + timedelta(days=days))

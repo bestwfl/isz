@@ -4,9 +4,11 @@ from random import randrange
 from common.base import log, consoleLog, Base
 from common import sqlbase
 import time
-from threading import Thread
+from threading import Thread, Lock
 import thread
 from threading import currentThread
+
+Lock()
 
 def test(name, value):
     """名称描述"""
