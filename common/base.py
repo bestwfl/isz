@@ -11,7 +11,7 @@ import re
 import string
 import time
 from threading import RLock
-
+import platform
 import requests
 import yaml
 from selenium import webdriver
@@ -41,8 +41,8 @@ logger.addHandler(consoleHandler)
 currentDriver = None
 lock = RLock()
 
-def tlock(func):
 
+def tlock(func):
     def wrapper(*args, **kwargs):
         lock.acquire()
         try:
@@ -53,6 +53,7 @@ def tlock(func):
             lock.release()
 
     return wrapper
+
 
 def log(func):
     def wrapper(*args, **kwargs):
@@ -73,6 +74,7 @@ def log(func):
             consoleLog(func.__doc__, level='e', fromAssert=False)
         finally:
             currentDriver.driver.quit() if currentDriver else None
+
     return wrapper
 
 
@@ -80,6 +82,7 @@ def consoleLog(msg, level='i', fromAssert=True):
     """
     对错误的记录，写进log文件中，对于error级别的适用于断言，如存在这种用例：删除合同后，判断合同表中的deleted的字段是否为1或者再查询，是否还能查到，此时，如果不为1或者还能查到
     则调用此方法，定义为error级别
+    :param fromAssert:
     :param msg: 需要写入的描述，如’合同删除后deleted未变成0‘
     :param level: 定义日志级别，分为i:info  w:warning  e:error
     """
@@ -91,16 +94,31 @@ def consoleLog(msg, level='i', fromAssert=True):
         if fromAssert:
             logger.error('one assert at : \n%s\n' % msg)
         else:
-            logger.error('======================================== one error at "%s" ========================================' % msg)
+            logger.error(
+                '======================================== one error at "%s" ========================================' % msg)
+
 
 def get_fileName():
     return os.path.basename(__file__).split('.')[0]
 
+
 def get_randomString(length):
     return ''.join(random.sample(string.ascii_letters + string.digits, length))
 
+
+def usePlatform():
+    """判断操作系统"""
+    return platform.system()
+
+
 def get_hosts_env():
-    hosts = open('C:\WINDOWS\system32\drivers\etc\HOSTS', 'r')
+    """读取hosts文件"""
+    sys = usePlatform()
+    hosts = None
+    if sys == 'Windows':
+        hosts = open('C:\WINDOWS\system32\drivers\etc\HOSTS', 'r')
+    elif sys == 'Darwin':
+        hosts = open('/etc/hosts', 'r')
     try:
         env = hosts.readlines()[5][1:5]
     except:
@@ -108,6 +126,7 @@ def get_hosts_env():
         env = None
     hosts.close()
     return env
+
 
 def get_conf(section, option, valueType=str):
     if section == 'testCondition':
@@ -121,7 +140,7 @@ def get_conf(section, option, valueType=str):
         if get_conf('testCondition', 'test') == 'online':
             section = section + '_online'
     config = ConfigParser.ConfigParser()
-    path = os.path.join(os.path.split(os.path.realpath(__file__))[0]) + '\conf.ini'
+    path = os.path.join(os.path.split(os.path.realpath(__file__))[0]) + '/conf.ini'
     config.read(path)
     if valueType is str:
         value = config.get(section, option)
@@ -148,7 +167,7 @@ def set_conf(section, **value):
     config = ConfigParser.ConfigParser()
     path = os.path.join(os.path.split(os.path.realpath(__file__))[0]) + '\conf.ini'
     config.read(path)
-    for k,v in value.items():
+    for k, v in value.items():
         if type(v) is unicode:
             config.set(section, k, v.encode('utf-8'))
         else:
@@ -166,10 +185,10 @@ def get_cookie(driver):
                 ISZ_SESSIONID = cookie['value']
             if cookie['name'] == 'CROSS_ISZ_SESSIONID':
                 CROSS_ISZ_SESSIONID = cookie['value']
-    cookie = {}
-    cookie['ISZ_SESSIONID'] = ISZ_SESSIONID.encode('utf-8')
-    cookie['CROSS_ISZ_SESSIONID'] = CROSS_ISZ_SESSIONID.encode('utf-8')
+    cookie = {'ISZ_SESSIONID': ISZ_SESSIONID.encode('utf-8'),
+              'CROSS_ISZ_SESSIONID': CROSS_ISZ_SESSIONID.encode('utf-8')}
     return cookie
+
 
 def get_yaml(id):
     """
@@ -187,7 +206,7 @@ def get_yaml(id):
                     for caseExplain in yy[module][caseName]:
                         if type(yy[module][caseName][caseExplain]) is not str:
                             if yy[module][caseName][caseExplain]['序号'.decode('utf-8')] == id:
-                                for key,info in yy[module][caseName][caseExplain].items():
+                                for key, info in yy[module][caseName][caseExplain].items():
                                     if type(info) is int:
                                         caseInfo += u'案例描述：' + caseExplain + '\n' + key + u'：' + str(id) + '\n'
                                     else:
@@ -195,7 +214,8 @@ def get_yaml(id):
                                             caseInfo += key + u'：' + i + '\n'
     return caseInfo
 
-def request(url,needCookie=True,data=None,contentType='application/json',method='post',**params):
+
+def request(url, needCookie=True, data=None, contentType='application/json', method='post', **params):
     headers = {
         'content-type': contentType,
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
@@ -209,14 +229,14 @@ def request(url,needCookie=True,data=None,contentType='application/json',method=
             else:
                 pass
         if method == 'post':
-            r = requests.post(url,data=json.dumps(data),headers=headers,cookies = cookie)
+            r = requests.post(url, data=json.dumps(data), headers=headers, cookies=cookie)
             text = r.text.encode('utf-8')
             if r.status_code == 200:
-                count = int(re.findall('"total":(.*?)}',text)[0])
+                count = int(re.findall('"total":(.*?)}', text)[0])
                 return count
             else:
-                info = 'url : %s \n data : %s \n cookie : %s \n value : %s' % (url,data,cookie,text)
-                consoleLog(u'当前接口异常：' + info,level='e')
+                info = 'url : %s \n data : %s \n cookie : %s \n value : %s' % (url, data, cookie, text)
+                consoleLog(u'当前接口异常：' + info, level='e')
     else:
         if method == 'get':
             pass
@@ -236,6 +256,7 @@ def clearConf():
             config.set(x, y)
     config.write(open('conf.ini', 'w'))
 
+
 def hostSet(condition):
     set_conf('testCondition', test=condition)
     filepath = r'C:\Windows\System32\drivers\etc\hosts'
@@ -243,10 +264,10 @@ def hostSet(condition):
     f = open(filepath, 'w')
     if condition == 'test':
         set_conf('db', host='192.168.0.208', user='wujun', password='wujun', db='isz_erp_npd', charset='utf8')
-        hosts = get_conf('host','test')
+        hosts = get_conf('host', 'test')
     elif condition == 'mock':
         set_conf('db', host='192.168.0.208', user='wujun', password='wujun', db='isz_erp', charset='utf8')
-        hosts = get_conf('host','mock')
+        hosts = get_conf('host', 'mock')
     f.write(hosts)
     f.close()
 
@@ -280,6 +301,7 @@ def solr(core, condition):
     else:
         consoleLog(u'%s-core 执行异常！' % core, 'w')
         return
+
 
 class Base(object):
     """
@@ -382,7 +404,7 @@ class Base(object):
         """
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(loc), message=u'等待元素未出现，请查看截图')
 
-    def find_element(self,*loc):
+    def find_element(self, *loc):
         """
         返回单个元素定位
         """
@@ -406,7 +428,7 @@ class Base(object):
         else:
             return self.driver.find_elements(*loc)
 
-    def send_keys(self,loc,keys):
+    def send_keys(self, loc, keys):
         self.find_element(*loc).send_keys(keys)
 
     def upload_file(self, loc, path):
@@ -429,7 +451,7 @@ class Base(object):
             u'没有找到提交成功记录')
         time.sleep(3)
 
-    def input_text(self, loc, text,index = None):
+    def input_text(self, loc, text, index=None):
         """
         重写send_keys方法
         :param loc:目标元素
@@ -438,7 +460,7 @@ class Base(object):
         :param index:定位目标为数组时，需指定所需元素在数组中的位置
         """
         if type(index) == int:
-            eles = self.find_elements(index,*loc)
+            eles = self.find_elements(index, *loc)
             for i in range(10):
                 try:
                     eles.click()
@@ -458,14 +480,14 @@ class Base(object):
             ele.clear()
             ele.send_keys(text)
 
-    def click(self, loc,index = None):
+    def click(self, loc, index=None):
         """
         重写click方法
         :param index: 默认为定位单个元素点击，如定位返回数组，则调用多个元素定位方法
         """
-        #WebDriverWait(self.driver,10).until(EC.element_to_be_clickable(loc),u'元素不可点击')
+        # WebDriverWait(self.driver,10).until(EC.element_to_be_clickable(loc),u'元素不可点击')
         if type(index) == int:
-            eles = self.find_elements(index,*loc)
+            eles = self.find_elements(index, *loc)
             for i in range(10):
                 try:
                     eles.click()
@@ -481,7 +503,7 @@ class Base(object):
                 except WebDriverException:
                     time.sleep(1)
 
-    def dblclick(self,loc,index = None,checkLoc = None):
+    def dblclick(self, loc, index=None, checkLoc=None):
         """
         重写双击方法
         :param loc: 可执行双击的元素  （注：需核实元素是否有双击事件，如定位到tr中的某一个td时，双击是无效的，对tr的双击才有效。
@@ -521,14 +543,14 @@ class Base(object):
                 except StaleElementReferenceException:
                     time.sleep(1)
 
-    def context_click(self,loc,index = None):
+    def context_click(self, loc, index=None):
         """
         重写右击方法
         :param loc: 可执行右击的元素
         :param index: 默认为定位单个元素点击，如定位返回数组，则调用多个元素定位方法
         """
         if type(index) == int:
-            eles = self.find_elements(index,*loc)
+            eles = self.find_elements(index, *loc)
             ActionChains(self.driver).context_click(eles).perform()
         else:
             ele = self.find_element(*loc)
@@ -537,7 +559,7 @@ class Base(object):
     def switch_frame(self, loc):
         self.driver.switch_to_frame(loc)
 
-    def script(self, js,returnValue=False):
+    def script(self, js, returnValue=False):
         """
         尽量少用js，因为执行速度远远高于网络和系统反应速度，很容易报错。
         迫不得已用到js的情况下无外乎点击、传值等，如果太快页面没刷新过来会导致报WebDriverException（目前已知会报出WebDriverException），此处捕获后，等待1秒再次执行js，最多十次，若执行成功则跳出循环
@@ -552,7 +574,7 @@ class Base(object):
                 else:
                     self.driver.execute_script(js)
                 break
-            except WebDriverException,e:
+            except WebDriverException, e:
                 # consoleLog(e)
                 # consoleLog(u'js执行失败，正进行第%s次尝试' % str(i+1).decode('utf-8'))
                 time.sleep(1)
@@ -563,9 +585,9 @@ class Base(object):
         :param loc: 接收jquery的选择器的值，如 #id  .class  css选择器，不是page页面中定义的元素元组
         :param dateValue: 具体时间值，格式如2017-01-02
         """
-        #js = "$(\"%s\").removeAttr('readonly');$(\"%s\").attr('value','%s')" % (loc,loc,date)
-        #上面的是调用js原生方法，由于前段框架的问题，原生方法传参无效，需利用jquery调用easyui中的方法
-        js = "$('%s').datebox('setValue','%s')" % (loc ,dateValue)
+        # js = "$(\"%s\").removeAttr('readonly');$(\"%s\").attr('value','%s')" % (loc,loc,date)
+        # 上面的是调用js原生方法，由于前段框架的问题，原生方法传参无效，需利用jquery调用easyui中的方法
+        js = "$('%s').datebox('setValue','%s')" % (loc, dateValue)
         self.script(js)
         time.sleep(0.2)
 
@@ -599,15 +621,15 @@ class Base(object):
         self.script(js)
         time.sleep(0.2)
 
-    def scrollTo(self,loc,index = None):
+    def scrollTo(self, loc, index=None):
         if type(index) == int:
             ele = self.find_elements(index, *loc)
             self.driver.execute_script("arguments[0].scrollIntoView(true);", ele)
         else:
             ele = self.find_element(*loc)
-            self.driver.execute_script("arguments[0].scrollIntoView(true);",ele)
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", ele)
 
-    def search_wait(self, click_loc, wait_loc, index = None):
+    def search_wait(self, click_loc, wait_loc, index=None):
         """
         点击搜索或者重置之后，所等待的页面元素没有捕捉到，重新点击刷新页面
         :param click_loc: 点击的元素
@@ -645,9 +667,7 @@ class Base(object):
                 except WebDriverException:
                     time.sleep(1)
 
+
 if __name__ == '__main__':
     t = get_yaml(1010)
     print t
-
-
-

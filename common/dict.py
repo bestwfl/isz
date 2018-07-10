@@ -1,10 +1,10 @@
 # -*- coding:utf8 -*-
-
+import time
 from collections import OrderedDict
 from enum import Enum
+
 from common.base import get_conf
 from common.mysql import Mysql
-
 """字典"""
 
 
@@ -203,4 +203,8 @@ class AUDIT_STATUS(Enum):
 #             raise ValueError('apartment search sql return null')
 
 if __name__ == '__main__':
-    print AUDIT_STATUS.APARTMETN_CONTRACT_END.APPROVED
+    print AUDIT_STATUS.APARTMETN_CONTRACT_END.value.APPROVED.value
+    print(AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER.value)
+    print(userInfo)
+    time.sleep(2)
+
