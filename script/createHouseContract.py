@@ -2,9 +2,7 @@
 
 import time
 from threading import Thread
-
 import threadpool
-
 from common import sqlbase
 from common.base import get_randomString, consoleLog
 from common.datetimes import today, addMonths, addDays
@@ -17,13 +15,13 @@ def createHouseContract(houseInfo):
     house = House(houseInfo[0])
     consoleLog('签约房源：%s, %s, %s' % (house.house_id, house.house_code, house.property_name))
     # 委托合同参数
-    contract_num_sign = u'WFL工程1.5'  # 合同标识
-    contract_num = '%s-%s%s' % (contract_num_sign, time.strftime('%m%d%H%M'), get_randomString(2))
+    contract_num_sign = u'WFL工程1.6'  # 合同标识
     apartment_type = 'BRAND'
-    entrust_type = 'ENTIRE'
+    entrust_type = 'SHARE'
+    contract_num = '%s-%s-%s-%s%s' % (contract_num_sign, apartment_type[0], entrust_type[0], time.strftime('%m%d%H%M'), get_randomString(2))
     sign_date = today()
     owner_sign_date = today()
-    fitment_start_date = addDays(1, sign_date)
+    fitment_start_date = today()
     fitment_end_date = addMonths(1, sign_date)
     entrust_start_date = addDays(1, fitment_end_date)
     entrust_year = 3
@@ -53,7 +51,7 @@ if __name__ == '__main__':
                "AND EXISTS(SELECT * FROM residential_building rb WHERE rb.building_id=a.building_id AND deleted=0) " \
                "AND EXISTS(SELECT * FROM residential c WHERE a.residential_id=c.residential_id) " \
                "AND EXISTS(SELECT * FROM house_rent hr WHERE hr.house_id=a.house_id AND house_status='WAITING_RENT') " \
-               "ORDER BY rand() LIMIT 1"
+               "ORDER BY rand() LIMIT 5"
     houseInfos = sqlbase.serach(houseSql, oneCount=False)
     consoleLog('查询结束')
     login()

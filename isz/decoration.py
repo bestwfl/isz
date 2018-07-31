@@ -200,7 +200,7 @@ class Decoration(object):
         # 闭水
         def closed():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/survey/closed'
-            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='SCENE.png', filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='SCENE.png')
             data = {
                 'air_switch': None,
                 'attachments': [{

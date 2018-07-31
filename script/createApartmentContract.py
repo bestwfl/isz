@@ -10,7 +10,7 @@ from common.interface_wfl import testWithLogin
 
 # @testWithLogin
 def test():
-    apartmentId = 'HZXC1705280168-02'
+    apartmentId = 'NJQH1711170012-02'
     customer = createCustomer()  # 创建租客，出租合同
     contract_num_sign = u'WFL修改服务消息模式'  # 合同标识
     contract_num = '%s-%s%s' % (contract_num_sign, time.strftime('%m%d%H%M'), get_randomString(2))

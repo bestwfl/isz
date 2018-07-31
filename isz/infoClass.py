@@ -38,7 +38,6 @@ class HouseInfo(object):
 
 
 class HouseContractInfo(HouseInfo):
-
     def __init__(self, contractIdOrNum):
         contractId = Mysql().getAll("select contract_id,house_id from house_contract where (contract_id='%s' or "
                                     "contract_num='%s') and deleted=0" % (contractIdOrNum, contractIdOrNum),
@@ -543,9 +542,8 @@ class Receivable(object):
     @property
     def end_status_now(self):
         """实时应收状态"""
-        self.__end_status = \
-        Mysql().getOne("select end_status from apartment_contract_receivable where receivable_id='%s' "
-                       "and deleted=0" % self.receivable_id)[0]
+        self.__end_status = Mysql().getOne("select end_status from apartment_contract_receivable where receivable_id='%s' "
+                                           "and deleted=0" % self.receivable_id)[0]
         return self.__end_status
 
 
@@ -615,5 +613,5 @@ def check_query_table(param, type):
     result = Mysql().getOne(sql, research=True, nullLog=False)
     if not result:
         consoleLog('{}宽表：{} 未生成'.format(type, param))
-    # else:
-    #     consoleLog('宽表数据已生成')
+        # else:
+        #     consoleLog('宽表数据已生成')

@@ -24,7 +24,11 @@ def addDays(days=0, mydate=None):
     """在当前的前提下加减天数，返回date类型YYYY-MM-DD"""
     if days < 0:
         if mydate:
-            time = datetime.strptime(mydate, '%Y-%m-%d') - timedelta(days=abs(days))
+            try:
+                time = datetime.strptime(mydate, '%Y-%m-%d') - timedelta(days=days)
+            except:
+                from datetime import datetime as dt
+                time = dt.strptime(mydate, '%Y-%m-%d') - timedelta(days=days)
             return time.strftime('%Y-%m-%d')
         else:
             return str(date.today() - timedelta(days=abs(days)))
@@ -33,7 +37,8 @@ def addDays(days=0, mydate=None):
             try:
                 time = datetime.strptime(mydate, '%Y-%m-%d') + timedelta(days=days)
             except:
-                pass
+                from datetime import datetime as dt
+                time = dt.strptime(mydate, '%Y-%m-%d') + timedelta(days=days)
             return time.strftime('%Y-%m-%d')
         else:
             return str(date.today() + timedelta(days=days))

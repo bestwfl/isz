@@ -408,6 +408,8 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
 
 
 class ApartmentContractEnd(ApartmentContractEndInfo):
+
+
     def endAudit(self):
         """终止结算审核"""
         endInfo = ApartmentContractEndInfo(self.apartment_contract_id)
@@ -463,7 +465,7 @@ class ApartmentContractEnd(ApartmentContractEndInfo):
 
 
 if __name__ == '__main__':
-    contract = ApartmentContract('WFL修改服务消息模式-07100943c6')
+    contract = ApartmentContract('WFL修改服务消息模式-07121531YJ')
     # contract.audit()
     # contract.resign()
     contract.end()

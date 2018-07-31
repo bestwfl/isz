@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 
 from isz.houseContract import HouseContract
-from common import sqlbase
+from common.mysql import Mysql
 from common.base import consoleLog
 from common.datetimes import addDays, addMonths, addMonthExDay
 from common.dict import free_date_par, landlord, getUserInfo
@@ -379,9 +379,11 @@ class House(HouseInfo):
 
         result = contractbase.saveHouseContract(houseContract)
         if result:
-            houseContractInfo = sqlbase.serach(
-                "select contract_id,contract_num,house_id from house_contract where house_id = '%s' and deleted = 0 order by create_time desc limit 1" %
-                self.house_id)
-            consoleLog(u'新签委托合同成功！')
-            consoleLog(u'合同编号 : %s 合同ID : %s' % (houseContractInfo[1], houseContractInfo[0]))
+            # houseContractInfo = sqlbase.serach(
+            #     "select contract_id,contract_num,house_id from house_contract where house_id = '%s' and deleted = 0 order by create_time desc limit 1" %
+            #     self.house_id)
+            sql = "select contract_id,contract_num,house_id from house_contract where house_id = '%s' and deleted = 0 order by create_time desc limit 1" % self.house_id
+            houseContractInfo = Mysql().getAll(sql)[0]
+            consoleLog('新签委托合同成功！')
+            consoleLog('合同编号 : %s 合同ID : %s' % (houseContractInfo[1], houseContractInfo[0]))
             return HouseContract(houseContractInfo[0])

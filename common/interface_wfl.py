@@ -4,6 +4,8 @@ import json
 import traceback
 import requests
 import time
+import os
+import sys
 from common.base import consoleLog, set_conf
 from common.base import get_conf
 from common.sqlbase import getsmsMtHis
@@ -88,21 +90,26 @@ class Image(object):
         self.url = img_url
 
 # @checckLogin
-def upLoadPhoto(url, filename, filepath, name='file'):
+def upLoadPhoto(url, filename, filepath=None, name='file'):
     """
     上传图片
-    :param filepath:'C:\Users\user\Desktop\Image\\' 文件路径
+    :param filepath:'C:\Users\user\Desktop\Image\\' 所在文件夹路径
     :param filename:文件名称
     :param name:请求文件类型
     :param url:上传地址
    """
     img = {}
+    if not filepath:
+        filepath = sys.path[1]+'\img\\'
+    filepath = filepath + filename
+    if not os.path.exists(filepath):
+        consoleLog('文件路径不存在，文件路径：%s' % filepath)
     try:
-        file = {
-            name: (str(filename).encode('utf-8'), open(str(filepath + filename).encode('utf-8'), 'rb'), 'image/png'),
+        filetype = {
+            name: (str(filename).encode('utf-8'), open(str(filepath).encode('utf-8'), 'rb'), 'image/png'),
         }
         cookie = eval(get_conf('cookieInfo', 'cookies'))
-        request = requests.post(url=url, files=file, cookies=cookie)
+        request = requests.post(url=url, files=filetype, cookies=cookie)
         result = json.loads(request.text)
         if result['code'] is 200 or result['code'] == u'200' or result['code'] is 0:
             try:
@@ -112,7 +119,7 @@ def upLoadPhoto(url, filename, filepath, name='file'):
             img['img_id'] = result['obj']['img_id']
         else:
             msg = result['msg'].encode('utf-8')
-            consoleLog(u'上传文件接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s\n返回默认图片' % (url, file, msg.decode('utf-8')), 'w')
+            consoleLog(u'上传文件接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s\n返回默认图片' % (url, filetype, msg.decode('utf-8')), 'w')
             img['img_url'] = get_conf('img', 'url')
             img['img_id'] = get_conf('img', 'img_id')
     except BaseException:

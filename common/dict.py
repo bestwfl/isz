@@ -39,6 +39,10 @@ class UserInfo(object):
         user_id = Mysql().getOne(sql)[0]
         return UserInfo(user_id)
 
+    @staticmethod
+    def getConfigUser():
+        """获取配置文件默认用户"""
+        return UserInfo.getUserByPhone(get_conf('sysUser', 'userphone'))
 
 def getUserInfo():
     """获取登录用户信息"""

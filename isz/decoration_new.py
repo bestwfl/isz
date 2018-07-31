@@ -1,51 +1,28 @@
 # -*- coding:utf8 -*-
 
 import time
-from isz.houseContract import HouseContract
 from common import sqlbase
 from common.base import consoleLog, get_conf
 from common.datetimes import addDays
 from common.interface_wfl import myRequest, upLoadPhoto
-from common.dict import User, UserInfo, get_dict_value
+from common.dict import UserInfo, get_dict_value
 from isz.infoClass import DecorationProjectInfo
 
 
 class Decoration(DecorationProjectInfo):
     """装修工程"""
     uploadPhotoURL = 'http://decorate.ishangzu.com/isz_decoration/DecorationFileController/uploadPhoto'  # 装修工程上传图片地址
+    user = UserInfo.getConfigUser()
 
-    # def __init__(self, contractIdOrNum):
-    #     self.project_id = None
-    #     nullLog = False
-    #     for i in range(5):
-    #         project = sqlbase.serach(
-    #             "select project_id,b.contract_num from %s.new_decoration_project a inner join %s.decoration_house_info b "
-    #             "on a.info_id=b.info_id  where b.deleted=0 and (b.contract_num='%s' or b.contract_id='%s')"
-    #             "limit 1" % (
-    #                 get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), contractIdOrNum, contractIdOrNum),
-    #             nullLog=nullLog)
-    #         if project:
-    #             self.project_id = project[0]
-    #             self.contract_num = project[1]
-    #             self.sign_uid = HouseContract.contract_field(contractIdOrNum, 'sign_uid')
-    #             break
-    #         elif i < 4:
-    #             time.sleep(1)
-    #             if i == 3:
-    #                 nullLog = True
-    #         else:
-    #             raise BaseException('the house_contract does not exist decoration order, contract：%s' % contractIdOrNum)
-
-    # 下单
     def placeOrder(self):
         """下单"""
         consoleLog(u'开始工程管理')
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/changeProgress/placeOrder'
         data = {
-            'place_order_dep': User.DID,
+            'place_order_dep': self.user.dep_id,
             'place_order_reason': u'测试',
-            'place_order_uid': User.UID,
-            'place_order_uname': User.NAME,
+            'place_order_uid': self.user.user_id,
+            'place_order_uname': self.user.user_name,
             'place_order_date': time.strftime('%Y-%m-%d %H:%M:%S'),
             'predict_survey_date': '%s 09:00' % addDays(1),
             'project_id': self.project_id
@@ -154,7 +131,7 @@ class Decoration(DecorationProjectInfo):
                 }]
             }
             for attachment in data['attachments']:
-                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'])
                 attachment['imgs'][0]['url'] = IMG.url
                 attachment['imgs'][0]['img_id'] = IMG.id
             result = myRequest(url, data)
@@ -165,7 +142,7 @@ class Decoration(DecorationProjectInfo):
         def profee():
             """物业交割"""
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/survey/profee'
-            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='PROPERTY_DELIVERY_ORDER.png', filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='PROPERTY_DELIVERY_ORDER.png')
             data = {
                 'air_switch': '',
                 'door_card': '',
@@ -202,7 +179,7 @@ class Decoration(DecorationProjectInfo):
         def closed():
             """闭水"""
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/survey/closed'
-            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='SCENE.png', filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='SCENE.png')
             data = {
                 'air_switch': None,
                 'attachments': [{
@@ -254,8 +231,7 @@ class Decoration(DecorationProjectInfo):
     def projectOrder(self, rooms=3, livings=1, kitchens=1, bathrooms=2, balconys=2):
         """项目计划"""
         url = 'http://decorate.ishangzu.com/isz_decoration/decoHouseInfoController/saveOrUpdateApartment/saveApartment/projectOrder'
-        img = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png',
-                          filepath=r"C:\Users\user\Desktop\Image\\")  # 户型图上传
+        img = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png')  # 户型图上传
         data = {
             'build_area': self.build_area,
             'reform_way_fact': 'OLDRESTYLE',
@@ -566,7 +542,7 @@ class Decoration(DecorationProjectInfo):
         def acceptanceConfigList():
             """物品清单验收"""
 
-            def getsupplierOrderDetail(supplierId):
+            def getSupplierOrderDetail(supplierId):
                 """获取物品清单信息"""
                 url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationConfigController/supplierOrdersDetail'
                 data = {"project_id": self.project_id, "supplier_id": supplierId}
@@ -580,7 +556,7 @@ class Decoration(DecorationProjectInfo):
                 supplierIds = self.config_suppliers
                 configsVo = []
                 for supplierId in supplierIds:
-                    configs = getsupplierOrderDetail(supplierId)
+                    configs = getSupplierOrderDetail(supplierId)
                     for config in configs:
                         configsVo.append(config)
                 for i in configsVo:
@@ -604,7 +580,7 @@ class Decoration(DecorationProjectInfo):
                 "acceptance_num_this": 0,
                 "acceptance_time": None,
                 "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "create_uid": User.UID,
+                "create_uid": self.user.user_id,
                 "data_type": "成品安装",
                 "data_type_len": 26,
                 "decoration_detial": "家具安装",
@@ -637,7 +613,7 @@ class Decoration(DecorationProjectInfo):
                 "unit_name": "件",
                 "unit_price": 10,
                 "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "update_uid": User.UID,
+                "update_uid": self.user.user_id,
                 "zone_type": None,
                 "type_index": 0,
                 "fun_index": 0
@@ -646,7 +622,7 @@ class Decoration(DecorationProjectInfo):
                 "acceptance_num_this": 0,
                 "acceptance_time": None,
                 "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "create_uid": User.UID,
+                "create_uid": self.user.user_id,
                 "data_type": "成品安装",
                 "data_type_len": 26,
                 "decoration_detial": "嵌入式天花灯-改造",
@@ -679,7 +655,7 @@ class Decoration(DecorationProjectInfo):
                 "unit_name": "个",
                 "unit_price": 24,
                 "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "update_uid": User.UID,
+                "update_uid": self.user.user_id,
                 "zone_type": None,
                 "fun_index": 1,
                 "type_index": 1
@@ -688,7 +664,7 @@ class Decoration(DecorationProjectInfo):
                 "acceptance_num_this": 0,
                 "acceptance_time": None,
                 "create_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "create_uid": User.UID,
+                "create_uid": self.user.user_id,
                 "data_type": "成品安装",
                 "data_type_len": 26,
                 "decoration_detial": "明装筒灯-改造",
@@ -721,7 +697,7 @@ class Decoration(DecorationProjectInfo):
                 "unit_name": "个",
                 "unit_price": 33.6,
                 "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "update_uid": User.UID,
+                "update_uid": self.user.user_id,
                 "zone_type": None,
                 "fun_index": 1,
                 "type_index": 1
@@ -802,8 +778,8 @@ class Decoration(DecorationProjectInfo):
                         "place_order_dep": "",
                         "place_order_dep_name": None,
                         "place_order_reason": "测试",
-                        "place_order_uid": User.UID,
-                        "place_order_uname": User.NAME,
+                        "place_order_uid": self.user.user_id,
+                        "place_order_uname": self.user.user_id,
                         "plumbing_type": "INNERPIPE",
                         "plumbing_type_name": None,
                         "predict_complete_date": "",
@@ -856,8 +832,8 @@ class Decoration(DecorationProjectInfo):
             self.update()
             saveStuffLists()
 
-        # 装修清单验收
         def acceptanceStuffList():
+            """装修清单验收"""
             geturl = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationStuffController/getSuffList/%s' % self.project_id
             result = myRequest(geturl, method='get')
             if result:
@@ -875,9 +851,8 @@ class Decoration(DecorationProjectInfo):
         designStuffList()
         acceptanceStuffList()
 
-    # 施工中
     def hideAndStufCheck(self):
-
+        """施工中"""
 
         def hideCheck():
             """隐蔽验收"""
@@ -965,7 +940,7 @@ class Decoration(DecorationProjectInfo):
                 "water_meter_num": None
             }
             for attachment in data['attachments']:
-                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'])
                 attachment['imgs'][0]['url'] = IMG.url
                 attachment['imgs'][0]['img_id'] = IMG.id
             result = myRequest(url, data)
@@ -973,8 +948,8 @@ class Decoration(DecorationProjectInfo):
                 consoleLog(u'隐蔽验收完成')
                 return
 
-        # 硬装验收
         def stufCheck():
+            """硬装验收"""
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/constructing/stufCheck'
             data = {
                 "air_switch": None,
@@ -1060,7 +1035,7 @@ class Decoration(DecorationProjectInfo):
                 "water_meter_num": None
             }
             for attachment in data['attachments']:
-                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'])
                 attachment['imgs'][0]['url'] = IMG.url
                 attachment['imgs'][0]['img_id'] = IMG.id
             result = myRequest(url, data)
@@ -1071,13 +1046,14 @@ class Decoration(DecorationProjectInfo):
         hideCheck()
         stufCheck()
 
-    # 项目验收
     def projectCheck(self):
-        # 整体验收
+        """项目验收"""
+
         def wholeCheck():
+            """整体验收"""
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proCheck/wholeCheck'
-            IMG_CARDS = upLoadPhoto(url=self.uploadPhotoURL, filename='CARDS.png', filepath=r"C:\Users\user\Desktop\Image\\")
-            IMG_THREE = upLoadPhoto(url=self.uploadPhotoURL, filename='THREE.png', filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG_CARDS = upLoadPhoto(url=self.uploadPhotoURL, filename='CARDS.png')
+            IMG_THREE = upLoadPhoto(url=self.uploadPhotoURL, filename='THREE.png')
             data = {
                 "air_switch": None,
                 "attachments": None,
@@ -1132,11 +1108,10 @@ class Decoration(DecorationProjectInfo):
                 # consoleLog(u'整体验收完成')
                 return
 
-        # 物业交割验收
         def profee():
+            """物业交割"""
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proCheck/profee'
-            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='PROPERTY_DELIVERY_ORDER.png',
-                              filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='PROPERTY_DELIVERY_ORDER.png')
             data = {
                 "air_switch": "",
                 "door_card": "",
@@ -1170,8 +1145,8 @@ class Decoration(DecorationProjectInfo):
                 # consoleLog(u'物业交割完成')
                 return
 
-        # 费用结算
         def costSettle():
+            """费用结算"""
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proCheck/costsettle'
             data = {
                 "project_id": self.project_id,
@@ -1186,18 +1161,10 @@ class Decoration(DecorationProjectInfo):
         profee()
         costSettle()
 
-    # 室内图
     def indoorImg(self):
+        """室内图"""
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proComp/indoor'
-        # IMG_PUBLIC_TOILET_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='PUBLIC_TOILET_1.png', filepath=r"C:\Users\user\Desktop\Image\\")
-        # IMG_KITCHEN_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='KITCHEN_1.png', filepath=r"C:\Users\user\Desktop\Image\\")
-        # IMG_PARLOUR_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='PARLOUR_1.png', filepath=r"C:\Users\user\Desktop\Image\\")
-        # IMG_METH = upLoadPhoto(url=self.uploadPhotoURL, filename='METH.png', filepath=r"C:\Users\user\Desktop\Image\\")
-        # IMG_ETH = upLoadPhoto(url=self.uploadPhotoURL, filename='ETH.png', filepath=r"C:\Users\user\Desktop\Image\\")
-        # IMG_PROP = upLoadPhoto(url=self.uploadPhotoURL, filename='PROP.png', filepath=r"C:\Users\user\Desktop\Image\\")
-        # IMG_BALCONY_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='BALCONY_1.png', filepath=r"C:\Users\user\Desktop\Image\\")
-        # IMG_BALCONY_2 = upLoadPhoto(url=self.uploadPhotoURL, filename='BALCONY_2.png', filepath=r"C:\Users\user\Desktop\Image\\")
-        IMG_LAYOUT = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        IMG_LAYOUT = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png')
         data = {
             "curOneLevelNode": None,
             "curTwoLevelNode": None,
@@ -1205,8 +1172,8 @@ class Decoration(DecorationProjectInfo):
             "house_attachs": [{
                 "attach_type": "PUBLIC_TOILET_1",
                 "imgs": [{
-                    "url": None,  # IMG_PUBLIC_TOILET_1.url,
-                    "img_id": None,  # IMG_PUBLIC_TOILET_1.id,
+                    "url": None,
+                    "img_id": None,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1216,8 +1183,8 @@ class Decoration(DecorationProjectInfo):
             }, {
                 "attach_type": "KITCHEN_1",
                 "imgs": [{
-                    "url": None,  # IMG_KITCHEN_1.url,
-                    "img_id": None,  # IMG_KITCHEN_1.id,
+                    "url": None,
+                    "img_id": None,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1227,8 +1194,8 @@ class Decoration(DecorationProjectInfo):
             }, {
                 "attach_type": "PARLOUR_1",
                 "imgs": [{
-                    "url": None,  # IMG_PARLOUR_1.url,
-                    "img_id": None,  # IMG_PARLOUR_1.id,
+                    "url": None,
+                    "img_id": None,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1238,8 +1205,8 @@ class Decoration(DecorationProjectInfo):
             }, {
                 "attach_type": "METH",
                 "imgs": [{
-                    "url": None,  # IMG_METH.url,
-                    "img_id": None,  # IMG_METH.id,
+                    "url": None,
+                    "img_id": None,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1249,8 +1216,8 @@ class Decoration(DecorationProjectInfo):
             }, {
                 "attach_type": "ETH",
                 "imgs": [{
-                    "url": None,  # IMG_ETH.url,
-                    "img_id": None,  # IMG_ETH.id,
+                    "url": None,
+                    "img_id": None,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1260,8 +1227,8 @@ class Decoration(DecorationProjectInfo):
             }, {
                 "attach_type": "PROP",
                 "imgs": [{
-                    "url": None,  # IMG_PROP.url,
-                    "img_id": None,  # IMG_PROP.id,
+                    "url": None,
+                    "img_id": None,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1271,8 +1238,8 @@ class Decoration(DecorationProjectInfo):
             }, {
                 "attach_type": "BALCONY_1",
                 "imgs": [{
-                    "url": None,  # IMG_BALCONY_1.url,
-                    "img_id": None,  # IMG_BALCONY_1.id,
+                    "url": None,
+                    "img_id": None,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1282,8 +1249,8 @@ class Decoration(DecorationProjectInfo):
             }, {
                 "attach_type": "BALCONY_2",
                 "imgs": [{
-                    "url": None,  # IMG_BALCONY_2.url,
-                    "img_id": None,  # IMG_BALCONY_2.id,
+                    "url": None,
+                    "img_id": None,
                     "create_name": "",
                     "create_dept": "",
                     "create_time": "",
@@ -1307,7 +1274,7 @@ class Decoration(DecorationProjectInfo):
             "remark": None
         }
         for house_attach in data['house_attachs']:
-            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % house_attach['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % house_attach['attach_type'])
             house_attach['imgs'][0]['url'] = IMG.url
             house_attach['imgs'][0]['img_id'] = IMG.id
         result = myRequest(url, data)
@@ -1315,8 +1282,8 @@ class Decoration(DecorationProjectInfo):
             # consoleLog(u'室内图添加完成')
             return
 
-    # 竣工交付
     def delivery(self):
+        """交房"""
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proComp/delivery'
         data = {
             "deliver_room_date": '%s 10:00:00' % addDays(1),
@@ -1328,8 +1295,8 @@ class Decoration(DecorationProjectInfo):
             consoleLog(u'竣工完成')
             return
 
-    # 整个装修流程
     def fitment(self):
+        """整个装修流程"""
         self.placeOrder()  # 下单
         self.dispatchOrder()  # 派单
         self.acceptOrder()  # 接单
