@@ -2,7 +2,7 @@
 import os
 import time
 from common.base import consoleLog, get_randomString
-from common.mysql import Mysql
+from common.mySql import Mysql
 from officebase.myexcel import Excel
 import xlwt
 from xlutils.copy import copy

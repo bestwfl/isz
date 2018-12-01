@@ -1,16 +1,17 @@
 # -*- coding:utf8 -*-
-
+from common.interface_wfl import upLoadPhoto
 from isz.houseContract import HouseContract
-from common.mysql import Mysql
+from common.mySql import Mysql
 from common.base import consoleLog
 from common.datetimes import addDays, addMonths, addMonthExDay
 from common.dict import free_date_par, landlord, getUserInfo
 from isz.contractBase import ContractBase
 from isz.infoClass import HouseInfo
-
+import time
 
 class House(HouseInfo):
     """业主房源信息"""
+    uploadPhotoURL = 'http://erp.ishangzu.com/isz_housecontract/houseContractController/uploadImageFile'  # 委托合同上传图片地址
 
     def createHouseContract(self, contract_num, apartment_type, entrust_type, sign_date, owner_sign_date,
                             entrust_start_date, entrust_year, rent, parking=None, payment_cycle='HALF_YEAR',
@@ -56,10 +57,18 @@ class House(HouseInfo):
         first_pay_date = addMonthExDay(30, months=0, date=entrust_start_date)
         second_pay_date = addMonthExDay(30, months=2, date=entrust_start_date)
         # 装修期 品牌默认签约前一个月 托管默认无
-        fitment_start_date = addMonths(-1,
-                                       entrust_start_date) if fitment_start_date is None else fitment_start_date
-        fitment_end_date = addDays(-1,
-                                   entrust_start_date) if fitment_end_date is None else fitment_end_date
+        fitment_start_date = addMonths(-1, entrust_start_date) if fitment_start_date is None else fitment_start_date
+        fitment_end_date = addDays(-1, entrust_start_date) if fitment_end_date is None else fitment_end_date
+
+        # 图片上传
+        idCardPhotos = upLoadPhoto(url=self.uploadPhotoURL, filename='idCardPhotos.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        CERTIFICATE_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='CERTIFICATE_1.png', filepath=r"C:\Users\user\Desktop\Image\\")  # 带证号页(产权证编号)
+        CERTIFICATE_2 = upLoadPhoto(url=self.uploadPhotoURL, filename='CERTIFICATE_2.png', filepath=r"C:\Users\user\Desktop\Image\\")  # 主页（业主姓名/物业地址）
+        CERTIFICATE_3 = upLoadPhoto(url=self.uploadPhotoURL, filename='CERTIFICATE_3.png', filepath=r"C:\Users\user\Desktop\Image\\")  # 附记页
+        FENHUTU = upLoadPhoto(url=self.uploadPhotoURL, filename='FENHUTU.png', filepath=r"C:\Users\user\Desktop\Image\\")  # 分户图
+        YUANHUXINGTU = upLoadPhoto(url=self.uploadPhotoURL, filename='YUANHUXINGTU.png', filepath=r"C:\Users\user\Desktop\Image\\")  # 原户型图
+        OTHER = upLoadPhoto(url=self.uploadPhotoURL, filename='OTHER.png', filepath=r"C:\Users\user\Desktop\Image\\")  # 其他
+        ATTACHMENTS = upLoadPhoto(url=self.uploadPhotoURL, filename='ATTACHMENTS.png', filepath=r"C:\Users\user\Desktop\Image\\")  # 合同附件
 
         houseContractFirst = {
             'address': self.property_name,
@@ -68,6 +77,10 @@ class House(HouseInfo):
             'commonLandlords': [],
             'common_case': 'PRIVATE',  # 共有情况 （默认私有）
             'common_case_cn': '',
+            "bathrooms": 2,
+            "kitchens": 1,
+            "livings": 1,
+            "rooms": 3,
             'contract_id': None,
             'contract_type': contract_type,
             'contract_type_cn': u'新签' if contract_type == 'NEWSIGN' else u'续签',
@@ -78,33 +91,24 @@ class House(HouseInfo):
                 'property_owner_type': 'PROPERTYOWNER',  # 产权人类型 （默认个人）
                 'property_card_id': 'chanquanzheng',  # 产权证号 （默认）
                 'idCardPhotos': [{
-                    'src': 'http://img.ishangzu.com/erp/2018/2/9/15/ceec21bc-c6e5-481a-92cf-21a1d7982b12.jpg',  # 默认
-                    'url': 'http://img.ishangzu.com/erp/2018/2/9/15/ceec21bc-c6e5-481a-92cf-21a1d7982b12.jpg',  # 默认
+                    'src': idCardPhotos.src,  # 默认
+                    'url': idCardPhotos.url,  # 默认
                     'remark': '',
-                    'img_id': 'FF80808161C581A90161C5A7893B0010'  # 默认
-                }, {
-                    "src": "http://img.ishangzu.com/erp/2018/4/2/15/c30e57ce-f24a-4334-bc68-a0acea61fa4b.png",
-                    "url": "http://img.ishangzu.com/erp/2018/4/2/15/c30e57ce-f24a-4334-bc68-a0acea61fa4b.png",
-                    "remark": "",
-                    "img_id": "FF80808162756A8E0162852842010265"
+                    'img_id': idCardPhotos.id  # 默认
                 }]  # 证件照片
             },  # 产权人信息
             'house_code': self.house_code,  # 房源code
-            'inside_space': self.build_area if self.build_area else '120.00',  # 使用面积 默认收房面积
+            # 'inside_space': int(self.build_area) if self.build_area else 120.00,  # 使用面积 默认收房面积
+            'inside_space': 120.00,  # 使用面积 默认收房面积
             'is_new_data': None,
             'mortgageeStatementOriginal': [],
             'pledge': '0',
             'productionVos': [{
                 "attachments": [{
-                    "src": "http://img.ishangzu.com/erp/2018/3/30/10/d735a299-cb64-4298-aad8-c65f0e5b6147.png",
-                    "url": "http://img.ishangzu.com/erp/2018/3/30/10/d735a299-cb64-4298-aad8-c65f0e5b6147.png",
+                    "src": CERTIFICATE_2.src,
+                    "url": CERTIFICATE_2.url,
                     "remark": "",
-                    "img_id": "FF808081626BF853016274D8BB3F0462"
-                }, {
-                    "src": "http://img.ishangzu.com/erp/2018/4/2/14/ac70ffd5-5397-41e8-a40a-2f2f41ec6d5b.png",
-                    "url": "http://img.ishangzu.com/erp/2018/4/2/14/ac70ffd5-5397-41e8-a40a-2f2f41ec6d5b.png",
-                    "remark": "",
-                    "img_id": "FF80808162756A8E0162850B52960257"
+                    "img_id": CERTIFICATE_2.id
                 }],
                 "file_type": "主页（业主姓名/物业地址）",
                 "file_type_id": fileType.getFileIdByTpye("主页(有业主姓名/物业地址页)"),
@@ -114,15 +118,10 @@ class House(HouseInfo):
                 "is_save_need": "Y"
             }, {
                 "attachments": [{
-                    "src": "http://img.ishangzu.com/erp/2018/3/30/10/28e31cff-3aeb-481a-ade6-af643efae25b.png",
-                    "url": "http://img.ishangzu.com/erp/2018/3/30/10/28e31cff-3aeb-481a-ade6-af643efae25b.png",
+                    "src": CERTIFICATE_1.src,
+                    "url": CERTIFICATE_1.url,
                     "remark": "",
-                    "img_id": "FF808081626BF853016274D8C1D70463"
-                }, {
-                    "src": "http://img.ishangzu.com/erp/2018/4/2/14/47d8d465-1f91-43ff-b835-7d50aa5a1b76.png",
-                    "url": "http://img.ishangzu.com/erp/2018/4/2/14/47d8d465-1f91-43ff-b835-7d50aa5a1b76.png",
-                    "remark": "",
-                    "img_id": "FF80808162756A8E0162850F184C0260"
+                    "img_id": CERTIFICATE_1.id
                 }],
                 "file_type": "带证号页(产权证编号)",
                 "file_type_id": fileType.getFileIdByTpye("带证号页(有产权证编号页)"),
@@ -132,15 +131,10 @@ class House(HouseInfo):
                 "is_save_need": "Y"
             }, {
                 "attachments": [{
-                    "src": "http://img.ishangzu.com/erp/2018/3/30/10/bda51090-8294-4675-ba85-cbd1f19f600a.png",
-                    "url": "http://img.ishangzu.com/erp/2018/3/30/10/bda51090-8294-4675-ba85-cbd1f19f600a.png",
+                    "src": CERTIFICATE_3.src,
+                    "url": CERTIFICATE_3.url,
                     "remark": "",
-                    "img_id": "FF808081626BF853016274D8FB1E0466"
-                }, {
-                    "src": "http://img.ishangzu.com/erp/2018/4/2/14/05ece962-549e-4005-858c-3e89c1636edf.png",
-                    "url": "http://img.ishangzu.com/erp/2018/4/2/14/05ece962-549e-4005-858c-3e89c1636edf.png",
-                    "remark": "",
-                    "img_id": "FF80808162756A8E0162850F2BE30262"
+                    "img_id": CERTIFICATE_3.id,
                 }],
                 "file_type": "附记页",
                 "file_type_id": fileType.getFileIdByTpye("附记页"),
@@ -150,15 +144,10 @@ class House(HouseInfo):
                 "is_save_need": "Y"
             }, {
                 "attachments": [{
-                    "src": "http://img.ishangzu.com/erp/2018/3/30/10/6aacb6a1-94e2-42c4-aeef-c712d3ac677d.png",
-                    "url": "http://img.ishangzu.com/erp/2018/3/30/10/6aacb6a1-94e2-42c4-aeef-c712d3ac677d.png",
+                    "src": FENHUTU.src,
+                    "url": FENHUTU.url,
                     "remark": "",
-                    "img_id": "FF808081626BF853016274D8E4FE0465"
-                }, {
-                    "src": "http://img.ishangzu.com/erp/2018/4/2/14/695674d7-b45c-45d1-8699-f0700bff5931.png",
-                    "url": "http://img.ishangzu.com/erp/2018/4/2/14/695674d7-b45c-45d1-8699-f0700bff5931.png",
-                    "remark": "",
-                    "img_id": "FF80808162756A8E0162850EEA88025E"
+                    "img_id": FENHUTU.id
                 }],
                 "file_type": "分户图",
                 "file_type_id": fileType.getFileIdByTpye("分户图"),
@@ -168,15 +157,10 @@ class House(HouseInfo):
                 "is_save_need": "N"
             }, {
                 "attachments": [{
-                    "src": "http://img.ishangzu.com/erp/2018/3/30/11/fdc19823-e59d-400a-bc5a-b44729fed558.png",
-                    "url": "http://img.ishangzu.com/erp/2018/3/30/11/fdc19823-e59d-400a-bc5a-b44729fed558.png",
+                    "src": YUANHUXINGTU.src,
+                    "url": YUANHUXINGTU.url,
                     "remark": "",
-                    "img_id": "FF808081626BF853016274D9048B0467"
-                }, {
-                    "src": "http://img.ishangzu.com/erp/2018/4/2/14/7c57a909-940a-4c3b-926a-05bb03e85ecc.png",
-                    "url": "http://img.ishangzu.com/erp/2018/4/2/14/7c57a909-940a-4c3b-926a-05bb03e85ecc.png",
-                    "remark": "",
-                    "img_id": "FF80808162756A8E0162850EFC5E025F"
+                    "img_id": YUANHUXINGTU.id
                 }],
                 "file_type": "原户型图",
                 "file_type_id": fileType.getFileIdByTpye("原户型图"),
@@ -186,15 +170,10 @@ class House(HouseInfo):
                 "is_save_need": "N"
             }, {
                 "attachments": [{
-                    "src": "http://img.ishangzu.com/erp/2018/3/30/11/a9b3ae6b-cf79-4026-af07-29cb7f0f6748.png",
-                    "url": "http://img.ishangzu.com/erp/2018/3/30/11/a9b3ae6b-cf79-4026-af07-29cb7f0f6748.png",
+                    "src": OTHER.src,
+                    "url": OTHER.url,
                     "remark": "",
-                    "img_id": "FF808081626BF853016274D90EA90468"
-                }, {
-                    "src": "http://img.ishangzu.com/erp/2018/4/2/14/36e5c1cd-b624-4c6b-9d2a-eec2176272fa.png",
-                    "url": "http://img.ishangzu.com/erp/2018/4/2/14/36e5c1cd-b624-4c6b-9d2a-eec2176272fa.png",
-                    "remark": "",
-                    "img_id": "FF80808162756A8E0162850EDB0C025D"
+                    "img_id": OTHER.id
                 }],
                 "file_type": "其他",
                 "file_type_id": fileType.getFileIdByTpye("其他"),
@@ -244,16 +223,18 @@ class House(HouseInfo):
             'notPropertyOwnerGrantReceipts': [],
             'pay_object': 'PERSONAL',  # 收款账号类型 （默认个人）
             'payeeIdPhotos': [{
-                'src': 'http://img.ishangzu.com/erp/2018/2/9/15/ceec21bc-c6e5-481a-92cf-21a1d7982b12.jpg',  # 默认
-                'url': 'http://img.ishangzu.com/erp/2018/2/9/15/ceec21bc-c6e5-481a-92cf-21a1d7982b12.jpg',  # 默认
+                'src': idCardPhotos.src,  # 默认
+                'url': idCardPhotos.url,  # 默认
                 'remark': '',
-                'img_id': 'FF808081616A30FA01617968993804B0'  # 默认
-            }, {
-                'src': 'http://img.ishangzu.com/erp/2018/2/24/10/12c0c38a-56c4-431c-9589-fd4029013f28.jpg',  # 默认
-                'url': 'http://img.ishangzu.com/erp/2018/2/24/10/12c0c38a-56c4-431c-9589-fd4029013f28.jpg',  # 默认
-                'remark': '',
-                'img_id': 'FF80808161C581A90161C5A7893B0010'  # 默认
+                'img_id': idCardPhotos.id  # 默认
             }],  # 证件照片
+             "receiptAccountProve": [{
+                 "src": idCardPhotos.src,
+                 "url": idCardPhotos.url,
+                 "type": "",
+                 "img_id": idCardPhotos.id
+             }]
+         ,
             'payee_card_type': landlordInfo['card_type'],  # 证件类型
             'payee_card_type_cn': '',
             'payee_emergency_name': u'紧急',  # 紧急人姓名（默认）
@@ -291,13 +272,9 @@ class House(HouseInfo):
             'building_id': self.building_id,
             'city_code': self.city_code,  # 城市
             'contractAttachments': [{
-                "src": "http://image.ishangzu.com/erp/2018/3/30/13/51d1a715-ada2-4d71-921e-d061aed71c6d.png",
-                "url": "http://image.ishangzu.com/erp/2018/3/30/13/51d1a715-ada2-4d71-921e-d061aed71c6d.png",
-                "img_id": "FF808081626BF8530162756F164B04DE"
-            }, {
-                "src": "http://img.ishangzu.com/erp/2018/4/2/14/ec255478-78fe-44de-bb96-210d01d96e69.png",
-                "url": "http://img.ishangzu.com/erp/2018/4/2/14/ec255478-78fe-44de-bb96-210d01d96e69.png",
-                "img_id": "FF80808162756A8E01628514ED670263"
+                "src": ATTACHMENTS.src,
+                "url": ATTACHMENTS.url,
+                "img_id": ATTACHMENTS.id
             }],
             'contract_id': None,
             'contract_num': contract_num,
@@ -335,7 +312,8 @@ class House(HouseInfo):
             'payment_cycle_cn': '',
             'property': None,
             'property_company': None,
-            'reform_way': 'OLDRESTYLE' if apartment_type is 'BRAND' else 'TINYCHANGE',  # 改造方式RESTYLED
+            'reform_way': 'RETROFITTING' if apartment_type is 'BRAND' else 'TINYCHANGE',  # RETROFITTING小改
+            # 'reform_way': 'UNRRESTYLE',  # 改造方式RESTYLED
             'reform_way_cn': '',
             'remark': None,
             'rentMoney': str(rent),  # 租金
@@ -376,7 +354,6 @@ class House(HouseInfo):
             'houseContractFour': houseContractFour,
             'houseContractFive': houseContractFive
         }
-
         result = contractbase.saveHouseContract(houseContract)
         if result:
             # houseContractInfo = sqlbase.serach(

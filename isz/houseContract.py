@@ -15,20 +15,10 @@ class HouseContract(ContractBase, HouseContractInfo):
     委托合同相关，包括初审复审续签，终止及审核...
     """
 
-    # 合同照片
     def contractPhotos(self):
-
-        def photos(photoType, oneCount=True):
-            sql = "select a.img_id,b.src from  house_contract_attachment a inner join image b on a.img_id=b.img_id " \
-                  "where contract_id='%s'and attachment_type='%s' and a.deleted=0" % (self.contract_id, photoType)
-            return sqlbase.serach(sql, oneCount)
-
-        # payeeIdPhotoSql = sqlbase.serach("select a.img_id,b.src from  house_contract_attachment a inner join image b on a.img_id=b.img_id where contract_id='%s' "
-        #                                  "and attachment_type='PAYEEIDPHOTO' and a.deleted=0" % self.contract_id)
-        # contractAttachmentsSql = sqlbase.serach("select a.img_id,b.src from  house_contract_attachment a inner join image b on a.img_id=b.img_id where contract_id='%s' "
-        #                                  "and attachment_type='HOUSECONTRACT_ATTACHMENT' and a.deleted=0" % self.contract_id)
-        payeeIdPhotos = photos('PAYEEIDPHOTO')
-        contractAttachments = photos('HOUSECONTRACT_ATTACHMENT')
+        """合同照片"""
+        payeeIdPhotos = self.photos('PAYEEIDPHOTO')
+        contractAttachments = self.photos('HOUSECONTRACT_ATTACHMENT')
         payeeIdPhotos = payeeIdPhotos if payeeIdPhotos else ['', '']
         contractAttachments = contractAttachments if contractAttachments else ['', '']
         contractPhotos = {
@@ -136,17 +126,20 @@ class HouseContract(ContractBase, HouseContractInfo):
         apartment_type = apartment_type if apartment_type else self.apartment_type  # 默认原合同的公寓类型
         entrust_type = entrust_type if entrust_type else self.entrust_type  # 默认原合同的出租方式
         # 品牌公寓的装修开始和结束都默认在原合同之后一天，服务公寓没有装修期
-        if apartment_type == 'BRAND':
-            fitment_start_date = fitment_start_date if fitment_start_date else addDays(1, self.entrust_end_date)
-            fitment_end_date = fitment_end_date if fitment_end_date else fitment_start_date
-        else:
-            fitment_start_date = None
-            fitment_end_date = None
+        # if apartment_type == 'BRAND':
+        #     fitment_start_date = fitment_start_date if fitment_start_date else addDays(1, self.entrust_end_date)
+        #     fitment_end_date = fitment_end_date if fitment_end_date else fitment_start_date
+        # else:
+        fitment_start_date = None
+        fitment_end_date = None
+        #  续签默认没有装修期
         entrust_start_date = entrust_start_date if entrust_start_date else (
             addDays(1, fitment_end_date) if fitment_end_date else addDays(1,
                                                                           self.entrust_end_date))  # 续签开始日期默认为装修期结束日后一天，没有装修期的话就是原合同到期日的后一天
         entrust_year = entrust_year if entrust_year else (
             self.entrust_year if self.entrust_year else 3)  # 委托年限默认原合同年限，原合同没有的话3年
+        sign_date = addDays(-1, entrust_start_date)
+        owner_sign_date = sign_date
         payment_cycle = payment_cycle if payment_cycle else self.payment_cycle  # 付款周期默认与原合同相同
         entrust_year_after = addDays(-1, addMonths(12 * int(entrust_year), entrust_start_date))
         entrust_end_date = addDays(free_date_par[payment_cycle] * int(entrust_year), entrust_year_after)  # 委托到期日
@@ -332,8 +325,8 @@ class HouseContract(ContractBase, HouseContractInfo):
             houseContractInfo = sqlbase.serach(
                 "select contract_id from house_contract where house_id = '%s' and deleted = 0 and contract_type='RENEWSIGN' and contract_num='%s' order by create_time desc limit 1" %
                 (self.house_id, contract_num))
-            consoleLog(u'委托续签合同成功！')
-            consoleLog(u'合同编号 : %s 合同ID : %s' % (contract_num, houseContractInfo[0]))
+            consoleLog('委托续签合同成功！')
+            consoleLog('合同编号 : %s 合同ID : %s' % (contract_num, str(houseContractInfo[0])))
             return houseContractInfo[0]
 
     def __getEndBase(self):
@@ -403,8 +396,9 @@ class HouseContractEnd(HouseContractEndInfo):
 
 if __name__ == '__main__':
     # login()
-    contract = HouseContract('WFL工程1.5-07051013Oe')
-    # contract_num = 'RS-%s' % contract.contract_num
+    contract = HouseContract('WFL账户BS10160928-Fa')
+    # contract_num = 'RS-%s' % contract.house_contract_num
     # contract.resign(contract_num)
-    contract.end()
+    # contract.end()
+    contract.audit()
     # print(landlord)

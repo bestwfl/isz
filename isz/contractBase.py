@@ -2,7 +2,7 @@
 from common import sqlbase
 from common.base import consoleLog
 from common.interface_wfl import myRequest, delNull
-from common.mysql import Mysql
+from common.mySql import Mysql
 
 class ContractBase(object):
     """合同基础方法"""
@@ -76,7 +76,7 @@ class ContractBase(object):
         url = 'isz_contract/ApartmentContractController/saveOrUpdateApartmentContract.action'
         result = myRequest(url, data)
         if result:
-            consoleLog(u'承租合同 %s 已创建完成' % data['contract_num'])
+            consoleLog('承租合同 %s 已创建完成' % data['contract_num'])
             apartmentContractInfo = {'contractID': sqlbase.serach(
                 "select contract_id from apartment_contract where contract_num = '%s'" % data['contract_num'])[0],
                                      'contractNum': data['contract_num']}

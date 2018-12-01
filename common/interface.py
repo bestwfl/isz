@@ -8,16 +8,16 @@ from common import sqlbase
 from common import datetimes
 import requests, json, time, random, re
 
-
 user, pwd = get_conf('sysUser', 'userphone'), get_conf('sysUser', 'pwd')
 
-def myRequest(url,data=None, needCookie=True, contentType='application/json', method='post', returnValue=False):
+
+def myRequest(url, data=None, needCookie=True, contentType='application/json', method='post', returnValue=False):
     headers = {
-        'content-type' : contentType,
-        'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
+        'content-type': contentType,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
     }
     host = 'http://isz.ishangzu.com/'
-    interfaceURL = host+url
+    interfaceURL = host + url
     request = None
     cookie = eval(get_conf('cookieInfo', 'cookies'))
     if method == 'get':
@@ -40,9 +40,10 @@ def myRequest(url,data=None, needCookie=True, contentType='application/json', me
     else:
         return result
 
+
 def get_cookie():
     needClient = None
-    #默认登录不使用客户端，如果报错，则赋值给needClient为True，然后调用客户端的登录接口进行校验
+    # 默认登录不使用客户端，如果报错，则赋值给needClient为True，然后调用客户端的登录接口进行校验
     url = 'http://isz.ishangzu.com/isz_base/LoginController/login.action'
     data = {
         'user_phone': user, 'user_pwd': pwd, 'auth_code': '', 'LechuuPlatform': 'LECHUU_CUSTOMER',
@@ -69,7 +70,7 @@ def get_cookie():
         auth_key = getAuthKey()
         # 检查授权
         url = 'isz_base/LoginAuthController/checkLoginAuth.action'
-        data ={'auth_key': auth_key}
+        data = {'auth_key': auth_key}
         result = myRequest(url, data, needCookie=False)
         if u'授权成功' in result['msg']:
             auth_code = result['obj']['authList'][0]['auth_code']
@@ -118,7 +119,8 @@ def get_cookie():
             sql = "select * from sys_department_flat where dept_id=(SELECT dep_id from sys_department where dep_name = '技术开发中心') and child_id=(" \
                   "SELECT dep_id from sys_user where user_phone = '%s' and user_status = 'INCUMBENCY')" % user
             if sqlbase.get_count(sql) == 0:
-                content = sqlbase.serach("SELECT content from sms_mt_his where destPhone = '%s' ORDER BY create_time desc limit 1" % user)[0]
+                content = sqlbase.serach(
+                    "SELECT content from sms_mt_his where destPhone = '%s' ORDER BY create_time desc limit 1" % user)[0]
                 sms_code = re.findall('验证码：(.*?)，', content.encode('utf-8'))[0]
                 data['verificationCode'] = sms_code
         headers = {
@@ -137,10 +139,12 @@ def get_cookie():
             consoleLog(u'接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s' % (url, data, msg.decode('utf-8')), 'w')
             raise Exception(u'客户端登录第四步：验证码登录失败')
 
+
 def delNull(data):
     """删除字典中为null的值"""
+
     def typeDict(data):
-        for x,y in data.items():
+        for x, y in data.items():
             if y is None:
                 del data[x]
             elif type(y) is list:
@@ -149,13 +153,15 @@ def delNull(data):
                 typeDict(data[x])
 
     def typeList(data):
-        for x,y in enumerate(data):
+        for x, y in enumerate(data):
             if type(y) is dict:
                 typeDict(data[x])
             if y is None:
                 del data[x]
+
     typeDict(data) if type(data) is dict else typeList(data)
     return data
+
 
 def creatResidential():
     url = 'isz_house/ResidentialController/saveResidential.action'
@@ -165,36 +171,37 @@ def creatResidential():
           "ORDER BY RAND() LIMIT 1"
     dutyDepID = sqlbase.serach(sql)[0]
     data = {
-        "residential_name":residentialName,
-        "residential_jianpin":"auto",
-        "city_code":"330100",
-        "area_code":"330108",
-        "taBusinessCircleString":"4",
-        "address":"autoTest",
-        "gd_lng":"120.138631",
-        "gd_lat":"30.186537",
-        "property_type":"ordinary",
-        "taDepartString":dutyDepID,
-        "byname":"auto"
+        "residential_name": residentialName,
+        "residential_jianpin": "auto",
+        "city_code": "330100",
+        "area_code": "330108",
+        "taBusinessCircleString": "4",
+        "address": "autoTest",
+        "gd_lng": "120.138631",
+        "gd_lat": "30.186537",
+        "property_type": "ordinary",
+        "taDepartString": dutyDepID,
+        "byname": "auto"
     }
-    result = myRequest(url,data)
+    result = myRequest(url, data)
     if result:
         sql = "SELECT residential_id from residential where residential_name = '%s'" % residentialName
         residentialID = sqlbase.serach(sql)[0]
-        residential = {'residentialName':residentialName,'residentialID':residentialID,'dutyDepID':dutyDepID}
+        residential = {'residentialName': residentialName, 'residentialID': residentialID, 'dutyDepID': dutyDepID}
         return residential
+
 
 def creatBuilding():
     url = 'isz_house/ResidentialBuildingController/saveResidentialBuildingNew.action'
     residential = creatResidential()
     buildingName = 'buiding'
     data = {
-        "property_name":residential['residentialName'],
-        "building_name":buildingName,
-        "no_building":u"无",
-        "housing_type":"ordinary",
-        "residential_id":residential['residentialID'],
-        "have_elevator":"Y"
+        "property_name": residential['residentialName'],
+        "building_name": buildingName,
+        "no_building": u"无",
+        "housing_type": "ordinary",
+        "residential_id": residential['residentialID'],
+        "have_elevator": "Y"
     }
     result = myRequest(url, data)
     if result:
@@ -204,12 +211,13 @@ def creatBuilding():
         residential['buildingName'] = buildingName
         return residential
 
+
 def creatUnit():
     url = 'isz_house/ResidentialBuildingController/saveResidentialBuildingUnit.action'
     residential = creatBuilding()
     unitName = 'unit'
     data = {
-        "property_name": residential['residentialName']+residential['buildingName'],
+        "property_name": residential['residentialName'] + residential['buildingName'],
         "unit_name": unitName,
         "no_unit": u"无",
         "building_id": residential['buildingID']
@@ -221,6 +229,7 @@ def creatUnit():
         residential['unitID'] = unitID
         residential['unitName'] = unitName
         return residential
+
 
 def creatFloor():
     url = 'isz_house/ResidentialBuildingController/saveResidentialBuildingFloor.action'
@@ -234,19 +243,23 @@ def creatFloor():
     }
     result = myRequest(url, data)
     if result:
-        sql = "SELECT floor_id from residential_building_floor where building_id = '%s' and unit_id = '%s'" % (residential['buildingID'],residential['unitID'])
+        sql = "SELECT floor_id from residential_building_floor where building_id = '%s' and unit_id = '%s'" % (
+        residential['buildingID'], residential['unitID'])
         floorID = sqlbase.serach(sql)[0]
         residential['floorID'] = floorID
         residential['floorName'] = floorName
         return residential
+
 
 def creatHouseNum():
     url = 'isz_house/ResidentialBuildingController/saveResidentialBuildingHouseNo.action'
     residential = creatFloor()
     houseNumName = 'number'
     data = {
-        "property_name": residential['residentialName'] + residential['buildingName'] + residential['unitName'] + residential['floorName'] + u'层',
-        "rooms": "1", "livings": "1", "bathrooms": "1", "kitchens": "1", "balconys": "1", "build_area": "100.00","orientation": "NORTH",
+        "property_name": residential['residentialName'] + residential['buildingName'] + residential['unitName'] +
+                         residential['floorName'] + u'层',
+        "rooms": "1", "livings": "1", "bathrooms": "1", "kitchens": "1", "balconys": "1", "build_area": "100.00",
+        "orientation": "NORTH",
         "house_no": houseNumName,
         "unit_id": residential['unitID'],
         "building_id": residential['buildingID'],
@@ -255,16 +268,17 @@ def creatHouseNum():
     result = myRequest(url, data)
     if result:
         sql = "SELECT house_no_id from residential_building_house_no where building_id = '%s' and unit_id = '%s' and floor_id = '%s'" % \
-              (residential['buildingID'],residential['unitID'],residential['floorID'])
+              (residential['buildingID'], residential['unitID'], residential['floorID'])
         houseNumID = sqlbase.serach(sql)[0]
         residential['houseNumID'] = houseNumID
         residential['houseNumName'] = houseNumName
         return residential
 
+
 def addHouse():
     url = 'isz_house/HouseController/saveHouseDevelop.action'
     residential = creatHouseNum()
-    personInfo = sqlbase.serach("select user_id,dep_id from sys_user where user_phone = '15168368432'")
+    personInfo = sqlbase.serach("SELECT user_id,dep_id FROM sys_user WHERE user_phone = '15168368432'")
     data = {
         "residential_name_search": residential['residentialID'],
         "building_name_search": residential['buildingID'],
@@ -308,6 +322,7 @@ def addHouse():
         residential['houseDevelogID'] = houseDevelogID
         return residential
 
+
 def auditHouse():
     url = 'isz_house/HouseController/auditHouseDevelop.action'
     houseInfo = addHouse()
@@ -349,13 +364,15 @@ def auditHouse():
         "area_code": "330108",
         "city_code": "330100",
         "house_develop_id": houseInfo['houseDevelogID'],
-        "update_time":sqlbase.serach("SELECT update_time from house_develop where house_develop_id = '%s'" % houseInfo['houseDevelogID'])[0],
-        #"update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
+        "update_time": sqlbase.serach(
+            "SELECT update_time from house_develop where house_develop_id = '%s'" % houseInfo['houseDevelogID'])[0],
+        # "update_time": time.strftime('%Y-%m-%d %H:%M:%S'),
         "audit_content": u"同意"
     }
     result = myRequest(url, data)
     if result:
-        sql = "select house_id,house_code from house where residential_id = '%s' and house_no_id = '%s'" % (houseInfo['residentialID'],houseInfo['houseNumID'])
+        sql = "select house_id,house_code from house where residential_id = '%s' and house_no_id = '%s'" % (
+        houseInfo['residentialID'], houseInfo['houseNumID'])
         house = sqlbase.serach(sql)
         houseInfo['houseID'] = house[0]
         houseInfo['houseCode'] = house[1]
@@ -363,10 +380,15 @@ def auditHouse():
         solr('house', get_conf('testCondition', 'test'))
         return houseInfo
 
-def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_date,entrust_start_date,entrust_end_date,delay_date,free_start_date,free_end_date,first_pay_date,second_pay_date,
-    rent,parking,year_service_fee,payment_cycle,freeType='STARTMONTH',fitment_start_date=None,fitment_end_date=None,contract_type='NEWSIGN',contract_id=None,rooms=None,
-    fitmentCost=None,house_rent_price=None,houseInfo=None):
-    #暂时先不考虑续签，所以不要用此接口做续签
+
+def addHouseContractAndFitment(apartment_type, entrust_type, sign_date, owner_sign_date, entrust_start_date,
+                               entrust_end_date, delay_date, free_start_date, free_end_date, first_pay_date,
+                               second_pay_date,
+                               rent, parking, year_service_fee, payment_cycle, freeType='STARTMONTH',
+                               fitment_start_date=None, fitment_end_date=None, contract_type='NEWSIGN',
+                               contract_id=None, rooms=None,
+                               fitmentCost=None, house_rent_price=None, houseInfo=None):
+    # 暂时先不考虑续签，所以不要用此接口做续签
     """
     新增委托合同以及分割交房之后同时定价
     :param apartment_type: 公寓类型
@@ -400,43 +422,43 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
     data['house_id'] = houseInfo['houseID']
     data['residential_id'] = houseInfo['residentialID']
     data['building_id'] = houseInfo['buildingID']
-    data['property_type'] = 'HAVECARD'                                                              # 有产证商品房
-    data['inside_space'] = '123'                                                                            # 使用面积
-    data['pledge'] = '0'                                                                                        # 是否抵押
-    data['apartment_type'] = apartment_type                                                      # 公寓类型
-    data['reform_way'] = 'OLDRESTYLE' if apartment_type is 'BRAND' else 'UNRRESTYLE'   # 改造方式
-    data['entrust_type'] = entrust_type                                                                # 合同类型
-    data['contract_num'] = 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S')+get_randomString()  # 合同编号
-    data['sign_body'] = 'ISZPRO'                                                                          # 签约主体
-    data['sign_date'] = sign_date                                                                         # 签约日期
-    data['owner_sign_date'] = owner_sign_date                                                   # 业主交房日
+    data['property_type'] = 'HAVECARD'  # 有产证商品房
+    data['inside_space'] = '123'  # 使用面积
+    data['pledge'] = '0'  # 是否抵押
+    data['apartment_type'] = apartment_type  # 公寓类型
+    data['reform_way'] = 'OLDRESTYLE' if apartment_type is 'BRAND' else 'UNRRESTYLE'  # 改造方式
+    data['entrust_type'] = entrust_type  # 合同类型
+    data['contract_num'] = 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S') + get_randomString()  # 合同编号
+    data['sign_body'] = 'ISZPRO'  # 签约主体
+    data['sign_date'] = sign_date  # 签约日期
+    data['owner_sign_date'] = owner_sign_date  # 业主交房日
     if fitment_start_date or fitment_end_date:
-        data['fitment_start_date'] = fitment_start_date                                           # 装修起算日
-        data['fitment_end_date'] = fitment_end_date                                             # 装修结束日
-    data['entrust_start_date'] = entrust_start_date                                                # 委托起算日
-    data['entrust_end_date'] = entrust_end_date                                                  # 委托到期日
-    data['delay_date'] = delay_date                                                                      # 延长到期日
-    data['freeType'] = freeType                                                                            # 免租类型
-    data['free_start_date'] = free_start_date                                                          # 免租开始日
-    data['free_end_date'] = free_end_date                                                           # 免租到期日
-    data['first_pay_date'] = first_pay_date                                                             # 首次付款日
-    data['second_pay_date'] = second_pay_date                                                   # 二次付款日
-    data['rental_price'] = str(float(rent)+float(parking))                                         # 月租金
-    data['rent'] = str(rent)                                                                                          # 房租
-    data['property'] = '0.00'                                                                                  # 物业费
-    data['energy_fee'] = '0.00'                                                                              #能耗费
-    data['remember'] = '0'                                                                                   # 是否包含车位费，默认为0，程序写死
-    data['parking'] = str(parking)                                                                          # 车位费
-    data['deposit'] = '0.00'                                                                                    # 押金
-    data['year_service_fee'] = str(year_service_fee)                                                      # 年服务费
-    data['payment_cycle'] = payment_cycle                                                          # 付款类型
-    data['property_company'] = '0.00'                                                                  # 需公司缴纳的物业费
-    data['energy_company'] = '0.00'                                                                     # 需公司缴纳的能耗费
-    data['remark'] = 'autotest'                                                                             # 备注
-    data['account_name'] = '业主姓名'                                                                  # 收款人
-    data['account_bank'] = u'支行'                                                                        # 支行
-    data['account_num'] = '10086'                                                                       # 银行账号
-    data['model'] = '5'                                                                                         #当前共有几个页面，判断是新增还是分别保存某个tab页面
+        data['fitment_start_date'] = fitment_start_date  # 装修起算日
+        data['fitment_end_date'] = fitment_end_date  # 装修结束日
+    data['entrust_start_date'] = entrust_start_date  # 委托起算日
+    data['entrust_end_date'] = entrust_end_date  # 委托到期日
+    data['delay_date'] = delay_date  # 延长到期日
+    data['freeType'] = freeType  # 免租类型
+    data['free_start_date'] = free_start_date  # 免租开始日
+    data['free_end_date'] = free_end_date  # 免租到期日
+    data['first_pay_date'] = first_pay_date  # 首次付款日
+    data['second_pay_date'] = second_pay_date  # 二次付款日
+    data['rental_price'] = str(float(rent) + float(parking))  # 月租金
+    data['rent'] = str(rent)  # 房租
+    data['property'] = '0.00'  # 物业费
+    data['energy_fee'] = '0.00'  # 能耗费
+    data['remember'] = '0'  # 是否包含车位费，默认为0，程序写死
+    data['parking'] = str(parking)  # 车位费
+    data['deposit'] = '0.00'  # 押金
+    data['year_service_fee'] = str(year_service_fee)  # 年服务费
+    data['payment_cycle'] = payment_cycle  # 付款类型
+    data['property_company'] = '0.00'  # 需公司缴纳的物业费
+    data['energy_company'] = '0.00'  # 需公司缴纳的能耗费
+    data['remark'] = 'autotest'  # 备注
+    data['account_name'] = '业主姓名'  # 收款人
+    data['account_bank'] = u'支行'  # 支行
+    data['account_num'] = '10086'  # 银行账号
+    data['model'] = '5'  # 当前共有几个页面，判断是新增还是分别保存某个tab页面
     # 业主信息
     data['lords'] = [
         {
@@ -472,7 +494,7 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
     def step1():
         # 添加房源信息以及签约人信息到请求参数中
         url = 'isz_contract/houseContractController/getHouseContractInfo.action'
-        requestPayload = {"houseId":houseInfo['houseID']}
+        requestPayload = {"houseId": houseInfo['houseID']}
         result = myRequest(url, requestPayload)
         if result:
             data['city_code'] = result['obj']['city_code']
@@ -489,8 +511,8 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
         # 添加租金策略到请求参数中
         url = 'isz_contract/houseContractController/createRentInfo.action'
         requestPayload = {
-            "property": "0.00",             #需公司缴纳的物业费
-            "energy_fee": "0.00",           #需公司缴纳的能耗费
+            "property": "0.00",  # 需公司缴纳的物业费
+            "energy_fee": "0.00",  # 需公司缴纳的能耗费
             "parking": str(parking),
             "rent": str(rent),
             "year_service_fee": str(year_service_fee),
@@ -532,8 +554,8 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
     def step4():
         # 续签情况下添加前合同数据导请求参数中
         url = 'isz_contract/houseContractController/getLandlordAndSign.action'
-        requestPayload = {'contract_id':contract_id}
-        result = myRequest(url,requestPayload)
+        requestPayload = {'contract_id': contract_id}
+        result = myRequest(url, requestPayload)
         if result:
             pass
 
@@ -547,9 +569,11 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
         step4()
 
     url = 'isz_contract/houseContractController/saveOrUpdateHouseContract.action'
-    result = myRequest(url,data)
+    result = myRequest(url, data)
     if result:
-        houseContractInfo = sqlbase.serach("select contract_id,contract_num from house_contract where house_id = '%s' and deleted = 0 order by create_time desc limit 1" % houseInfo['houseID'])
+        houseContractInfo = sqlbase.serach(
+            "select contract_id,contract_num from house_contract where house_id = '%s' and deleted = 0 order by create_time desc limit 1" %
+            houseInfo['houseID'])
         consoleLog(u'新签委托合同成功！合同编号 : %s' % houseContractInfo[1])
 
         def fitmentHouseAndSolr():
@@ -590,6 +614,7 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
                         }
                     ]
                 }
+
                 def addRoomsToRequestPayload():
                     """根据分割的房间数量，动态将房间数据添加至请求参数中"""
                     for i in range(rooms):
@@ -629,31 +654,32 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
                             }
                         }
                         requestPayload['fitmentRoomList'].append(content)
+
                 if apartment_type is 'BRAND':
                     if entrust_type is 'SHARE':
                         addRoomsToRequestPayload()
-                        result = myRequest(url,requestPayload)
+                        result = myRequest(url, requestPayload)
                         if result:
                             consoleLog(u'委托合同 %s 已分割' % houseContractInfo[1])
                             sendOrder()
                             closingRoom()
                             return confirmPrice()
                     elif entrust_type is 'ENTIRE':
-                        #没有房间（室）的概念，添加单一卧室的配置数据至请求参数中
+                        # 没有房间（室）的概念，添加单一卧室的配置数据至请求参数中
                         content = {
-                            'houseRoom':{
-                                'houseRoomConfigurationList':[
-                                    {'configuration_code':'TV','owner_type':'LANDLORD'},
+                            'houseRoom': {
+                                'houseRoomConfigurationList': [
+                                    {'configuration_code': 'TV', 'owner_type': 'LANDLORD'},
                                     {'configuration_code': 'SOFAGROUP', 'owner_type': 'LANDLORD'},
                                     {'configuration_code': 'TV', 'owner_type': 'ISHANGZU'},
                                     {'configuration_code': 'SOFAGROUP', 'owner_type': 'ISHANGZU'}
                                 ],
-                                'public_flag':'N'
+                                'public_flag': 'N'
                             }
                         }
                         requestPayload['fitmentRoomList'].append(content)
                         requestPayload['fitmentHouse']['apartment_kind'] = 'WUSHE'
-                        result = myRequest(url,requestPayload)
+                        result = myRequest(url, requestPayload)
                         if result:
                             consoleLog(u'委托合同 %s 已分割' % houseContractInfo[1])
                             sendOrder()
@@ -661,7 +687,7 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
                             return confirmPrice()
                 elif apartment_type is 'MANAGE' and entrust_type is 'SHARE':
                     addRoomsToRequestPayload()
-                    result = myRequest(url,requestPayload)
+                    result = myRequest(url, requestPayload)
                     requestPayload['fitmentHouse']['apartment_kind'] = 'SHARE'
                     del requestPayload['fitmentHouse']['fitment_style']
                     if result:
@@ -673,37 +699,39 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
 
         def sendOrder():
             """派单"""
-            sql = "SELECT su.user_id FROM sys_user su, sys_position sp,sys_department sd WHERE su.position_id = sp.position_id and su.dep_id = sd.dep_id and sd.dep_district = '330100' " \
+            sql = "SELECT su.user_id FROM sys_user su, sys_position sp,sys_department sd WHERE su.position_id = sp.position_id AND su.dep_id = sd.dep_id AND sd.dep_district = '330100' " \
                   "AND su.user_status = 'INCUMBENCY' AND sp.position_name LIKE '%品牌公寓专员%' LIMIT 1"
             user_id = sqlbase.serach(sql)[0]
             url = 'isz_house/DesignController/sendOrder.action'
-            fitmentInfo = sqlbase.serach("select fitment_id,update_time from fitment_house where contract_id = '%s'" % houseContractInfo[0])
+            fitmentInfo = sqlbase.serach(
+                "select fitment_id,update_time from fitment_house where contract_id = '%s'" % houseContractInfo[0])
             requestPayload = {
-                'fitment_id':fitmentInfo[0],
-                'fitment_uid':user_id,
-                'update_time':fitmentInfo[1]
+                'fitment_id': fitmentInfo[0],
+                'fitment_uid': user_id,
+                'update_time': fitmentInfo[1]
             }
-            result = myRequest(url,requestPayload)
+            result = myRequest(url, requestPayload)
             if result:
                 consoleLog(u'委托合同 %s 已派单' % houseContractInfo[1])
 
         def closingRoom():
             """交房"""
             url = 'isz_house/DesignController/closingRoom.action'
-            fitmentInfo = sqlbase.serach("select fitment_id,update_time from fitment_house where contract_id = '%s'" % houseContractInfo[0])
+            fitmentInfo = sqlbase.serach(
+                "select fitment_id,update_time from fitment_house where contract_id = '%s'" % houseContractInfo[0])
             requestPayload = {
                 'fitment_id': fitmentInfo[0],
-                'decorate_start_date':time.strftime('%Y-%m-%d'),
+                'decorate_start_date': time.strftime('%Y-%m-%d'),
                 'hard_delivery_date': time.strftime('%Y-%m-%d'),
                 'set_delivery_date': time.strftime('%Y-%m-%d'),
                 'update_time': fitmentInfo[1],
-                'total_cost':str(fitmentCost)
+                'total_cost': str(fitmentCost)
             }
             if apartment_type is 'MANAGE' and entrust_type is 'SHARE':
                 del requestPayload['decorate_start_date']
                 del requestPayload['hard_delivery_date']
                 del requestPayload['set_delivery_date']
-            result = myRequest(url,requestPayload)
+            result = myRequest(url, requestPayload)
             if result:
                 consoleLog(u'委托合同 %s 已交房' % houseContractInfo[1])
 
@@ -711,8 +739,10 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
             """定价"""
             if entrust_type is 'SHARE':
                 url = 'isz_house/ApartmentController/searchShareApartment.action'
-                apartments_id = sqlbase.serach("SELECT apartment_id from apartment where house_id = '%s' and date(create_time)=date(sysdate()) and rent_type='SHARE'" % houseInfo['houseID'],oneCount=False)
-                requestPayload = {'apartment_id':apartments_id[0]}
+                apartments_id = sqlbase.serach(
+                    "SELECT apartment_id from apartment where house_id = '%s' and date(create_time)=date(sysdate()) and rent_type='SHARE'" %
+                    houseInfo['houseID'], oneCount=False)
+                requestPayload = {'apartment_id': apartments_id[0]}
                 result = myRequest(url, requestPayload)
                 if result:
                     url = 'isz_house/ApartmentController/confirmPricing.action'
@@ -738,17 +768,20 @@ def addHouseContractAndFitment(apartment_type,entrust_type,sign_date,owner_sign_
                         return apartments_id[0]
             else:
                 url = 'isz_house/ApartmentController/confirmApatmentRentPricing.action'
-                apartments_id = sqlbase.serach("SELECT apartment_id from apartment where house_id = '%s' and date(create_time)=date(sysdate())" % houseInfo['houseID'])
-                requestPayload = {'apartment_id': apartments_id[0],'rent_price':str(house_rent_price) if house_rent_price else '1024'}
-                result = myRequest(url,requestPayload)
+                apartments_id = sqlbase.serach(
+                    "SELECT apartment_id from apartment where house_id = '%s' and date(create_time)=date(sysdate())" %
+                    houseInfo['houseID'])
+                requestPayload = {'apartment_id': apartments_id[0],
+                                  'rent_price': str(house_rent_price) if house_rent_price else '1024'}
+                result = myRequest(url, requestPayload)
                 if result:
                     # 避免等待时间太长，生成的房源没有出来，此处调用solr的增量操作
                     solr('apartment', get_conf('testCondition', 'test'))
                     consoleLog(u'房源 %s 完成定价' % houseInfo['houseCode'])
                     return apartments_id[0]
 
-
         return fitmentHouseAndSolr()
+
 
 def createCustomer():
     """
@@ -760,45 +793,51 @@ def createCustomer():
                "153", "155", "156", "157", "158", "159", "186", "187", "188"]
     phone = random.choice(prelist) + "".join(random.choice("0123456789") for i in range(8))
     data = {
-        'customer_name':'AutoTest' + '-' + time.strftime('%m%d-%H%M%S'),        #姓名
-        'phone':phone,                                                                                          #手机
-        'customer_status':'EFFECTIVE',                                                                   #状态
-        'email':'isz@ishangzu.com',                                                                       #邮箱
-        'wechat':'wechat',                                                                                      #微信
-        'constellation':'VIRGO',                                                                              #星座
-        'education':'BACHELOR',                                                                            #学历
-        'belong_did':sqlbase.serach("select dep_id from sys_user where user_phone = '15168368432' and user_status = 'INCUMBENCY'")[0],      #所属部门
-        'belong_uid': sqlbase.serach("select user_id from sys_user where user_phone = '15168368432' and user_status = 'INCUMBENCY'")[0],      #所属人
-        'customer_from':'FLOOR19',                                                                       #来源
-        'rent_class':'CLASSA',                                                                                  #求租等级
-        'rent_type':'GATHERHOUSE',                                                                      #求租类型
-        'rent_use':'RESIDENCE',                                                                             #求租用途
-        'rent_fitment':'FITMENT_SIMPLE',                                                              #装修情况
-        'city_code':'330100',                                                                                   #求租城区
-        'rent_area_code':'330108',                                                                          #求租地区
-        'rent_business_circle_ids':'4',                                                                       #求租商圈
-        'office_address':u'海创基地',                                                                       #上班地点
-        'address_gd_lng':'120.138631',                                                                   #经度
-        'address_gd_lat':'30.186537',                                                                      #纬度
-        'rent_rooms':'1',                                                                                         #求租户型
-        'rent_livings':'1',
-        'rent_bathrooms':'1',
-        'rent_from_price':'1000.00',                                                                        #求租价格
-        'rent_to_price':'2000.00',
-        'rent_date':time.strftime('%Y-%m-%d'),                                                      #希望入住日期
-        'rent_people':'2',                                                                                       #入住人数
-        'area':'28',                                                                                                 #面积
-        'rent_other':'other demand',                                                                       #其他需求
-        'gender':'MALE',                                                                                        #性别
-        'marriage':'UNMARRIED',                                                                          #婚否
-        'submit_channels':'ERP'                                                                             #提交渠道
+        'customer_name': 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S'),  # 姓名
+        'phone': phone,  # 手机
+        'customer_status': 'EFFECTIVE',  # 状态
+        'email': 'isz@ishangzu.com',  # 邮箱
+        'wechat': 'wechat',  # 微信
+        'constellation': 'VIRGO',  # 星座
+        'education': 'BACHELOR',  # 学历
+        'belong_did': sqlbase.serach(
+            "SELECT dep_id FROM sys_user WHERE user_phone = '15168368432' AND user_status = 'INCUMBENCY'")[0],  # 所属部门
+        'belong_uid': sqlbase.serach(
+            "SELECT user_id FROM sys_user WHERE user_phone = '15168368432' AND user_status = 'INCUMBENCY'")[0],  # 所属人
+        'customer_from': 'FLOOR19',  # 来源
+        'rent_class': 'CLASSA',  # 求租等级
+        'rent_type': 'GATHERHOUSE',  # 求租类型
+        'rent_use': 'RESIDENCE',  # 求租用途
+        'rent_fitment': 'FITMENT_SIMPLE',  # 装修情况
+        'city_code': '330100',  # 求租城区
+        'rent_area_code': '330108',  # 求租地区
+        'rent_business_circle_ids': '4',  # 求租商圈
+        'office_address': u'海创基地',  # 上班地点
+        'address_gd_lng': '120.138631',  # 经度
+        'address_gd_lat': '30.186537',  # 纬度
+        'rent_rooms': '1',  # 求租户型
+        'rent_livings': '1',
+        'rent_bathrooms': '1',
+        'rent_from_price': '1000.00',  # 求租价格
+        'rent_to_price': '2000.00',
+        'rent_date': time.strftime('%Y-%m-%d'),  # 希望入住日期
+        'rent_people': '2',  # 入住人数
+        'area': '28',  # 面积
+        'rent_other': 'other demand',  # 其他需求
+        'gender': 'MALE',  # 性别
+        'marriage': 'UNMARRIED',  # 婚否
+        'submit_channels': 'ERP'  # 提交渠道
     }
-    if myRequest(url,data):
-        customerInfo = sqlbase.serach("select customer_id,customer_name,customer_num from customer where customer_name = '%s'" % data['customer_name'])
+    if myRequest(url, data):
+        customerInfo = sqlbase.serach(
+            "select customer_id,customer_name,customer_num from customer where customer_name = '%s'" % data[
+                'customer_name'])
         consoleLog(u'租前客户 %s 创建成功' % customerInfo[1])
-        return {'customer_id':customerInfo[0],'customer_name':customerInfo[1],'customer_num':customerInfo[2]}
+        return {'customer_id': customerInfo[0], 'customer_name': customerInfo[1], 'customer_num': customerInfo[2]}
 
-def createApartmentContract(apartement_id,customerInfo,rent_price,sign_date,rent_start_date,rent_end_date,deposit,payment_cycle):
+
+def createApartmentContract(apartement_id, customerInfo, rent_price, sign_date, rent_start_date, rent_end_date, deposit,
+                            payment_cycle):
     """
     新增出租合同
     :param apartement_id: 签约的公寓ID，创建委托合同的接口会返回此信息
@@ -812,24 +851,29 @@ def createApartmentContract(apartement_id,customerInfo,rent_price,sign_date,rent
     :return: 返回创建的合同信息字典
     """
     url = 'isz_contract/ApartmentContractController/saveOrUpdateApartmentContract.action'
-    houseInfo = sqlbase.serach("select house_id,room_id,house_contract_id from apartment where apartment_id = '%s'" % apartement_id)
-    houseContractInfo = sqlbase.serach("select entrust_type from house_contract where contract_id = '%s'" % houseInfo[2])[0]
+    houseInfo = sqlbase.serach(
+        "select house_id,room_id,house_contract_id from apartment where apartment_id = '%s'" % apartement_id)
+    houseContractInfo = \
+    sqlbase.serach("select entrust_type from house_contract where contract_id = '%s'" % houseInfo[2])[0]
     time.sleep(1)
-    def modifiApartmentRentPrice(apartmentID,rentPrice):
+
+    def modifiApartmentRentPrice(apartmentID, rentPrice):
         """修改定价"""
         url = 'isz_house/ApartmentController/confirmApatmentRentPricing.action'
-        data = {'apartment_id':apartmentID,'rent_price':str(rentPrice)}
-        myRequest(url,data)
-    def updateCostAccount(apartmentID,rentPrice):
+        data = {'apartment_id': apartmentID, 'rent_price': str(rentPrice)}
+        myRequest(url, data)
+
+    def updateCostAccount(apartmentID, rentPrice):
         """更新成本占比"""
         url = 'isz_house/ApartmentController/updateCostAccount.action'
-        data = {'apartment_id':apartmentID,'rent_price':str(rentPrice)}
-        myRequest(url,data)
+        data = {'apartment_id': apartmentID, 'rent_price': str(rentPrice)}
+        myRequest(url, data)
+
     if houseContractInfo == 'SHARE':
-        modifiApartmentRentPrice(apartement_id,rent_price)
-        updateCostAccount(apartement_id,rent_price)
+        modifiApartmentRentPrice(apartement_id, rent_price)
+        updateCostAccount(apartement_id, rent_price)
     elif houseContractInfo == 'ENTIRE':
-        modifiApartmentRentPrice(apartement_id,rent_price)
+        modifiApartmentRentPrice(apartement_id, rent_price)
 
     if payment_cycle is 'HALF_YEAR':
         real_due_rent_price = rent_price * 0.985
@@ -838,50 +882,50 @@ def createApartmentContract(apartement_id,customerInfo,rent_price,sign_date,rent
     else:
         real_due_rent_price = rent_price
     data = {
-        'contract_num':'AutoTest' + '-' + time.strftime('%m%d-%H%M%S') + get_randomString(2),     #合同编号
-        'sign_date':sign_date,          #签约日期
-        'rent_start_date':rent_start_date,      #承租起算日
-        'rent_end_date':rent_end_date,      #承租结束日
-        'payment_date':rent_start_date,     #首次付款日
-        'deposit':str(deposit),         #押金
-        'payment_type':'NORMAL',        #付款方式
-        'payment_cycle':payment_cycle,      #付款周期
-        'cash_rent':str(rent_price * 0.1),     #转租费
-        'agency_fee':'1000',                                                        #中介服务费
-        'month_server_fee_discount':'100%',     #服务费折扣
-        'remark':'remark',      #备注
-        'sign_name':u'签约人',     #签约人
-        'sign_id_type':'IDNO',      #签约人证件类型
-        'sign_id_no':'42062119910828541X',      #签约人证件号
-        'sign_phone':'15168368432',     #签约人手机号
-        'sign_is_customer':'Y',     #签约人是否是承租人
-        'postal_address':u'通讯地址',   #签约人通讯地址
+        'contract_num': 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S') + get_randomString(2),  # 合同编号
+        'sign_date': sign_date,  # 签约日期
+        'rent_start_date': rent_start_date,  # 承租起算日
+        'rent_end_date': rent_end_date,  # 承租结束日
+        'payment_date': rent_start_date,  # 首次付款日
+        'deposit': str(deposit),  # 押金
+        'payment_type': 'NORMAL',  # 付款方式
+        'payment_cycle': payment_cycle,  # 付款周期
+        'cash_rent': str(rent_price * 0.1),  # 转租费
+        'agency_fee': '1000',  # 中介服务费
+        'month_server_fee_discount': '100%',  # 服务费折扣
+        'remark': 'remark',  # 备注
+        'sign_name': u'签约人',  # 签约人
+        'sign_id_type': 'IDNO',  # 签约人证件类型
+        'sign_id_no': '42062119910828541X',  # 签约人证件号
+        'sign_phone': '15168368432',  # 签约人手机号
+        'sign_is_customer': 'Y',  # 签约人是否是承租人
+        'postal_address': u'通讯地址',  # 签约人通讯地址
         'deposit_type': 'ONE',
         'depositIn': '1',
-        'apartmentContractRentInfoList':[
+        'apartmentContractRentInfoList': [
             {
-                'firstRow':True,
-                'money':str(real_due_rent_price),
-                'start_date':rent_start_date,
-                'end_date':rent_end_date,
-                'rowIndex':0,
-                'money_cycle':payment_cycle,
-                'payment_date':rent_start_date,
-                'deposit':deposit,
-                'agencyFeeMoney':1000,
-                'money_type':'RENT',
-                'rent_start_date':rent_start_date,
-                'rent_end_date':rent_end_date,
-                'sign_date':sign_date
+                'firstRow': True,
+                'money': str(real_due_rent_price),
+                'start_date': rent_start_date,
+                'end_date': rent_end_date,
+                'rowIndex': 0,
+                'money_cycle': payment_cycle,
+                'payment_date': rent_start_date,
+                'deposit': deposit,
+                'agencyFeeMoney': 1000,
+                'money_type': 'RENT',
+                'rent_start_date': rent_start_date,
+                'rent_end_date': rent_end_date,
+                'sign_date': sign_date
             }
         ],
-        'person':{
+        'person': {
             "urgent_customer_name": "紧急联系人",
             "urgent_phone": "15168368433",
             "urgent_card_type": "PASSPORT",
             "urgent_id_card": "huzhaohuzhao",
             "urgent_postal_address": "紧急联系人通讯地址",
-            "customer_id": customerInfo['customer_id'],#FF8080815F0A26E8015F1427B6040140
+            "customer_id": customerInfo['customer_id'],  # FF8080815F0A26E8015F1427B6040140
             "birth_date": "1991-8-28",
             "constellation": "VIRGO",
             "customer_num": customerInfo['customer_num'],
@@ -899,7 +943,7 @@ def createApartmentContract(apartement_id,customerInfo,rent_price,sign_date,rent
             "yesNo": "Y",
             "person_type": 3
         },
-        'persons':[
+        'persons': [
             {
                 "person_type": 3,
                 "gender": "MALE",
@@ -912,29 +956,30 @@ def createApartmentContract(apartement_id,customerInfo,rent_price,sign_date,rent
                 "staydate": time.strftime('%Y-%m-%d')
             }
         ],
-        'model':'4'
+        'model': '4'
     }
+
     def step1():
         url = 'isz_contract/ApartmentContractController/searchApartmentContractDetail.action'
-        requestPayload = {"apartment_id":apartement_id,"contract_type":"NEWSIGN"}
-        result = myRequest(url,requestPayload)
+        requestPayload = {"apartment_id": apartement_id, "contract_type": "NEWSIGN"}
+        result = myRequest(url, requestPayload)
         if result:
             content = delNull(result['obj']['apartmentContract'])
-            for x,y in content.items():
+            for x, y in content.items():
                 data[x] = y
 
     def step2():
         url = 'isz_contract/ApartmentContractController/getHouseContractByHouseId.action'
         requestPayload = {
-            "rent_start_date":rent_start_date,
-            "rent_end_date":rent_end_date,
-            "houseId":houseInfo[0],
-            "apartment_id":apartement_id,
-            "room_id":houseInfo[1]
+            "rent_start_date": rent_start_date,
+            "rent_end_date": rent_end_date,
+            "houseId": houseInfo[0],
+            "apartment_id": apartement_id,
+            "room_id": houseInfo[1]
         }
         if houseContractInfo == 'ENTIRE':
             del requestPayload['room_id']
-        result = myRequest(url,requestPayload)
+        result = myRequest(url, requestPayload)
         if result:
             data['houseContractList'] = delNull(result['obj'])
 
@@ -952,14 +997,14 @@ def createApartmentContract(apartement_id,customerInfo,rent_price,sign_date,rent
         }
         if houseContractInfo == 'ENTIRE':
             del requestPayload['room_id']
-        result = myRequest(url,requestPayload)
+        result = myRequest(url, requestPayload)
         if result:
             data['month_server_fee'] = str(result['obj']['month_server_fee'])
 
     def step4():
         url = 'isz_contract/ApartmentContractController/createApartmentContractReceivable.action'
         requestPayload = data['apartmentContractRentInfoList']
-        result = myRequest(url,requestPayload)
+        result = myRequest(url, requestPayload)
         if result:
             data['receivables'] = delNull(result['obj'])
             index = 0
@@ -967,22 +1012,30 @@ def createApartmentContract(apartement_id,customerInfo,rent_price,sign_date,rent
                 x['edit'] = False
                 x['rowIndex'] = index
                 index += 1
+
     step1()
     step2()
     step3()
     step4()
     print data
-    result = myRequest(url,data)
+    result = myRequest(url, data)
     if result:
         consoleLog(u'承租合同 %s 已创建完成' % data['contract_num'])
-        apartmentContractInfo = {'contractID':sqlbase.serach("select contract_id from apartment_contract where contract_num = '%s'" % data['contract_num'])[0],'contractNum':data['contract_num']}
+        apartmentContractInfo = {'contractID': sqlbase.serach(
+            "select contract_id from apartment_contract where contract_num = '%s'" % data['contract_num'])[0],
+                                 'contractNum': data['contract_num']}
         return apartmentContractInfo
 
-auditTypeInfo = collections.namedtuple('auditType',['houseContract','apartmentContract','houseContractEnd','apartmentContractEnd'])
-auditType = auditTypeInfo(houseContract='HOUSECONTRACT',apartmentContract='APARTMENTCONTRACTE',houseContractEnd='HOUSECONTRACTEND',apartmentContractEnd='APARTMENTCONTRACTEND')
-auditStatusInfo = collections.namedtuple('auditStatus',['chuShen','fuShen','fanShen','boHui','shenhe'])
-auditStatus = auditStatusInfo(chuShen='PASS',fuShen='APPROVED',fanShen='REAUDIT',boHui='REJECTED',shenhe='AUDIT')
-def audit(id,type,*actions):
+
+auditTypeInfo = collections.namedtuple('auditType', ['houseContract', 'apartmentContract', 'houseContractEnd',
+                                                     'apartmentContractEnd'])
+auditType = auditTypeInfo(houseContract='HOUSECONTRACT', apartmentContract='APARTMENTCONTRACTE',
+                          houseContractEnd='HOUSECONTRACTEND', apartmentContractEnd='APARTMENTCONTRACTEND')
+auditStatusInfo = collections.namedtuple('auditStatus', ['chuShen', 'fuShen', 'fanShen', 'boHui', 'shenhe'])
+auditStatus = auditStatusInfo(chuShen='PASS', fuShen='APPROVED', fanShen='REAUDIT', boHui='REJECTED', shenhe='AUDIT')
+
+
+def audit(id, type, *actions):
     """
     所有流程的审核操作
     :param type: 要审核的模块，如出租合同、委托合同终止等，传入auditType类的属性
@@ -991,38 +1044,58 @@ def audit(id,type,*actions):
     :return: None
     """
     if type is auditType.houseContract:
-        if sqlbase.serach("select audit_status from house_contract_payable where contract_id = '%s' and deleted = 0 limit 1" % id)[0] == 'NOTAUDIT':
+        if sqlbase.serach(
+                        "select audit_status from house_contract_payable where contract_id = '%s' and deleted = 0 limit 1" % id)[
+            0] == 'NOTAUDIT':
             url = 'isz_contract/houseContractController/houseContractPayableAudit.action'
             requestPayload = {
-                'payableid':','.join(sqlbase.serach("select payable_id from house_contract_payable where contract_id = '%s' and deleted = 0" % id,oneCount=False)),
-                'contractid':id,'status':'AUDITED'
+                'payableid': ','.join(sqlbase.serach(
+                    "select payable_id from house_contract_payable where contract_id = '%s' and deleted = 0" % id,
+                    oneCount=False)),
+                'contractid': id, 'status': 'AUDITED'
             }
-            myRequest(url,requestPayload)
+            myRequest(url, requestPayload)
         url = 'isz_contract/houseContractController/houseContractAudit.action'
-        data = {'achieveid':id,'content':'test','activityId':''}
+        data = {'achieveid': id, 'content': 'test', 'activityId': ''}
         for action in actions:
             if action is auditStatus.chuShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (auditStatus.chuShen,auditType.houseContract))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (
+                    auditStatus.chuShen, auditType.houseContract))[0]
             elif action is auditStatus.fuShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (auditStatus.fuShen, auditType.houseContract))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (
+                    auditStatus.fuShen, auditType.houseContract))[0]
             elif action is auditStatus.boHui:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (auditStatus.boHui, auditType.houseContract))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (
+                    auditStatus.boHui, auditType.houseContract))[0]
             elif action is auditStatus.fanShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (auditStatus.fanShen, auditType.houseContract))[0]
-            myRequest(url,data)
-            time.sleep(1) if len(actions) >  1 else None
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (
+                    auditStatus.fanShen, auditType.houseContract))[0]
+            myRequest(url, data)
+            time.sleep(1) if len(actions) > 1 else None
     elif type is auditType.apartmentContract:
         url = 'isz_contract/ApartmentContractController/apartmentContractAudit.action'
         data = {'achieveid': id, 'content': 'test', 'activityId': ''}
         for action in actions:
             if action is auditStatus.chuShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (auditStatus.chuShen, auditType.apartmentContract))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (
+                    auditStatus.chuShen, auditType.apartmentContract))[0]
             elif action is auditStatus.fuShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (auditStatus.fuShen, auditType.apartmentContract))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (
+                    auditStatus.fuShen, auditType.apartmentContract))[0]
             elif action is auditStatus.boHui:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (auditStatus.boHui, auditType.apartmentContract))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (
+                    auditStatus.boHui, auditType.apartmentContract))[0]
             elif action is auditStatus.fanShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (auditStatus.fanShen, auditType.apartmentContract))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (
+                    auditStatus.fanShen, auditType.apartmentContract))[0]
             myRequest(url, data)
             time.sleep(1) if len(actions) > 1 else None
     elif type is auditType.houseContractEnd:
@@ -1030,13 +1103,21 @@ def audit(id,type,*actions):
         data = {'achieveid': id, 'content': 'test', 'activityId': ''}
         for action in actions:
             if action is auditStatus.chuShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (auditStatus.chuShen, auditType.houseContractEnd))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (
+                    auditStatus.chuShen, auditType.houseContractEnd))[0]
             elif action is auditStatus.fuShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % ('REVIEW', auditType.houseContractEnd))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (
+                    'REVIEW', auditType.houseContractEnd))[0]
             elif action is auditStatus.boHui:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % ('RE_JECT', auditType.houseContractEnd))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (
+                    'RE_JECT', auditType.houseContractEnd))[0]
             elif action is auditStatus.fanShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (auditStatus.fanShen, auditType.houseContractEnd))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (
+                    auditStatus.fanShen, auditType.houseContractEnd))[0]
             myRequest(url, data)
             time.sleep(1) if len(actions) > 1 else None
     elif type is auditType.apartmentContractEnd:
@@ -1044,17 +1125,26 @@ def audit(id,type,*actions):
         data = {'achieveid': id, 'content': 'test', 'activityId': ''}
         for action in actions:
             if action is auditStatus.chuShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (auditStatus.chuShen, auditType.apartmentContractEnd))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s' and activity_type = '%s'" % (
+                    auditStatus.chuShen, auditType.apartmentContractEnd))[0]
             elif action is auditStatus.fuShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % ('REVIEW', auditType.apartmentContractEnd))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (
+                    'REVIEW', auditType.apartmentContractEnd))[0]
             elif action is auditStatus.boHui:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % ('RE_JECT', auditType.apartmentContractEnd))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (
+                    'RE_JECT', auditType.apartmentContractEnd))[0]
             elif action is auditStatus.fanShen:
-                data['activityId'] = sqlbase.serach("select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (auditStatus.fanShen,auditType.apartmentContractEnd))[0]
+                data['activityId'] = sqlbase.serach(
+                    "select activity_id from workflow_activity where activity_status = '%s'and activity_type = '%s'" % (
+                    auditStatus.fanShen, auditType.apartmentContractEnd))[0]
             myRequest(url, data)
             time.sleep(1) if len(actions) > 1 else None
 
-def receipt(contractType,contractID):
+
+def receipt(contractType, contractID):
     """
     出租合同实收及应收的审核
     :param contractType: 委托合同或者出租合同
@@ -1063,38 +1153,45 @@ def receipt(contractType,contractID):
     """
     if contractType == 'houseContract':
         url = 'isz_finance/HouseContractPayableController/savePay.action'
-        info = sqlbase.serach("select payable_amount,payable_id from house_contract_payable where contract_id = '%s' and deleted = 0" % contractID,oneCount=False)
+        info = sqlbase.serach(
+            "select payable_amount,payable_id from house_contract_payable where contract_id = '%s' and deleted = 0" % contractID,
+            oneCount=False)
         for i in info:
             data = {
-                'payable_amount':i[0],      #应付金额
-                'payment_money':i[0],       #实付金额
-                'payment_date':datetimes.today(),        #实付日期
-                'payment_type':'CASH',      #付款方式
-                'remark':'test',        #备注
-                'payable_id':i[1],      #应付ID
-                'contract_id':contractID
+                'payable_amount': i[0],  # 应付金额
+                'payment_money': i[0],  # 实付金额
+                'payment_date': datetimes.today(),  # 实付日期
+                'payment_type': 'CASH',  # 付款方式
+                'remark': 'test',  # 备注
+                'payable_id': i[1],  # 应付ID
+                'contract_id': contractID
             }
-            myRequest(url,data)
+            myRequest(url, data)
         time.sleep(1)
     elif contractType == 'apartmentContract':
         url = 'isz_finance/ApartmentContractReceiptsController/saveOrUpdateNewReceipts.action'
-        info = sqlbase.serach("select receivable_money,receivable_id from apartment_contract_receivable where contract_id = '%s' and deleted = 0" % contractID, oneCount=False)
+        info = sqlbase.serach(
+            "select receivable_money,receivable_id from apartment_contract_receivable where contract_id = '%s' and deleted = 0" % contractID,
+            oneCount=False)
         for i in info:
             data = {
-                'alipay_card': '0011',   #支付宝账号
-                'company': sqlbase.serach("select sign_body from apartment_contract where contract_id = '%s'" % contractID)[0],     #收款公司
+                'alipay_card': '0011',  # 支付宝账号
+                'company':
+                    sqlbase.serach("select sign_body from apartment_contract where contract_id = '%s'" % contractID)[0],
+            # 收款公司
                 'contract_id': contractID,
-                'operation_total': '1024',    #转账总金额
-                'receipts_date': datetimes.today(),      #收款日期
-                'receipts_type': 'ALIPAY',       #收款方式：支付宝转账
-                'receipts_money': i[0],      #收款金额
-                'receivable_id': i[1]    #应收ID
+                'operation_total': '1024',  # 转账总金额
+                'receipts_date': datetimes.today(),  # 收款日期
+                'receipts_type': 'ALIPAY',  # 收款方式：支付宝转账
+                'receipts_money': i[0],  # 收款金额
+                'receivable_id': i[1]  # 应收ID
             }
-            #实收
-            result = myRequest(url,data)
+            # 实收
+            result = myRequest(url, data)
             if result:
                 # 审核
-                myRequest(url='isz_finance/ApartmentContractReceiptsController/endReceivable.action', data={'receivable_id': i[1]})
+                myRequest(url='isz_finance/ApartmentContractReceiptsController/endReceivable.action',
+                          data={'receivable_id': i[1]})
             else:
                 break
         time.sleep(1)
@@ -1108,7 +1205,7 @@ if __name__ == '__main__':
     # createApartmentContract(apartement_id=apartment,customerInfo=customer,rent_price=5500,sign_date='2017-10-01',rent_start_date='2017-10-02',rent_end_date='2018-12-12',
     #                         deposit=2000,payment_cycle='MONTH')
 
-    #audit('FF8080815F569109015F5698FF9F00FA',auditType.houseContract,auditStatus.chuShen,auditStatus.fuShen,auditStatus.fanShen,auditStatus.chuShen,auditStatus.boHui)
+    # audit('FF8080815F569109015F5698FF9F00FA',auditType.houseContract,auditStatus.chuShen,auditStatus.fuShen,auditStatus.fanShen,auditStatus.chuShen,auditStatus.boHui)
 
-    #receipt('apartmentContract','FF8080815F613E71015F61C030F3031E')
+    # receipt('apartmentContract','FF8080815F613E71015F61C030F3031E')
     get_cookie()

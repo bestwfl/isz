@@ -2,7 +2,7 @@
 import time
 from common.interface_wfl import myRequest, consoleLog
 from officebase.myexcel import Excel
-from common.mysql import Mysql
+from common.mySql import Mysql
 
 
 def housingAuthorityPush():

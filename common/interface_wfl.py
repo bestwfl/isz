@@ -10,8 +10,10 @@ from common.base import consoleLog, set_conf
 from common.base import get_conf
 from common.sqlbase import getsmsMtHis
 
+
 def checckLogin(func):
     """检验登录状态"""
+
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         loginmsg = '请重新登陆'
@@ -20,10 +22,11 @@ def checckLogin(func):
             consoleLog('登录状态失效，尝试重新登录！')
             login()
             return func(*args, **kwargs)
+
     return wrapper
 
-def testWithLogin(func):
 
+def testWithLogin(func):
     def wrapper(*args, **kwargs):
         login()
         try:
@@ -46,6 +49,8 @@ def myRequest(url, data=None, needCookie=True, contentType='application/json', m
     host = 'http://isz.ishangzu.com/'
     interfaceURL = host + url if not url.startswith('http') else url
     cookie = eval(get_conf('cookieInfo', 'cookies'))
+    if url.find('http://decorationapp.ishangzu.com/') >= 0:
+        cookie = eval(get_conf('cookieInfo', 'decorationapp_cookies'))
     request = None
     if method == 'get':
         if needCookie:
@@ -67,6 +72,8 @@ def myRequest(url, data=None, needCookie=True, contentType='application/json', m
     except ValueError:
         consoleLog(request)
         raise ValueError('ERROR')
+    if 'code' not in result.keys():
+        return result
     if request.status_code is not 200 or (result['code'] is not 0 and result['code'] is not 1):
         msg = result['msg'].encode('utf-8')
         loginmsg = u'请重新登陆'
@@ -75,21 +82,21 @@ def myRequest(url, data=None, needCookie=True, contentType='application/json', m
             consoleLog(u'登录状态失效，尝试重新登录！')
             login()
             return myRequest(url, data, needCookie, contentType, method, returnValue)
-
         consoleLog(u'接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s' % (interfaceURL, data, msg.decode('utf-8')), 'w')
         if shutdownFlag:
-            raise BaseException('request error!')
+            raise Exception('接口响应异常!')
         return False if not returnValue else msg
     else:
         return result
 
 
 class Image(object):
-    def __init__(self, img_id, img_url):
-        self.id = img_id
-        self.url = img_url
+    def __int__(self):
+        self.id = None
+        self.url = None
+        self.src = None
 
-# @checckLogin
+
 def upLoadPhoto(url, filename, filepath=None, name='file'):
     """
     上传图片
@@ -98,34 +105,49 @@ def upLoadPhoto(url, filename, filepath=None, name='file'):
     :param name:请求文件类型
     :param url:上传地址
    """
-    img = {}
+    image = Image()
     if not filepath:
-        filepath = sys.path[1]+'\img\\'
-    filepath = filepath + filename
-    if not os.path.exists(filepath):
-        consoleLog('文件路径不存在，文件路径：%s' % filepath)
+        filepath = sys.path[1] + '\img\\'
+    filepath_l = filepath + filename
+    if not os.path.exists(filepath_l):
+        consoleLog('文件路径不存在，文件路径：%s' % filepath_l)
     try:
         filetype = {
-            name: (str(filename).encode('utf-8'), open(str(filepath).encode('utf-8'), 'rb'), 'image/png'),
+            name: (str(filename).encode('utf-8'), open(str(filepath_l).encode('utf-8'), 'rb'), 'image/png'),
         }
         cookie = eval(get_conf('cookieInfo', 'cookies'))
+        if url.find('http://decorationapp.ishangzu.com/') >= 0:
+            cookie = eval(get_conf('cookieInfo', 'decorationapp_cookies'))
         request = requests.post(url=url, files=filetype, cookies=cookie)
         result = json.loads(request.text)
         if result['code'] is 200 or result['code'] == u'200' or result['code'] is 0:
-            try:
-                img['img_url'] = result['obj']['img_url']
-            except:
-                img['img_url'] = result['obj']['photoUrl']
-            img['img_id'] = result['obj']['img_id']
+            for key, value in result['obj'].items():
+                if 'img_id' == key:
+                    image.id = value
+                if 'src' == key:
+                    image.src = value
+                    image.url = value
+                if 'url' in key or 'photoUrl' == key:
+                    image.url = value
+                    image.src = value
         else:
             msg = result['msg'].encode('utf-8')
-            consoleLog(u'上传文件接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s\n返回默认图片' % (url, filetype, msg.decode('utf-8')), 'w')
-            img['img_url'] = get_conf('img', 'url')
-            img['img_id'] = get_conf('img', 'img_id')
-    except BaseException:
-        img['img_url'] = get_conf('img', 'url')
-        img['img_id'] = get_conf('img', 'img_id')
-    return Image(img['img_id'], img['img_url'])
+            if '登陆' in msg:
+                if url.find('http://decorationapp.ishangzu.com/') >= 0:
+                    Decoration.decorationAppLogin()
+                login()
+                return upLoadPhoto(url, filename, filepath, name)
+            else:
+                consoleLog(u'上传文件接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s\n返回默认图片' % (url, filetype, msg.decode('utf-8')), 'w')
+                image.url = get_conf('img', 'url')
+                image.src = get_conf('img', 'src')
+                image.id = get_conf('img', 'img_id')
+    except Exception as e:
+        consoleLog(e.args, 'e')
+        image.url = get_conf('img', 'url')
+        image.src = get_conf('img', 'src')
+        image.id = get_conf('img', 'img_id')
+    return image
 
 
 def login(user=get_conf('sysUser', 'userPhone'), pwd=get_conf('sysUser', 'pwd')):
@@ -260,9 +282,7 @@ def delNull(data):
 
 
 if __name__ == '__main__':
-    pass
-    # loginUrl = 'isz_base/LoginController/login.action'
-    # userdata = {"user_phone": '13600000001', "user_pwd": "ceshi123456", "auth_code": "",
-    #             "LechuuPlatform": "LECHUU_CUSTOMER", "version": "1.0.0"}
-    # result = myRequest(loginUrl, data=userdata, needCookie=False)
-    # time.sleep(3)
+    uploadPhotoURL = 'http://erp.ishangzu.com/isz_housecontract/houseContractController/uploadImageFile'  # 委托合同上传图片地址
+    idCardPhotos = upLoadPhoto(url=uploadPhotoURL, filename='idCardPhotos.png',
+                               filepath=r"C:\Users\user\Desktop\Image\\")
+    print idCardPhotos

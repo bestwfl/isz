@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 
 import time
-from common import sqlbase
+from common import sqlbase, dict
 from common.base import consoleLog, get_conf
 from common.datetimes import addDays
 from common.interface_wfl import myRequest, upLoadPhoto
@@ -230,6 +230,55 @@ class Decoration(DecorationProjectInfo):
 
     def projectOrder(self, rooms=3, livings=1, kitchens=1, bathrooms=2, balconys=2):
         """项目计划"""
+
+        def design_zone(zone_type, room_no, usearea, have_toilet="WITHOUT", have_balcony="WITHOUT", is_fictitious_room='N'):
+            """分割户型"""
+            if have_toilet == "HAVE":  # 卫生间
+                have_toilet_name = "有(4平米)"
+                toilet_area = "4"
+            else:
+                have_toilet_name = "-"
+                toilet_area = "0"
+            if have_balcony == "HAVE":  # 阳台
+                have_balcony_name = "有(4平米)"
+                balcony_area = "4"
+            else:
+                have_balcony_name = "-"
+                balcony_area = "0"
+            if zone_type == 'ROOM':  # 朝向
+                zone_orientation = "SOURTH"
+                zone_orientation_name = "南"
+            else:
+                zone_orientation = "NORTH"
+                zone_orientation_name = "北"
+            zone = {
+                "zone_type": zone_type,
+                "zone_type_name": dict.DecorationZoneType.get(zone_type),
+                "room_no": room_no,
+                "room_no_name": dict.DecorationRoomNo.get(room_no),
+                "zone_orientation": zone_orientation,
+                "zone_orientation_name": zone_orientation_name,
+                "have_toilet": have_toilet,
+                "have_toilet_name": have_toilet_name,
+                "toilet_area": toilet_area,
+                "have_balcony": have_balcony,
+                "have_balcony_name": have_balcony_name,
+                "balcony_area": balcony_area,
+                "have_window_name": "有(1平米)",
+                "window_area": "1",
+                "zone_status_name": "已创建",
+                "zone_status": "FOUND",
+                "usearea": usearea,
+                "window_type": "ORDINARYWINDOW",
+                "zone_id": "",
+                "is_fictitious_room": is_fictitious_room
+            }
+            return zone
+
+        zone_list = []
+        for room_no in dict.DecorationRoomNo.keys():
+            pass
+
         url = 'http://decorate.ishangzu.com/isz_decoration/decoHouseInfoController/saveOrUpdateApartment/saveApartment/projectOrder'
         img = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png')  # 户型图上传
         data = {

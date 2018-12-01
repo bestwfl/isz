@@ -1,43 +1,67 @@
 # -*- coding:utf8 -*-
 
 import time
+
+from sqlalchemy import true
+
 from isz.houseContract import HouseContract
 from common import sqlbase
-from common.base import consoleLog, get_conf
-from common.datetimes import addDays
+from common.base import consoleLog, get_conf, set_conf
+from common.datetimes import addDays, today
 from common.interface_wfl import myRequest, upLoadPhoto
 from common.dict import User
+from common.mySql import Mysql
+import requests
+import json
 
 
 class Decoration(object):
     """装修工程"""
     uploadPhotoURL = 'http://decorate.ishangzu.com/isz_decoration/DecorationFileController/uploadPhoto'  # 装修工程上传图片地址
+    mysql = Mysql()
 
     def __init__(self, contractIdOrNum):
         self.project_id = None
         nullLog = False
-        for i in range(5):
-            project = sqlbase.serach(
-                "select project_id,b.contract_num,b.sign_uid from %s.new_decoration_project a inner join %s.decoration_house_info b "
-                "on a.info_id=b.info_id  where b.deleted=0 and (b.contract_num='%s' or b.contract_id='%s')"
-                "limit 1" % (
-                    get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), contractIdOrNum, contractIdOrNum),
-                nullLog=nullLog)
+        for i in range(15):
+            project = self.mysql.getOne(
+                "select project_id,b.contract_num,b.sign_uid,a.info_id,b.address,b.pristine_family from isz_decoration.new_decoration_project a inner join isz_decoration.decoration_house_info b "
+                "on a.info_id=b.info_id  where b.deleted=0 and (b.contract_num='%s' or b.contract_id='%s')" % (
+                    contractIdOrNum, contractIdOrNum), nullLog=nullLog)
             if project:
                 self.project_id = project[0]
                 self.contract_num = project[1]
                 self.sign_uid = project[2]
+                self.info_id = project[3]
+                self.address = project[4]
+                self.pristine_family = project[5]
+                self.timestamp = None
+                self.task_Id = self.mysql.getOne(
+                    "SELECT art.ID_ FROM isz_activiti.act_ru_execution are LEFT JOIN isz_activiti.act_ru_task art ON are.`PROC_INST_ID_` = art.`PROC_INST_ID_` WHERE are.`BUSINESS_KEY_`='{}'".format(
+                        self.project_id))[0]
                 break
-            elif i < 4:
+            elif i < 14:
                 time.sleep(1)
-                if i == 3:
+                if i == 13:
                     nullLog = True
             else:
                 raise BaseException('the house_contract does not exist decoration order, contract：%s' % contractIdOrNum)
 
+    @property
+    def predict_survey_date(self):
+        return self.mysql.getOne(
+            "select left(predict_survey_date,10) from isz_decoration.new_decoration_project where project_id='%s'" % self.project_id)[
+            0]
+
+    @property
+    def taskId(self):
+        return self.mysql.getOne(
+            "select art.ID_ from isz_activiti.act_ru_execution are LEFT JOIN isz_activiti.act_ru_task art on are.PROC_INST_ID_ = art.PROC_INST_ID_ where are.BUSINESS_KEY_='%s'"
+            % self.project_id)[0]
+
     # 下单
     def placeOrder(self):
-        consoleLog(u'开始工程管理')
+        consoleLog(u'--------开始工程管理--------')
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/changeProgress/placeOrder'
         data = {
             'place_order_dep': User.DID,
@@ -53,23 +77,89 @@ class Decoration(object):
             # consoleLog(u'下单完成')
             return
 
+    def newPlaceOrder(self):
+        """2.0下单"""
+        url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/changeProgress/placeOrder'
+        data = {
+            'place_order_dep': User.DID,
+            'place_order_dep_name': User.D_NAME,
+            'place_order_reason': "新收配置订单",
+            'place_order_uid': User.UID,
+            'place_order_uname': User.NAME,
+            'place_order_date': time.strftime('%Y-%m-%d %H:%M:%S'),
+            'predict_survey_date': "",
+            'project_id': self.project_id
+        }
+        result = myRequest(url, data)
+        if result:
+            return
+
     # 派单
     def dispatchOrder(self):
         url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/changeProgress/dispatchOrder'
         data = {
-            'construct_uid': '1610',
-            'construct_uname': u'徐经纬',
-            'dispach_remark': u'测试',
+            # 'construct_uid': '1610',
+            # 'construct_uid': '8AB398CA550C536B01550C536BCC0000',
+            # 'construct_uname': u'test_吴俊',
+
+            'construct_uid': 'FF808081666B4CE2016671193ACC00A7',
+            'construct_uname': 'test_王方龙_01',
+            'dispach_remark': '测试',
+
             'project_id': self.project_id,
             'supplier_id': '8A2152435FBAEFC3015FBAEFC3000000',
             'supplier_uid': '8AB398CA5FBAF072015FBB26338A0002',
-            'predict_survey_date': '',
-            'supplier_name': u'测试专用硬装供应商',
-            'supplier_uname': u'测试专用硬装员工'
+            'predict_survey_date': '%s 09:00' % addDays(1),
+            'supplier_name': '测试专用硬装供应商',
+            'supplier_uname': '测试专用硬装员工'
+
+            # 'supplier_uid': 'FF808081670708030167070803CA0000',
+            # 'supplier_uname': u'test_solxnp'
         }
         result = myRequest(url, data)
         if result:
             consoleLog(u'派单完成')
+        else:
+            raise Exception('派单失败!')
+
+    def newDispatchOrder(self):
+        """派单2.0"""
+        url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/changeProgress/dispatchOrder'
+        if get_conf('testCondition', 'test') == 'test':
+            data = {
+                "construct_uid": "FF808081666B4CE2016671193ACC00A7",
+                "construct_uname": "test_王方龙_01",
+                "dispach_remark": "测试派单",
+                "supplier_id": "8A2152435FBAEFC3015FBAEFC3000000",
+                "supplier_uid": "8AB398CA5FBAF072015FBB26338A0002",
+                "supplier_name": "测试专用硬装供应商",
+                "supplier_uname": "测试专用硬装员工",
+                "project_id": self.project_id
+            }
+        elif get_conf('testCondition', 'test') == 'mock':
+            data = {
+                "construct_uid": "FF80808163AB43EE0163B4CED5BD041F",
+                "construct_uname": "mock_王方龙_03",
+                "dispach_remark": "测试派单",
+                "project_id": self.project_id,
+                "supplier_id": "8A2152435FBAEFC3015FBAEFC3000000",
+                "supplier_uid": "FF8080816735879301673A6C46520042",
+                "supplier_name": "测试专用硬装供应商",
+                "supplier_uname": "WFL项目经理"
+            }
+        result = myRequest(url, data)
+        if result:
+            consoleLog('派单完成')
+        else:
+            raise Exception('派单失败!')
+
+    # 接单2.0
+    def newAcceptOrder(self):
+        url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/changeProgress/acceptOrder'
+        data = {"project_id": self.project_id, "predict_survey_date": today(), "remark": ""}
+        result = myRequest(url, data)
+        if result:
+            consoleLog(u'接单完成')
             return
 
     # 接单
@@ -152,7 +242,8 @@ class Decoration(object):
                 }]
             }
             for attachment in data['attachments']:
-                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'],
+                                  filepath=r"C:\Users\user\Desktop\Image\\")
                 attachment['imgs'][0]['url'] = IMG.url
                 attachment['imgs'][0]['img_id'] = IMG.id
             result = myRequest(url, data)
@@ -163,7 +254,8 @@ class Decoration(object):
         # 物业交割
         def profee():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/survey/profee'
-            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='PROPERTY_DELIVERY_ORDER.png', filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='PROPERTY_DELIVERY_ORDER.png',
+                              filepath=r"C:\Users\user\Desktop\Image\\")
             data = {
                 'air_switch': '',
                 'door_card': '',
@@ -251,11 +343,11 @@ class Decoration(object):
 
     # 项目计划
     def projectOrder(self):
-        projectInfo = sqlbase.serach(
-            "select b.info_id,a.project_no,b.entrust_type,b.build_area from %s.new_decoration_project a "
-            "inner join %s.decoration_house_info b on a.info_id=b.info_id "
-            "and a.project_id='%s' where b.deleted=0 " % (
-                get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), self.project_id))
+        # projectInfo = sqlbase.serach(
+        projectInfo = Mysql().getOne(
+            "select b.info_id,a.project_no,b.entrust_type,b.build_area from isz_decoration.new_decoration_project a "
+            "inner join isz_decoration.decoration_house_info b on a.info_id=b.info_id "
+            "and a.project_id='%s' where b.deleted=0 " % self.project_id)
         url = 'http://decorate.ishangzu.com/isz_decoration/decoHouseInfoController/saveOrUpdateApartment/saveApartment/projectOrder'
         img = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png',
                           filepath=r"C:\Users\user\Desktop\Image\\")  # 户型图上传
@@ -569,7 +661,8 @@ class Decoration(object):
             #  获取物品清单信息
             def getsupplierOrderDetail():
                 url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationConfigController/supplierOrdersDetail'
-                supplierId = sqlbase.serach(
+                # supplierId = sqlbase.serach(
+                supplierId = Mysql().getOne(
                     "select supplier_id from %s.new_config_list where project_id='%s' and deleted=0  and config_list_status<>'CHECKED'" % (
                         get_conf('db', 'decoration_db'), self.project_id))[0]
                 data = {"project_id": self.project_id, "supplier_id": supplierId}
@@ -577,7 +670,7 @@ class Decoration(object):
                 if result:
                     return result['obj']
 
-            #  验收确认
+            # 验收确认
             def acceptanceConfirm():
                 url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationConfigController/acceptance/confirm'
                 data = getsupplierOrderDetail()
@@ -981,7 +1074,8 @@ class Decoration(object):
             def saveStuffLists():
                 preview()
                 url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationStuffController/saveStuffLists'
-                projectInfo = sqlbase.serach(
+                # projectInfo = sqlbase.serach(
+                projectInfo = Mysql().getOne(
                     "select b.address,a.config_order_no,b.contract_id,b.contract_num,b.create_time,b.entrust_end_date,b.entrust_start_date,b.house_code,b.housekeep_mange_uid,b.info_id,"
                     "a.project_no,b.sign_date,b.city_code,b.city_name from %s.decoration_house_info b inner join  %s.new_decoration_project a on a.info_id=b.info_id and a.project_id='%s'" % (
                         get_conf('db', 'decoration_db'), get_conf('db', 'decoration_db'), self.project_id))
@@ -1117,7 +1211,6 @@ class Decoration(object):
     # 施工中
     def hideAndStufCheck(self):
 
-
         def hideCheck():
             """隐蔽验收"""
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/constructing/hideCheck'
@@ -1204,7 +1297,8 @@ class Decoration(object):
                 "water_meter_num": None
             }
             for attachment in data['attachments']:
-                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'],
+                                  filepath=r"C:\Users\user\Desktop\Image\\")
                 attachment['imgs'][0]['url'] = IMG.url
                 attachment['imgs'][0]['img_id'] = IMG.id
             result = myRequest(url, data)
@@ -1299,7 +1393,8 @@ class Decoration(object):
                 "water_meter_num": None
             }
             for attachment in data['attachments']:
-                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+                IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % attachment['attach_type'],
+                                  filepath=r"C:\Users\user\Desktop\Image\\")
                 attachment['imgs'][0]['url'] = IMG.url
                 attachment['imgs'][0]['img_id'] = IMG.id
             result = myRequest(url, data)
@@ -1315,8 +1410,10 @@ class Decoration(object):
         # 整体验收
         def wholeCheck():
             url = 'http://decorate.ishangzu.com/isz_decoration/NewDecorationProjectController/proCheck/wholeCheck'
-            IMG_CARDS = upLoadPhoto(url=self.uploadPhotoURL, filename='CARDS.png', filepath=r"C:\Users\user\Desktop\Image\\")
-            IMG_THREE = upLoadPhoto(url=self.uploadPhotoURL, filename='THREE.png', filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG_CARDS = upLoadPhoto(url=self.uploadPhotoURL, filename='CARDS.png',
+                                    filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG_THREE = upLoadPhoto(url=self.uploadPhotoURL, filename='THREE.png',
+                                    filepath=r"C:\Users\user\Desktop\Image\\")
             data = {
                 "air_switch": None,
                 "attachments": None,
@@ -1436,7 +1533,8 @@ class Decoration(object):
         # IMG_PROP = upLoadPhoto(url=self.uploadPhotoURL, filename='PROP.png', filepath=r"C:\Users\user\Desktop\Image\\")
         # IMG_BALCONY_1 = upLoadPhoto(url=self.uploadPhotoURL, filename='BALCONY_1.png', filepath=r"C:\Users\user\Desktop\Image\\")
         # IMG_BALCONY_2 = upLoadPhoto(url=self.uploadPhotoURL, filename='BALCONY_2.png', filepath=r"C:\Users\user\Desktop\Image\\")
-        IMG_LAYOUT = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png', filepath=r"C:\Users\user\Desktop\Image\\")
+        IMG_LAYOUT = upLoadPhoto(url=self.uploadPhotoURL, filename='LAYOUT.png',
+                                 filepath=r"C:\Users\user\Desktop\Image\\")
         data = {
             "curOneLevelNode": None,
             "curTwoLevelNode": None,
@@ -1546,7 +1644,8 @@ class Decoration(object):
             "remark": None
         }
         for house_attach in data['house_attachs']:
-            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % house_attach['attach_type'], filepath=r"C:\Users\user\Desktop\Image\\")
+            IMG = upLoadPhoto(url=self.uploadPhotoURL, filename='%s.png' % house_attach['attach_type'],
+                              filepath=r"C:\Users\user\Desktop\Image\\")
             house_attach['imgs'][0]['url'] = IMG.url
             house_attach['imgs'][0]['img_id'] = IMG.id
         result = myRequest(url, data)
@@ -1564,19 +1663,273 @@ class Decoration(object):
         }
         result = myRequest(url, data)
         if result:
-            consoleLog(u'竣工完成')
+            consoleLog('————————竣工完成————————')
             return
 
     # 整个装修流程
     def fitment(self):
-        self.placeOrder()  # 下单
-        self.dispatchOrder()  # 派单
-        self.acceptOrder()  # 接单
-        self.survey()  # 勘测
-        self.projectOrder()  # 项目计划
-        self.configList()  # 物品清单
-        self.stuffList()  # 装修清单
-        self.hideAndStufCheck()  # 施工中
-        self.projectCheck()  # 项目验收
-        self.indoorImg()  # 室内图
-        self.delivery()  # 竣工
+        self.newPlaceOrder()  # 下单
+        self.newDispatchOrder()  # 派单
+        self.newAcceptOrder()  # PC接单
+        self.newSurvey()  # 量房
+        # self.appAcceptOrder()  # 接单
+        # self.placeOrder()  # 下单
+        # self.dispatchOrder()  # 派单
+        # self.acceptOrder()  # 接单
+        # self.survey()  # 勘测
+        # self.projectOrder()  # 项目计划
+        # self.configList()  # 物品清单
+        # self.stuffList()  # 装修清单
+        # self.hideAndStufCheck()  # 施工中
+        # self.projectCheck()  # 项目验收
+        # self.indoorImg()  # 室内图
+        # self.delivery()  # 竣工
+
+    @staticmethod
+    # def decorationAppLogin(user=get_conf('sysUser', 'userPhone'), password=get_conf('sysUser', 'pwd')):
+    def decorationAppLogin(user_type='employee', user=get_conf('sysUser', 'userPhone'),
+                           password=get_conf('sysUser', 'pwd')):
+        data = {}
+        if user_type == 'employee':  # 专员登录
+            user_type = 'employee/EmployeeLoginController'
+            # data = {"user_phone": "15168368432", "user_pwd": password}
+            data = {"user_phone": "13600000003", "user_pwd": password}
+            # data = {"user_phone": "15606513905", "user_pwd": 'isz123456'}
+        elif user_type == 'supplier':  # 供应商登录
+            user_type = 'supplier/LoginController'
+            data = {"phone": "18815286582", "password": '123456'}
+        url = 'http://decorationapp.ishangzu.com/isz_decorationapp/%s/login' % user_type
+        headers = {
+            'content-type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
+        }
+        response = requests.post(url, data=json.dumps(data), headers=headers)
+        result = json.loads(response.text)
+        if result['msg'] == u'ok':
+            cookies = requests.utils.dict_from_cookiejar(response.cookies)
+            decorationapp_cookies = {
+                "SESSION_KEY_DECORATIONAPP_EMPLOYEE": cookies.get('SESSION_KEY_DECORATIONAPP_EMPLOYEE'),
+                "SESSION_KEY_DECORATIONAPP": cookies.get('SESSION_KEY_DECORATIONAPP')
+            }
+            set_conf('cookieInfo', decorationapp_cookies=decorationapp_cookies)
+            consoleLog(u'工程移动端登录成功!')
+        elif u'密码错误' in result['msg']:
+            msg = result['msg'].encode('utf-8')
+            consoleLog(u'接口异常！\n接口地址：%s\n请求参数：%s\n返回结果：%s' % (url, data, msg.decode('utf-8')), 'w')
+            quit()
+
+    def supplierAcceptOrder(self):
+        url = "http://decorationapp.ishangzu.com/isz_decorationapp/supplier/SupplierWaitAcceptOrderController/supplierAcceptOrder"
+        data = {"project_id": self.project_id, "taskId": self.taskId, "predict_survey_date": self.predict_survey_date}
+        result = myRequest(url, data, method='put')
+        if result:
+            consoleLog("供应商接单成功")
+        else:
+            consoleLog("供应商接单失败", 'e')
+
+    def constructAcceptOrder(self):
+        url = "http://decorationapp.ishangzu.com/isz_decorationapp/employee/WaitAcceptOrderController/constructAcceptOrder"
+        data = {"project_id": self.project_id, "predict_survey_date": '%s 09:00' % addDays(1)}
+        result = myRequest(url, data, method='put')
+        if result:
+            consoleLog("专员接单成功")
+        else:
+            consoleLog("专员接单失败", 'e')
+
+    def appAcceptOrder(self):
+        self.decorationAppLogin('employee')
+        self.constructAcceptOrder()
+        self.decorationAppLogin('supplier')
+        self.supplierAcceptOrder()
+
+    def newSurvey(self):
+        """量房"""
+        upLoadPhotoURL = 'http://decorationapp.ishangzu.com/isz_decorationapp/employee/DecorationFileController/uploadPhoto'
+        IMG = upLoadPhoto(url=upLoadPhotoURL, filename='PROPERTY_DELIVERY_ORDER.png', filepath=r"C:\Users\user\Desktop\Image\\")
+
+        def saveSurveyStatus():
+            """量房通过"""
+            url = 'http://decorationapp.ishangzu.com/isz_decorationapp/employee/decorationSurveyController/saveSurveyStatus'
+            data = {
+                "project_id": self.project_id,
+                "survery_room_status": "118",
+                "survery_room_status_description": ""
+            }
+            result = myRequest(url, data, returnValue=True)
+            if result:
+                consoleLog("量房通过")
+            else:
+                raise Exception("量房不通过")
+
+        def searchSurveyBaseInfo():
+            """获取房源基本信息"""
+            url = 'http://decorationapp.ishangzu.com/isz_decorationapp/employee/decorationSurveyController/searchSurveyBaseInfo'
+            data = {"project_id": self.project_id}
+            result = myRequest(url, data)
+            if result:
+                self.timestamp = result['obj']['update_timestamp']
+                return result['obj']
+            else:
+                raise Exception("获取订单基础信息失败")
+
+        def dividedHouse():
+            """分割户型"""
+            url = 'http://decorationapp.ishangzu.com/isz_decorationapp/employee/decorationSurveyController/saveSurveyBaseInfo'
+            data = searchSurveyBaseInfo()
+            data['house_orientation'] = 'SOURTH'
+            data['house_type'] = 'HOUSE'
+            data['decoration_style'] = 'WITHOUT'
+            data['is_need_waterproofing'] = 'Y'
+            data['optimization_room'] = 'ZERO'
+            data['original_wall'] = 'WHITE_WALL_WHITE_TOP'
+            data['reform_way_fact'] = 'RESTYLED'
+            data['remould_balconys'] = '0'
+            data['remould_bathrooms'] = '0'
+            data['remould_kitchens'] = '0'
+            data['remould_livings'] = '1'
+            data['remould_rooms'] = '1'
+            result = myRequest(url, data)
+            if result:
+                pass
+            else:
+                raise Exception("户型分割失败！")
+
+        def getStuffList(function_area, is_fictitious_room='N'):
+            """获取装修项目"""
+            url = 'http://decorationapp.ishangzu.com/isz_decorationapp/employee/StuffListController/getStuffList'
+            data = {"exist_ids": "", "function_area": function_area, "project_id": self.project_id,
+                    "is_fictitious_room": is_fictitious_room}
+            result = myRequest(url, data)
+            if result:
+                if len(result['obj']) > 0:
+                    if len(result['obj'][0]) > 0:
+                        if len(result['obj'][0]['product_detail']) > 0:
+                            return result['obj'][0]['product_detail'][0]
+                else:
+                    consoleLog("未获取到装修项目")
+                    return None
+            else:
+                raise Exception("获取装修项目失败！")
+
+        def getProductList(is_fictitious_room='N'):
+            """获取配置物品"""
+            url = 'http://decorationapp.ishangzu.com/isz_decorationapp/employee/ConfigListController/getProductList'
+            data = {"exist_ids": "", "product_name": "", "project_id": self.project_id,
+                    "is_fictitious_room": is_fictitious_room}
+            result = myRequest(url, data)
+            if result:
+                if len(result['obj']['rows']) > 0:
+                    if len(result['obj']['rows'][0]) > 0:
+                        if len(result['obj']['rows'][0]['decorationProductPageVoList']) > 0:
+                            return result['obj']['rows'][0]['decorationProductPageVoList'][0]
+                else:
+                    consoleLog("未获取到配置物品")
+                    return None
+            else:
+                raise Exception("获取配置物品失败！")
+
+        def updateFunctionZone(zone_id, zone_type, room_no):
+            """更新区间信息"""
+            url = 'http://decorationapp.ishangzu.com/isz_decorationapp/employee/decorationFunctionZoneController/updateFunctionZone'
+            data = {
+                "have_balcony": "WITHOUT",
+                "have_toilet": "WITHOUT",
+                "info_id": self.info_id,
+                "is_fictitious_room": "N",
+                "is_suite": True,
+                "room_no": room_no,
+                "usearea": "12",
+                "window_type": "WITHOUT",
+                "window_area": "",
+                "zone_id": zone_id,
+                "zone_orientation": "SOURTH",
+                "zone_type": zone_type
+            }
+            result = myRequest(url, data)
+            if result:
+                pass
+            else:
+                raise Exception("功能区间信息更新失败！")
+
+        def addStuffAndProduct():
+            """房屋添加硬装和配置"""
+            houseInfo = searchSurveyBaseInfo()
+            product = getProductList()
+            zones = houseInfo['zoneVoList']
+            for index, zoneInfo in enumerate(zones):
+                stuff = getStuffList(zoneInfo.get('zone_type'))
+                if not zoneInfo.get('zone_type') == 'SPORADIC':
+                    updateFunctionZone(zoneInfo['zone_id'], zoneInfo['zone_type'], zoneInfo['room_no'])
+                    zoneInfo['have_window_name'] = '无'
+                    zoneInfo['usearea'] = '12'
+                    zoneInfo['window_type'] = 'WITHOUT'
+                    zoneInfo['zone_orientation'] = 'SOURTH'
+                    zoneInfo['zone_orientation_name'] = '南'
+                    if product:
+                        product['purchase_num'] = 1
+                        product['change_type'] = 'ADD'
+                        product['zone_id'] = zoneInfo['zone_id']
+                        product['function_zone'] = zoneInfo['room_no_name']
+                        zoneInfo['products'] = [product]
+                    if stuff:
+                        stuff['change_type'] = 'ADD'
+                        stuff['purchase_num'] = 10
+                        stuff['function_zone'] = zoneInfo['room_no_name']
+                        stuff['zone_id'] = zoneInfo['zone_id']
+                        zoneInfo['stuffList'] = [stuff]
+                zones[index] = zoneInfo
+            houseInfo['zoneVoList'] = zones
+            return houseInfo
+
+        def save(data):
+            url = 'http://decorationapp.ishangzu.com/isz_decorationapp/employee/MongoController/save'
+
+            data['property_attachments'] = [{
+                "img_url": IMG.url,
+                "img_id": IMG.id
+            }]
+            data = {"key": "SaveAmountRooms_{}_{}".format(self.timestamp, self.project_id), "value": data}
+            result = myRequest(url, data)
+            if result:
+                pass
+            else:
+                raise Exception("提交失败！")
+
+        def saveSurveyStuffConfig():
+            """提交量房"""
+
+            url = 'http://decorationapp.ishangzu.com/isz_decorationapp/employee/decorationSurveyController/saveSurveyStuffConfig'
+            zoneVoList = addStuffAndProduct()['zoneVoList']
+            data = {
+                "layout_attachments": {
+                    "attach_type": "LAYOUT",
+                    "imgs": []
+                },
+                "property_attachments": [{
+                    "img_url": IMG.url,
+                    "img_id": IMG.id
+                }],
+                "project_id": self.project_id,
+                "start_date": today(),
+                "taskId": self.task_Id,
+                "zoneSCInfoDTOS": zoneVoList,
+                "survery_room_result": "success",
+                "check_data_type": "NORMAL"
+            }
+            result = myRequest(url, data)
+            if result:
+                pass
+            else:
+                raise Exception("提交失败！")
+
+        saveSurveyStatus()
+        dividedHouse()
+        save(addStuffAndProduct())
+        # saveSurveyStuffConfig()
+
+
+if __name__ == '__main__':
+    project = Decoration("WFL-2.0BS11271604-hI")
+    Decoration.decorationAppLogin(user_type='employee')
+    # project.appAcceptOrder()
+    project.newSurvey()

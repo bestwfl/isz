@@ -25,10 +25,10 @@ def addDays(days=0, mydate=None):
     if days < 0:
         if mydate:
             try:
-                time = datetime.strptime(mydate, '%Y-%m-%d') - timedelta(days=days)
+                time = datetime.strptime(mydate, '%Y-%m-%d') + timedelta(days=days)
             except:
                 from datetime import datetime as dt
-                time = dt.strptime(mydate, '%Y-%m-%d') - timedelta(days=days)
+                time = dt.strptime(mydate, '%Y-%m-%d') + timedelta(days=days)
             return time.strftime('%Y-%m-%d')
         else:
             return str(date.today() - timedelta(days=abs(days)))

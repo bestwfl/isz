@@ -1,26 +1,33 @@
 # -*- coding:utf8 -*-
 import time
+
+import thread
+
+from common.datetimes import addMonths
 from isz.apartmentContract import ApartmentContract
 from common import sqlbase
 from common.base import consoleLog, get_conf, solr, get_randomString
 from common.dict import userInfo, ROOM_NAME
 from common.interface_wfl import myRequest, delNull
-from isz.infoClass import ApartmentInfo
+from isz.decoration import Decoration
+from isz.houseContract import HouseContract
+from isz.infoClass import ApartmentInfo, HouseContractInfo
 
 
 class Apartment(ApartmentInfo):
     """房源相关"""
 
-    @staticmethod  # 跟进room_id获取房间号
+    @staticmethod
     def roomName(room_id):
+        """根据room_id获取房间号"""
         if not (room_id is None or room_id == 'None'):
             room_no = sqlbase.serach("select room_no from house_room where room_id='%s'" % room_id)[0]
             return ROOM_NAME[room_no]
         else:
             return None
 
-    # 定价
     def confirmPrice(self, house_rent_price):
+        """定价"""
         # houseInfo = self.houseInfo()
         if self.rent_type == 'SHARE':
             url = 'isz_house/ApartmentController/searchShareApartment.action'
@@ -54,6 +61,9 @@ class Apartment(ApartmentInfo):
                     consoleLog(u'房源 %s 完成定价' % self.house_code)
                     self.rent_price = house_rent_price
                     return self.apartment_id
+                else:
+                    consoleLog(u'房源 %s 定价失败' % self.house_code)
+                    quit()
         else:
             url = 'isz_house/ApartmentController/confirmApatmentRentPricing.action'
             # for i in range(10):
@@ -75,6 +85,9 @@ class Apartment(ApartmentInfo):
                 consoleLog(u'房源 %s 完成定价' % self.house_code)
                 self.rent_price = house_rent_price
                 return self.apartment_id
+            else:
+                consoleLog(u'房源 %s 定价失败' % self.house_code)
+                quit()
 
     # 修改定价
     def modifiApartmentRentPrice(self, rentPrice):
@@ -205,6 +218,8 @@ class Apartment(ApartmentInfo):
         url = ""
         data = {}
 
+
+
     # 新增出租合同
     def createApartmentContract(self, customerInfo, rent_price, sign_date,
                                 rent_start_date, rent_end_date, payment_cycle,
@@ -226,15 +241,24 @@ class Apartment(ApartmentInfo):
 
         :return: 返回创建的合同信息字典
         """
-
+        if self.fitment_status not in ('HANDOVER', 'DELIVERIED') and self.reform_way != 'UNRRESTYLE':
+            consoleLog('————————房源装修状态未交房，需要做交房操作————————')
+            decoration = Decoration(self.house_contract_id)
+            decoration.fitment()
+            time.sleep(3)
         # 如果房源未定价则现将房源定价，定价金额为租金金额
         if self.rent_price is None or self.rent_price == 0 or self.rent_price == 'None':
             self.confirmPrice(rent_price)  # 定价
         deposit = rent_price = float(self.rent_price)
         sign_name = u'签约人' if not sign_name else sign_name
-        sign_phone = '13600000000' if not sign_phone else sign_phone
+        sign_phone = '13600000001' if not sign_phone else sign_phone
         sign_id_type = 'PASSPORT' if not sign_id_type else sign_id_type
-        sign_id_no = 'huzhao123' if not sign_id_no else sign_id_no
+        sign_id_no = 'huzhao127' if not sign_id_no else sign_id_no
+        # house_contract_end_date = HouseContractInfo(self.house_contract_id).real_due_date
+        # rent_end_date = rent_end_date if house_contract_end_date > addMonths(3, rent_end_date) else house_contract_end_date
+        if rent_end_date > self.max_date:
+            rent_end_date = self.max_date
+            consoleLog(u"承租到期日为：%s" % rent_end_date)
         if payment_cycle is 'HALF_YEAR':  # 付款周期和租金规则
             real_due_rent_price = rent_price * 0.985
         elif payment_cycle is 'ONE_YEAR':
@@ -245,7 +269,9 @@ class Apartment(ApartmentInfo):
         contract_num = 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S') + get_randomString(
             2) if not contract_num else contract_num
         data = {
-            'contract_num': contract_num,  # 合同编号
+            "sign_type": "Y",
+            # 'contract_num': contract_num,  # 合同编号
+            'contract_num': "",  # 合同编号
             'sign_date': sign_date,  # 签约日期
             'rent_start_date': rent_start_date,  # 承租起算日
             'rent_end_date': rent_end_date,  # 承租结束日
@@ -254,9 +280,10 @@ class Apartment(ApartmentInfo):
             'payment_type': 'NORMAL',  # 付款方式
             'payment_cycle': payment_cycle,  # 付款周期
             'cash_rent': str(rent_price * 0.1),  # 转租费
-            'agency_fee': '1000',  # 中介服务费
+            'agency_fee': '',  # 中介服务费
             'month_server_fee_discount': '100%',  # 服务费折扣
             'remark': 'remark',  # 备注
+            "social_qualification": "on",
             'sign_name': sign_name,  # 签约人
             'sign_id_type': sign_id_type,  # 签约人证件类型
             'sign_id_no': sign_id_no,  # 签约人证件号
@@ -275,7 +302,7 @@ class Apartment(ApartmentInfo):
                     'money_cycle': payment_cycle,
                     'payment_date': rent_start_date,
                     'deposit': deposit,
-                    'agencyFeeMoney': 1000,
+                    'agencyFeeMoney': "",
                     'money_type': 'RENT',
                     'rent_start_date': rent_start_date,
                     'rent_end_date': rent_end_date,
@@ -304,26 +331,27 @@ class Apartment(ApartmentInfo):
                 "email": "isz@mail.com",
                 "tent_contact_address": "通讯地址",
                 "yesNo": "Y",
-                "person_type": 3
+                "person_type": 3,
+                "social_qualification": "N"  # customerInfo['social_qualification']
             },
-            'persons': [
-                {
-                    "person_type": 3,
-                    "gender": "MALE",
-                    "card_type": sign_id_type,
-                    "customer_name": sign_name,
-                    "id_card": sign_id_no,
-                    "phone": sign_phone,
-                    "cardType": "护照",
-                    "sex": "男",
-                    "staydate": time.strftime('%Y-%m-%d')
-                }
-            ],
+            # 'persons': [
+            #     {
+            #         "person_type": 3,
+            #         "gender": "MALE",
+            #         "card_type": sign_id_type,
+            #         "customer_name": sign_name,
+            #         "id_card": sign_id_no,
+            #         "phone": sign_phone,
+            #         "cardType": "护照",
+            #         "sex": "男",
+            #         "staydate": time.strftime('%Y-%m-%d')
+            #     }
+            # ],
             'model': '4'
         }
 
-        # 获取出租合同基础信息
         def searchApartmentContractDetail():
+            """获取出租合同基础信息"""
             url = 'isz_contract/ApartmentContractController/searchApartmentContractDetail.action'
             requestPayload = {
                 "apartment_id": self.apartment_id,
@@ -335,8 +363,8 @@ class Apartment(ApartmentInfo):
                 for x, y in content.items():
                     data[x] = y
 
-        # 获取自营房源信息
         def getHouseContractByHouseId(request=myRequest):
+            """获取自营房源信息"""
             url = 'isz_contract/ApartmentContractController/getHouseContractByHouseId.action'
             requestPayload = {
                 "rent_start_date": rent_start_date,
@@ -347,12 +375,13 @@ class Apartment(ApartmentInfo):
             }
             if self.rent_type == 'ENTIRE':
                 del requestPayload['room_id']
+
             result = request(url, requestPayload, shutdownFlag=True)
             if result:
                 data['houseContractList'] = delNull(result['obj'])
 
-        #
         def getServiceAgencyProperty():
+            """"""
             url = 'isz_contract/ApartmentContractController/getServiceAgencyProperty.action'
             requestPayload = {
                 "houseContractId": self.house_contract_id,  # data['houseContractList'][0]['contract_id'],
@@ -362,16 +391,16 @@ class Apartment(ApartmentInfo):
                 "contract_type": "NEWSIGN",
                 "sign_date": sign_date,
                 "house_id": self.house_id,
-                "room_id": self.room_id
+                "customer_id": customerInfo['customer_id']
             }
-            if self.rent_type == 'ENTIRE':
-                del requestPayload['room_id']
+            # if self.rent_type == 'ENTIRE':
+            #     del requestPayload['room_id']
             result = myRequest(url, requestPayload)
             if result:
                 data['month_server_fee'] = str(result['obj']['month_server_fee'])
 
-        # 生成出租应收
         def createApartmentContractReceivable():
+            """生成出租应收"""
             url = 'isz_contract/ApartmentContractController/createApartmentContractReceivable.action'
             requestPayload = data['apartmentContractRentInfoList']
             result = myRequest(url, requestPayload)
@@ -388,18 +417,27 @@ class Apartment(ApartmentInfo):
         getServiceAgencyProperty()
         createApartmentContractReceivable()
 
+        def createContract(url, data):
+            return myRequest(url, data, shutdownFlag=True)
+
         url = 'isz_contract/ApartmentContractController/saveOrUpdateApartmentContract.action'
+        # thread.start_new_thread(createContract, (url, data, ))
+        # result = thread.start_new_thread(createContract, (url, data, ))
         result = myRequest(url, data, shutdownFlag=True)  # 生成出租合同
         if result:
             consoleLog(u'承租合同 %s 已创建完成' % data['contract_num'])
+            # for i in range(20):
+            #     is_first_rent = sqlbase.serach("select is_first_rent from apartment_contract where contract_num='%s'" % data['contract_num'])
+            #     print i, is_first_rent
             return ApartmentContract(result['par']['contract_id'])
 
-    # 添加保修订单
     def create_repair_order(self):
+        """添加保修订单"""
         pass
 
 
 if __name__ == '__main__':
-    apartment_id = 'SJZ1001168-01'
-    apartment = ApartmentInfo(apartment_id)
-    print(apartment)
+    # apartment_id = 'SJZ1001168-01'
+    # apartment = ApartmentInfo(apartment_id)
+    # apartment = Apartment(apartment_id)
+    print(Apartment.getApartmentContractSignDate('8AB398CA5AF224AD015AF9014ED20344'))

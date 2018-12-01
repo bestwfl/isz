@@ -563,6 +563,7 @@ class Base(object):
         """
         尽量少用js，因为执行速度远远高于网络和系统反应速度，很容易报错。
         迫不得已用到js的情况下无外乎点击、传值等，如果太快页面没刷新过来会导致报WebDriverException（目前已知会报出WebDriverException），此处捕获后，等待1秒再次执行js，最多十次，若执行成功则跳出循环
+        :param returnValue:
         :param js:
         :return:
         """

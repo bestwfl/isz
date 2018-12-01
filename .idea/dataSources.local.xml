@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="dataSourceStorageLocal">
-    <data-source name="@192.168.0.208" uuid="5b17d2f2-5585-4693-b197-c18a9544400e">
-      <database-info product="MySQL" version="5.6.31-log" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.44 ( Revision: b3cda4f864902ffdde495b9df93937c3e20009be )">
+    <data-source name="test" uuid="5b17d2f2-5585-4693-b197-c18a9544400e">
+      <database-info product="MySQL" version="5.7.23-log" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.44 ( Revision: b3cda4f864902ffdde495b9df93937c3e20009be )">
         <extra-name-characters>#@</extra-name-characters>
         <identifier-quote-string>`</identifier-quote-string>
       </database-info>
@@ -11,15 +11,15 @@
       <user-name>wangfanglong</user-name>
       <introspection-schemas>*:*</introspection-schemas>
     </data-source>
-    <data-source name="szz" uuid="9887e43f-5605-4f54-8efd-930d5a086182">
-      <database-info product="MySQL" version="5.6.31-log" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.44 ( Revision: b3cda4f864902ffdde495b9df93937c3e20009be )">
+    <data-source name="mock" uuid="9887e43f-5605-4f54-8efd-930d5a086182">
+      <database-info product="MySQL" version="5.7.35" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.44 ( Revision: b3cda4f864902ffdde495b9df93937c3e20009be )">
         <extra-name-characters>#@</extra-name-characters>
         <identifier-quote-string>`</identifier-quote-string>
       </database-info>
       <case-sensitivity plain-identifiers="lower" quoted-identifiers="lower" />
       <secret-storage>master_key</secret-storage>
-      <user-name>sizhenzhen</user-name>
-      <introspection-schemas>*:@,information_schema,isz_decoration,isz_decoration_test,isz_erp,isz_erp_npd,isz_rsm,isz_rsm_pre</introspection-schemas>
+      <user-name>wangfanglong</user-name>
+      <introspection-schemas>*:*</introspection-schemas>
     </data-source>
   </component>
 </project>

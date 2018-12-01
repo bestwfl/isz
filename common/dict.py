@@ -4,7 +4,8 @@ from collections import OrderedDict
 from enum import Enum
 
 from common.base import get_conf
-from common.mysql import Mysql
+from common.mySql import Mysql
+
 """字典"""
 
 
@@ -44,10 +45,12 @@ class UserInfo(object):
         """获取配置文件默认用户"""
         return UserInfo.getUserByPhone(get_conf('sysUser', 'userphone'))
 
+
 def getUserInfo():
     """获取登录用户信息"""
     sql = "select a.user_name,a.user_id,a.dep_id,b.dep_name from sys_user a inner join sys_department b " \
-          "on a.dep_id=b.dep_id where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser', 'userphone')
+          "on a.dep_id=b.dep_id where a.user_phone='%s' and a.user_status='INCUMBENCY'" % get_conf('sysUser',
+                                                                                                   'userphone')
     exhouseSql = Mysql().getAll(sql)[0]
     userInfo = {
         'user_name': exhouseSql[0],
@@ -159,6 +162,38 @@ class AUDIT_STATUS(Enum):
         APPROVED = 'REVIEW'
 
 
+DecorationZoneType = {
+    "ROOM": "房间",
+    "PARLOUR": "客厅",
+    "PUBLIC_TOILET": "公共卫生间",
+    "KITCHEN": "厨房",
+    "BALCONY": "阳台",
+    "PUBLIC_AREA": "公共区域",
+}
+
+DecorationRoomNo = {
+    "BALCONY_1": "阳台1",
+    "BALCONY_2": "阳台2",
+    "BUT": "丁",
+    "DEC": "癸",
+    "ETH": "乙",
+    "HEPT": "庚",
+    "HEX": "己",
+    "KITCHEN_1": "厨房",
+    "METH": "甲",
+    "NON": "壬",
+    "OCT": "辛",
+    "PARLOUR_1": "客厅1",
+    "PARLOUR_2": "客厅2",
+    "PENT": "戊",
+    "PROP": "丙",
+    "PUBLIC_AREA_1": "公区",
+    "PUBLIC_TOILET_1": "公共卫生间1",
+    "PUBLIC_TOILET_2": "公共卫生间2",
+    "PUBLIC_TOILET_3": "公共卫生间3",
+    "PUBLIC_TOILET_4": "公共卫生间4"
+}
+
 # class ApartmentList():
 #
 #     __fields = ['apartment_id', 'apartment_code']
@@ -207,8 +242,9 @@ class AUDIT_STATUS(Enum):
 #             raise ValueError('apartment search sql return null')
 
 if __name__ == '__main__':
-    print AUDIT_STATUS.APARTMETN_CONTRACT_END.value.APPROVED.value
-    print(AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER.value)
-    print(userInfo)
-    time.sleep(2)
-
+    # print AUDIT_STATUS.APARTMETN_CONTRACT_END.value.APPROVED.value
+    # print(AuditStatus.APARTMETN_CONTRACT_END_APPROVED_AFTER.value)
+    # print(userInfo)
+    # time.sleep(2)
+    print getUserInfo()
+    pass

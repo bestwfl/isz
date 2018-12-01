@@ -5,7 +5,8 @@ import threading
 # from common import sqlbase
 from common import sqlbase
 from common.base import consoleLog, get_conf
-from common.mysql import Mysql
+from common.interface import myRequest
+from common.mySql import Mysql
 
 
 class HouseInfo(object):
@@ -102,7 +103,7 @@ class HouseContractInfo(HouseInfo):
         """
         payablesVo = []
         sql = "select * from house_contract_payable where contract_id='%s' and deleted=0" % self.house_contract_id
-        payables = Mysql().query(sql)
+        payables = Mysql().query(sql, resarch=True)
         for payable in payables:
             payableVo = Payable(payable['payable_id'])
             if not audit_status or audit_status == payableVo.audit_status:
@@ -119,6 +120,11 @@ class HouseContractInfo(HouseInfo):
 
     def landlord(self):
         return HouseContractLandlordInfo(self.house_contract_id)
+
+    def photos(self, photoType, oneCount=True):
+        sql = "select a.img_id,b.src from  house_contract_attachment a inner join image b on a.img_id=b.img_id " \
+              "where contract_id='%s'and attachment_type='%s' and a.deleted=0" % (self.house_contract_id, photoType)
+        return sqlbase.serach(sql, oneCount)
 
 
 class HouseContractLandlordInfo(object):
@@ -173,6 +179,7 @@ class HouseContractEndInfo(HouseContractInfo):
 
 
 class ApartmentInfo(HouseInfo):
+
     def __init__(self, apartmentIdOrCode):
         apartmentId = Mysql().getAll(
             "select apartment_id,house_id from apartment where (apartment_id='%s' or apartment_code "
@@ -198,6 +205,8 @@ class ApartmentInfo(HouseInfo):
         self.zone_id = self.apartment_info['zone_id']
         self.set_delivery_date = self.apartment_info['set_delivery_date']
         self.total_cost = self.apartment_info['total_cost']
+        self.fitment_status = self.apartment_info['fitment_status']
+        self.reform_way = self.apartment_info['reform_way']
 
     @property
     def room_no(self):
@@ -229,19 +238,27 @@ class ApartmentInfo(HouseInfo):
         else:
             return None
 
+    @property
+    def max_date(self):
+        """获取房源最大签约日期"""
+        url = '/isz_contract/ApartmentContractController/getApartmentContractSignDate.action'
+        requestPayload = {"apartment_id": self.apartment_id}
+        result = myRequest(url, requestPayload)
+        if result:
+            return result['obj']['max_date']
 
 class ApartmentContractInfo(ApartmentInfo):
     def __init__(self, contractIdOrNum):
         contractId = Mysql().getAll("select ac.contract_id,a.apartment_id from apartment_contract ac "
                                     "inner join apartment_contract_relation acr on ac.contract_id=acr.contract_id "
                                     "inner join apartment a on a.apartment_id=acr.apartment_id "
-                                    "where (ac.contract_id='%s' or ac.contract_num='%s') and ac.deleted=0 " %
+                                    "where (ac.contract_id='%s' or ac.contract_num='%s') and ac.contract_status <> 'CANCEL' and ac.deleted=0 " %
                                     (contractIdOrNum, contractIdOrNum))
         if 1 != len(contractId):
             raise ValueError(
                 'contract_id number is not one but: %s! search for:%s' % (len(contractId), contractIdOrNum))
         super(ApartmentContractInfo, self).__init__(contractId[0][1])
-        sql = "select * from apartment_contract where contract_id='%s'" % contractId[0][0]
+        sql = "select * from apartment_contract where contract_id='%s' " % contractId[0][0]
         self.apartment_contract_info = Mysql().query(sql)[0]
         self.apartment_contract_id = self.apartment_contract_info['contract_id']
         threading.Thread(target=check_query_table, args=(self.apartment_contract_id, 'apartment_contract')).start()

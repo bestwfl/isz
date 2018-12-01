@@ -3,7 +3,7 @@
 import random
 import time
 from common import sqlbase
-from common.base import consoleLog
+from common.base import consoleLog, get_randomString
 from common.interface_wfl import myRequest
 
 
@@ -17,7 +17,7 @@ def createCustomer():
                "153", "155", "156", "157", "158", "159", "186", "187", "188"]
     phone = random.choice(prelist) + "".join(random.choice("0123456789") for i in range(8))
     data = {
-        'customer_name': 'AutoTest' + '-' + time.strftime('%m%d-%H%M%S'),  # 姓名
+        'customer_name': 'WFL' + time.strftime('%m%d-%H%M') + get_randomString(2),  # 姓名
         'phone': phone,  # 手机
         'customer_status': 'EFFECTIVE',  # 状态
         'email': 'isz@ishangzu.com',  # 邮箱
@@ -50,11 +50,12 @@ def createCustomer():
         'rent_other': 'other demand',  # 其他需求
         'gender': 'MALE',  # 性别
         'marriage': 'UNMARRIED',  # 婚否
+        'social_qualification': 'NONE',
         'submit_channels': 'ERP'  # 提交渠道
     }
     if myRequest(url, data):
         customerInfo = sqlbase.serach(
-            "select customer_id,customer_name,customer_num from customer where customer_name = '%s'" % data[
+            "select customer_id,customer_name,customer_num,social_qualification from customer where customer_name = '%s'" % data[
                 'customer_name'])
         consoleLog(u'租前客户 %s 创建成功' % customerInfo[1])
-        return {'customer_id': customerInfo[0], 'customer_name': customerInfo[1], 'customer_num': customerInfo[2]}
+        return {'customer_id': customerInfo[0], 'customer_name': customerInfo[1], 'customer_num': customerInfo[2], 'social_qualification': customerInfo[3]}

@@ -4,7 +4,7 @@ from common import datetimes
 from common.base import consoleLog
 from common.datetimes import today, addDays, addMonths
 from common.dict import AUDIT_STATUS
-from common.interface_wfl import myRequest, delNull
+from common.interface_wfl import myRequest, delNull, upLoadPhoto
 from isz.contractBase import ContractBase
 from isz.infoClass import ApartmentContractInfo, ApartmentContractEndInfo, HouseContractInfo
 
@@ -14,6 +14,7 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
     出租合同对应操作
     :param contractIdOrNum 出租合同id或者num
     """
+    uploadPhotoURL = 'http://erp.ishangzu.com/isz_housecontract/houseContractController/uploadImageFile'  # 委托合同上传图片地址
 
     def audit(self):
         """审核
@@ -51,7 +52,10 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
         """
         url = 'isz_finance/ApartmentContractReceiptsController/saveOrUpdateNewReceipts.action'
         receivables = self.receivables()
+        i = 0
+        consoleLog("共有%s条应收待实收" % len(receivables))
         for receivable in receivables:
+            i = i + 1
             data = {
                 'alipay_card': '0011',  # 支付宝账号
                 'company': self.sign_body,  # 收款公司
@@ -66,8 +70,10 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
             result = myRequest(url, data)
             if result:
                 # 审核
+                consoleLog("实收第%s条完成" % i)
                 myRequest(url='isz_finance/ApartmentContractReceiptsController/endReceivable.action',
-                          data={'receivable_id': receivable['receivable_id']})
+                          data={'receivable_id': receivable.receivable_id})
+                consoleLog("审核第%s条完成" % i)
             else:
                 break
 
@@ -78,10 +84,10 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
         contract_num = 'RS-%s' % self.apartment_contract_num if not contract_num else contract_num
         sign_date = today() if not sign_date else sign_date
         rent_start_date = addDays(1, self.rent_end_date)
-        rent_end_date = addDays(-1, addMonths(12, self.rent_end_date)) if not rent_end_date else rent_end_date
+        rent_end_date = addMonths(12, self.rent_end_date) if not rent_end_date else rent_end_date
         start_date = rent_start_date
         end_date = rent_end_date
-        money = self.rental_price
+        money = self.rental_price if not self.rental_price == 'None' else 2030
         deposit = self.deposit
         month_server_fee = self.month_server_fee
         payment_date = rent_start_date if not payment_date else payment_date
@@ -118,10 +124,8 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
             "month_server_fee": month_server_fee,
             "month_server_fee_discount": "100%",
             "dispostIn": 1,
-
             "contract_num": contract_num,
             "person": {},
-            "persons": [{}],
             "model": "4"
         }
         url = 'isz_contract/ApartmentContractController/searchApartmentContractDetail.action'
@@ -139,10 +143,6 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
             for x, y in customerPerson.items():
                 data['person'][x] = y
 
-            customerPersonList = delNull(result['obj']['customerPersonList'])[0]
-            for x, y in customerPersonList.items():
-                data['persons'][0][x] = y
-
         data['receivables'] = self.createReceivables(data['apartmentContractRentInfoList'])
 
         hosueInfo = {
@@ -159,6 +159,8 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
     def end(self, end_date=today(), end_type=None):
         """终止结算"""
         self.audit()
+
+        endImg = upLoadPhoto(url=self.uploadPhotoURL, filename='idCardPhotos.png', filepath=r"C:\Users\user\Desktop\Image\\")
         url = '/isz_contract/ContractEndController/saveOrUpdateApartmentContractEnd'
         endInfo = self.getEndInfo()
         endInfo['apartmentContractEndReceivableList'] = [
@@ -311,8 +313,8 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
         endInfo['endBasicInfo']['receivable_date'] = time.strftime('%Y-%m-%d %H:%M:%S')
         endInfo['imgList'] = [{
             "attachment_type": None,
-            "img_id": "FF80808162F6DA2E0162F77B1C9C0649",
-            "src": "erp/2018/4/24/19/f1348bc6-cce6-4c49-9837-a0322c0b6c81.png"
+            "img_id": endImg.id,
+            "src": endImg.url
         }]
         receivable = 0
         for i in endInfo['apartmentContractEndReceivableList']:
@@ -406,7 +408,6 @@ class ApartmentContract(ContractBase, ApartmentContractInfo):
         else:
             return
 
-
 class ApartmentContractEnd(ApartmentContractEndInfo):
 
 
@@ -465,9 +466,10 @@ class ApartmentContractEnd(ApartmentContractEndInfo):
 
 
 if __name__ == '__main__':
-    contract = ApartmentContract('WFL修改服务消息模式-07121531YJ')
-    # contract.audit()
+    contract = ApartmentContract('预发20180929006')
+    contract.audit()
+    contract.receiptAndAudit()
     # contract.resign()
-    contract.end()
+    # contract.end(end_date='2018-08-30')
     # contract.endAudit()
     # print AuditStatus.APARTMETN_CONTRACT_END_STATUS_WAIT_AUDIT
